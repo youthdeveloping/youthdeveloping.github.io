@@ -463,6 +463,120 @@
       .footer-inner { display: block; }
       .footer-inner span:last-child { display: block; margin-top: 8px; }
     }
+  
+    .service-section { margin-top: 28px; }
+
+    .section-status {
+      font: 11px var(--mono);
+      letter-spacing: .14em;
+      color: var(--green);
+      border: 1px solid rgba(97,255,154,.22);
+      padding: 7px 10px;
+      border-radius: 999px;
+    }
+
+    .service-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .service-card {
+      position: relative;
+      min-height: 190px;
+      padding: 22px;
+      color: inherit;
+      text-decoration: none;
+      border: 1px solid var(--line);
+      background: rgba(12,16,22,.72);
+      border-radius: 14px;
+      transition: transform .2s ease, border-color .2s ease, background .2s ease;
+      overflow: hidden;
+    }
+
+    .service-card::after {
+      content: "";
+      position: absolute;
+      width: 110px;
+      height: 110px;
+      right: -55px;
+      bottom: -55px;
+      border-radius: 50%;
+      background: rgba(97,255,154,.07);
+      pointer-events: none;
+    }
+
+    .service-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(97,255,154,.38);
+      background: rgba(17,23,30,.9);
+    }
+
+    .service-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+    }
+
+    .service-number,
+    .service-state {
+      font: 10px var(--mono);
+      letter-spacing: .12em;
+    }
+
+    .service-number { color: var(--muted); }
+    .service-state { color: var(--green); }
+
+    .service-card h3 {
+      margin: 0 0 9px;
+      font: 600 21px var(--mono);
+      letter-spacing: -.03em;
+    }
+
+    .service-card p {
+      max-width: 280px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .service-arrow {
+      position: absolute;
+      right: 21px;
+      bottom: 18px;
+      color: var(--green);
+      font: 20px var(--mono);
+    }
+
+    @media (max-width: 820px) {
+      .service-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 560px) {
+      .service-grid { grid-template-columns: 1fr; }
+    }
+
+  
+    .section-link{color:var(--green);text-decoration:none;font:11px var(--mono);letter-spacing:.08em;border:1px solid rgba(97,255,154,.2);padding:8px 11px;border-radius:999px;transition:.2s ease}
+    .section-link:hover{border-color:rgba(97,255,154,.5);background:rgba(97,255,154,.05)}
+    .featured-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .service-icon{font-size:25px;line-height:1}
+    .all-services{margin-top:42px;padding-top:34px;border-top:1px solid var(--line)}
+    .all-services-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px}
+    .all-services-head h2{margin:6px 0 0;font-size:clamp(24px,3vw,34px);letter-spacing:-.04em}
+    .service-list{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+    .service-list a,.server-tool-grid a{display:grid;grid-template-columns:28px 1fr;grid-template-rows:auto auto;column-gap:9px;padding:14px;color:inherit;text-decoration:none;border:1px solid var(--line);background:rgba(12,16,22,.5);border-radius:10px;transition:.18s ease}
+    .service-list a:hover,.server-tool-grid a:hover{border-color:rgba(97,255,154,.28);background:rgba(17,23,30,.82);transform:translateY(-2px)}
+    .service-list a>span,.server-tool-grid a>span{grid-row:1/span 2;font-size:21px;line-height:1.2}
+    .service-list strong,.server-tool-grid strong{font-size:13px;font-weight:600}
+    .service-list small,.server-tool-grid small{margin-top:3px;color:var(--muted);font-size:11px;line-height:1.45}
+    .server-tools{margin-top:34px;padding-top:28px;border-top:1px dashed rgba(255,255,255,.08)}
+    .server-tool-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+    @media(max-width:900px){.service-list,.server-tool-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:620px){.featured-grid{grid-template-columns:1fr}.service-list,.server-tool-grid{grid-template-columns:1fr}.all-services-head{align-items:flex-start}}
+
   </style>
 </head>
 
@@ -590,7 +704,82 @@
           </div>
         </div>
       </section>
-    </main>
+    
+    <section class="section service-section" id="services">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">03 / SERVICES</div>
+          <h2>서비스</h2>
+        </div>
+        <a class="section-link" href="#all-services">모든 서비스 →</a>
+      </div>
+
+      <div class="service-grid featured-grid">
+        <a class="service-card" href="#" aria-label="타이머"><div class="service-top"><span class="service-icon">⏱️</span><span class="service-state">READY</span></div><h3>타이머</h3><p>여러 개의 타이머를 동시에 실행</p><span class="service-arrow">→</span></a>
+        <a class="service-card" href="#" aria-label="랜덤 뽑기"><div class="service-top"><span class="service-icon">🎲</span><span class="service-state">READY</span></div><h3>랜덤 뽑기</h3><p>이름·숫자·항목을 랜덤으로 선택</p><span class="service-arrow">→</span></a>
+        <a class="service-card" href="#" aria-label="계산기"><div class="service-top"><span class="service-icon">🧮</span><span class="service-state">READY</span></div><h3>계산기</h3><p>일반 계산부터 공학 계산까지</p><span class="service-arrow">→</span></a>
+        <a class="service-card" href="#" aria-label="비밀번호 생성기"><div class="service-top"><span class="service-icon">🔐</span><span class="service-state">READY</span></div><h3>비밀번호 생성기</h3><p>조건을 정하고 안전한 문자열 생성</p><span class="service-arrow">→</span></a>
+        <a class="service-card" href="#" aria-label="QR 코드 생성기"><div class="service-top"><span class="service-icon">📱</span><span class="service-state">READY</span></div><h3>QR 코드 생성기</h3><p>텍스트나 링크를 바로 QR로 변환</p><span class="service-arrow">→</span></a>
+        <a class="service-card" href="#" aria-label="반응속도 테스트"><div class="service-top"><span class="service-icon">⚡</span><span class="service-state">READY</span></div><h3>반응속도 테스트</h3><p>화면이 바뀌는 순간 빠르게 클릭</p><span class="service-arrow">→</span></a>
+      </div>
+
+      <div class="all-services" id="all-services">
+        <div class="all-services-head">
+          <div><div class="eyebrow">04 / ALL SERVICES</div><h2>전체 서비스</h2></div>
+          <span class="section-status">28 TOOLS</span>
+        </div>
+
+        <div class="service-list">
+          <a href="#"><span>⏱️</span><strong>타이머</strong><small>여러 개 동시 실행</small></a>
+          <a href="#"><span>⏰</span><strong>알람</strong><small>브라우저 알림</small></a>
+          <a href="#"><span>🛑</span><strong>스톱워치</strong><small>랩타임 저장</small></a>
+          <a href="#"><span>🎲</span><strong>랜덤 뽑기</strong><small>랜덤 선택</small></a>
+          <a href="#"><span>🎡</span><strong>룰렛</strong><small>친구들과 결정</small></a>
+          <a href="#"><span>✊</span><strong>가위바위보</strong><small>간단한 대결</small></a>
+          <a href="#"><span>🧮</span><strong>계산기</strong><small>일반 + 공학용</small></a>
+          <a href="#"><span>🔄</span><strong>단위 변환기</strong><small>길이·무게·온도·용량</small></a>
+          <a href="#"><span>🔐</span><strong>비밀번호 생성기</strong><small>조건별 랜덤 생성</small></a>
+          <a href="#"><span>📝</span><strong>메모장</strong><small>간단한 메모 저장</small></a>
+          <a href="#"><span>✅</span><strong>할 일 목록</strong><small>체크하면 완료</small></a>
+          <a href="#"><span>📅</span><strong>간단 캘린더</strong><small>일정 확인</small></a>
+          <a href="#"><span>🔗</span><strong>URL 단축기</strong><small>긴 주소 줄이기</small></a>
+          <a href="#"><span>📱</span><strong>QR 코드 생성기</strong><small>글·링크를 QR로</small></a>
+          <a href="#"><span>🎨</span><strong>색상 도구</strong><small>HEX / RGB 변환</small></a>
+          <a href="#"><span>🖼️</span><strong>이미지 압축기</strong><small>이미지 용량 줄이기</small></a>
+          <a href="#"><span>🎵</span><strong>메트로놈</strong><small>BPM 조절</small></a>
+          <a href="#"><span>🎹</span><strong>웹 피아노</strong><small>키보드로 연주</small></a>
+          <a href="#"><span>🔊</span><strong>사운드보드</strong><small>효과음 버튼</small></a>
+          <a href="#"><span>🎯</span><strong>에임 테스트</strong><small>빠르게 클릭하기</small></a>
+          <a href="#"><span>⚡</span><strong>반응속도 테스트</strong><small>클릭 속도 측정</small></a>
+          <a href="#"><span>👀</span><strong>CPS 테스트</strong><small>5초 동안 클릭</small></a>
+          <a href="#"><span>🔢</span><strong>점수판</strong><small>팀 A/B 점수</small></a>
+          <a href="#"><span>🏆</span><strong>간단 순위표</strong><small>친구들 점수 저장</small></a>
+          <a href="#"><span>👥</span><strong>팀 자동 나누기</strong><small>이름을 랜덤 배정</small></a>
+          <a href="#"><span>🎁</span><strong>제비뽑기</strong><small>당첨 개수 설정</small></a>
+          <a href="#"><span>💣</span><strong>폭탄 돌리기</strong><small>랜덤 시간 게임</small></a>
+          <a href="#"><span>🔗</span><strong>URL 도구</strong><small>주소 확인·정리</small></a>
+        </div>
+
+        <div class="server-tools">
+          <div class="all-services-head">
+            <div><div class="eyebrow">SERVER TOOLS</div><h2>서버 도구</h2></div>
+            <span class="section-status">PRIVATE</span>
+          </div>
+          <div class="server-tool-grid">
+            <a href="#"><span>💬</span><strong>채팅방</strong><small>서버 계정끼리 실시간 채팅</small></a>
+            <a href="#"><span>💰</span><strong>용돈 기록장</strong><small>수입·지출 기록</small></a>
+            <a href="#"><span>📨</span><strong>건의함</strong><small>관리자에게 의견 보내기</small></a>
+            <a href="#"><span>📰</span><strong>서버 공지</strong><small>관리자 공지 등록</small></a>
+            <a href="#"><span>🟢</span><strong>서버 상태</strong><small>정상·점검·장애 표시</small></a>
+            <a href="#"><span>📈</span><strong>서버 통계</strong><small>접속자·사용량 확인</small></a>
+            <a href="#"><span>🕵️</span><strong>내 접속 정보</strong><small>브라우저·OS·화면 정보</small></a>
+            <a href="#"><span>📝</span><strong>익명 한마디</strong><small>이름 없이 메시지 남기기</small></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
 
     <footer>
       <div class="footer-inner">
