@@ -1,0 +1,699 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#05070a">
+<title>YouthDeveloper // Admin</title>
+<style>
+:root{--bg:#05070a;--panel:#0c1016;--panel2:#090d12;--line:rgba(255,255,255,.09);--text:#edf2f7;--muted:#7d8996;--green:#61ff9a;--cyan:#62e8ff;--danger:#ff667d;--mono:"SFMono-Regular","Cascadia Code","Roboto Mono",Consolas,monospace;--sans:Inter,Pretendard,"Noto Sans KR",system-ui,sans-serif}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;color:var(--text);background:radial-gradient(circle at 80% 10%,rgba(98,232,255,.07),transparent 30rem),var(--bg);font-family:var(--sans)}
+[hidden]{display:none!important}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.wrap{width:min(1100px,calc(100% - 32px));margin:auto}
+
+/* login */
+.login{min-height:100vh;display:grid;place-items:center;padding:20px}
+.login-box{width:min(400px,100%);border:1px solid var(--line);background:var(--panel);padding:30px;border-radius:14px}
+.login-box h1{margin:0 0 6px;font-size:24px;letter-spacing:-.04em}
+.login-box p{margin:0 0 22px;color:var(--muted);font-size:13px;line-height:1.7}
+.field{display:block;margin-bottom:14px}
+.field>span{display:block;margin-bottom:6px;color:var(--muted);font:11px var(--mono)}
+.field input,.field select,.field textarea{width:100%;padding:11px 12px;border:1px solid var(--line);background:var(--panel2);border-radius:8px;font-size:14px}
+.field textarea{min-height:76px;resize:vertical}
+.btn{padding:10px 14px;border:1px solid rgba(97,255,154,.28);background:rgba(97,255,154,.07);color:var(--green);border-radius:8px;cursor:pointer;font:12px var(--mono);transition:.15s}
+.btn:hover{background:rgba(97,255,154,.14)}
+.btn.ghost{border-color:var(--line);background:transparent;color:var(--muted)}
+.btn.ghost:hover{color:var(--text);border-color:rgba(255,255,255,.2)}
+.btn.danger{border-color:rgba(255,102,125,.3);background:rgba(255,102,125,.07);color:var(--danger)}
+.btn.danger:hover{background:rgba(255,102,125,.15)}
+.btn.block{width:100%;padding:12px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.msg{min-height:20px;margin-top:12px;font-size:13px;color:var(--danger)}
+.msg.ok{color:var(--green)}
+
+/* panel */
+.top{position:sticky;top:0;z-index:5;border-bottom:1px solid var(--line);background:rgba(5,7,10,.9);backdrop-filter:blur(14px)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;gap:12px}
+.brand{font:700 17px var(--mono);letter-spacing:-.03em}
+.brand small{margin-left:10px;color:var(--muted);font-weight:400;font-size:11px}
+.top-actions{display:flex;gap:8px}
+.head{padding:36px 0 18px}
+.head h1{margin:0;font-size:clamp(28px,5vw,42px);letter-spacing:-.05em}
+.head p{margin:8px 0 0;color:var(--muted);font-size:14px;line-height:1.7}
+.notice{margin:0 0 18px;padding:12px 14px;border:1px dashed rgba(98,232,255,.3);border-radius:10px;color:#a9c9d1;font-size:13px;line-height:1.7}
+.notice b{color:var(--cyan)}
+.sync{margin:0 0 14px;border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:0 14px}
+.sync summary{cursor:pointer;padding:12px 0;color:var(--muted);font:12px var(--mono)}
+.sync[open] summary{border-bottom:1px solid var(--line);margin-bottom:14px}
+.sync-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.sync-grid .field:last-child{grid-column:1/-1}
+.sync .check{margin-bottom:14px}
+.sync-state{align-self:center;font:12px var(--mono);color:var(--muted)}
+.sync-state.ok{color:var(--green)}
+.sync-state.err{color:var(--danger)}
+@media(max-width:620px){.sync-grid{grid-template-columns:1fr}}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.toolbar input,.toolbar select{padding:10px 12px;border:1px solid var(--line);background:var(--panel);border-radius:8px;font-size:13px}
+.toolbar input{flex:1;min-width:180px}
+.spacer{flex:1}
+.list{display:grid;gap:8px;padding-bottom:70px}
+.row{display:grid;grid-template-columns:44px 1fr auto;gap:14px;align-items:center;padding:14px 16px;border:1px solid var(--line);background:rgba(12,16,22,.7);border-radius:12px}
+.row .ico{font-size:26px;text-align:center}
+.row h3{margin:0;font-size:15px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.row p{margin:4px 0 0;color:var(--muted);font-size:12px;line-height:1.5}
+.row .meta{margin-top:6px;font:10px var(--mono);color:#5f6b77;word-break:break-all}
+.tag{padding:2px 7px;border:1px solid var(--line);border-radius:99px;font:10px var(--mono);color:var(--muted);font-weight:400}
+.tag.star{color:var(--green);border-color:rgba(97,255,154,.3)}
+.tag.off{color:var(--danger);border-color:rgba(255,102,125,.3)}
+.row-actions{display:flex;gap:6px}
+.empty{padding:40px 10px;text-align:center;color:var(--muted);font-size:14px;border:1px dashed var(--line);border-radius:12px}
+
+/* dialog */
+dialog{width:min(520px,calc(100% - 24px));padding:0;border:1px solid var(--line);border-radius:14px;background:var(--panel);color:var(--text)}
+dialog::backdrop{background:rgba(0,0,0,.65)}
+.dlg{padding:24px}
+.dlg h2{margin:0 0 18px;font-size:20px;letter-spacing:-.03em}
+.grid2{display:grid;grid-template-columns:90px 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.check{display:flex;align-items:center;gap:8px;margin-bottom:16px;font-size:13px;color:var(--muted)}
+.check input{width:16px;height:16px;accent-color:#61ff9a}
+.dlg-actions{display:flex;justify-content:flex-end;gap:8px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);padding:10px 16px;border:1px solid rgba(97,255,154,.35);background:#0c1a12;color:var(--green);border-radius:8px;font:12px var(--mono);z-index:20}
+
+@media(max-width:620px){
+  .row{grid-template-columns:36px 1fr}
+  .row-actions{grid-column:1/-1;justify-content:flex-end}
+  .grid3{grid-template-columns:1fr}
+  .brand small{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- 로그인 -->
+<main class="login" id="loginView">
+  <form class="login-box" id="loginForm" autocomplete="off">
+    <h1>관리자 로그인</h1>
+    <p>YouthDeveloper 관리자 전용 페이지입니다. 비밀번호를 입력해 주세요.</p>
+    <label class="field">
+      <span>비밀번호</span>
+      <input id="pw" type="password" autocomplete="current-password" required autofocus>
+    </label>
+    <button class="btn block" id="loginBtn" type="submit">입장</button>
+    <div class="msg" id="loginMsg" role="alert"></div>
+  </form>
+</main>
+
+<!-- 관리 화면 -->
+<div id="panelView" hidden>
+  <header class="top">
+    <div class="wrap">
+      <div class="brand">Youth<span style="color:var(--green)">Developer</span><small>admin</small></div>
+      <div class="top-actions">
+        <a class="btn ghost" href="https://youthdeveloping.github.io/" style="text-decoration:none">메인으로</a>
+        <button class="btn danger" id="logoutBtn" type="button">로그아웃</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="head">
+      <h1>앱 관리</h1>
+      <p>총 <b id="count">0</b>개의 앱이 등록되어 있습니다. 추가, 수정, 삭제할 수 있습니다.</p>
+    </section>
+
+    <div class="notice">
+      <b>사이트 반영 방법.</b> 앱을 고친 뒤 <b>사이트에 반영</b>을 누르면 GitHub 저장소의 <b>data/apps.json</b>이 갱신되고, 약 1~2분 뒤 방문자에게 적용됩니다. 처음 한 번만 아래에서 GitHub 토큰을 입력해 주세요.
+    </div>
+
+    <details class="sync" id="syncBox">
+      <summary>GitHub 연결 설정</summary>
+      <div class="sync-grid">
+        <label class="field"><span>저장소</span><input id="syRepo" value="youthdeveloping/youthdeveloping.github.io" spellcheck="false"></label>
+        <label class="field"><span>브랜치</span><input id="syBranch" value="main" spellcheck="false"></label>
+        <label class="field"><span>파일 경로</span><input id="syPath" value="data/apps.json" spellcheck="false"></label>
+        <label class="field"><span>토큰 (Fine-grained, Contents 읽기/쓰기)</span><input id="syToken" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_..."></label>
+      </div>
+      <label class="check"><input id="syRemember" type="checkbox"> 이 브라우저에 토큰 기억하기 (공용 기기에서는 사용하지 마세요)</label>
+    </details>
+
+    <div class="toolbar">
+      <button class="btn" id="publishBtn" type="button">사이트에 반영</button>
+      <button class="btn ghost" id="pullBtn" type="button">사이트에서 불러오기</button>
+      <span class="sync-state" id="syncState" role="status"></span>
+    </div>
+
+    <div class="toolbar">
+      <input id="q" type="search" placeholder="이름 또는 설명 검색" aria-label="검색">
+      <select id="catFilter" aria-label="분류 필터">
+        <option value="all">전체 분류</option>
+        <option value="utility">유틸리티</option>
+        <option value="game">게임</option>
+        <option value="creative">크리에이티브</option>
+        <option value="server">서버 도구</option>
+      </select>
+      <button class="btn" id="addBtn" type="button">앱 추가</button>
+    </div>
+    <div class="toolbar">
+      <button class="btn ghost" id="exportBtn" type="button">JSON 내보내기</button>
+      <button class="btn ghost" id="copyBtn" type="button">JSON 복사</button>
+      <button class="btn ghost" id="importBtn" type="button">JSON 가져오기</button>
+      <input id="importFile" type="file" accept="application/json,.json" hidden>
+      <span class="spacer"></span>
+      <button class="btn danger" id="resetBtn" type="button">기본값으로 되돌리기</button>
+    </div>
+
+    <div class="list" id="list"></div>
+  </main>
+</div>
+
+<!-- 추가/수정 -->
+<dialog id="dlg">
+  <form class="dlg" id="appForm" method="dialog">
+    <h2 id="dlgTitle">앱 추가</h2>
+    <div class="grid2">
+      <label class="field"><span>아이콘</span><input id="fIcon" maxlength="4" placeholder="🧩"></label>
+      <label class="field"><span>이름</span><input id="fName" maxlength="40" required placeholder="예: 타이머"></label>
+    </div>
+    <label class="field"><span>설명</span><textarea id="fDesc" maxlength="120" placeholder="한 줄로 설명해 주세요"></textarea></label>
+    <div class="grid3">
+      <label class="field"><span>분류</span>
+        <select id="fCat">
+          <option value="utility">유틸리티</option>
+          <option value="game">게임</option>
+          <option value="creative">크리에이티브</option>
+          <option value="server">서버 도구</option>
+        </select>
+      </label>
+      <label class="field"><span>상태</span>
+        <select id="fStatus">
+          <option value="on">공개</option>
+          <option value="off">비공개</option>
+        </select>
+      </label>
+    </div>
+    <label class="field"><span>링크 (비워두면 준비 중)</span><input id="fUrl" placeholder="/services.html#timer 또는 https://..."></label>
+    <label class="check"><input id="fFeatured" type="checkbox"> 메인 페이지 대표 서비스로 노출</label>
+    <div class="msg" id="formMsg" role="alert" style="margin:-6px 0 12px"></div>
+    <div class="dlg-actions">
+      <button class="btn ghost" id="cancelBtn" type="button">취소</button>
+      <button class="btn" type="submit">저장</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+(() => {
+  'use strict';
+
+  // 비밀번호는 원문이 아닌 SHA-256 해시로만 보관합니다.
+  const PASS_HASH = '0a43382445adf542c3df8cc1da6b90229c770f5087591d6348aa2d118cf89a1e';
+  const SESSION_KEY = 'yd_admin_session';
+  const DATA_KEY = 'yd_apps';
+  const LOCK_KEY = 'yd_admin_lock';
+  const MAX_TRIES = 5;
+  const LOCK_MS = 60 * 1000;
+
+  const CAT = { utility: '유틸리티', game: '게임', creative: '크리에이티브', server: '서버 도구' };
+
+  // [id, icon, name, desc, cat, featured]
+  const DEFAULTS = [
+    ['timer','⏱️','타이머','여러 개 동시 실행','utility',1],
+    ['alarm','⏰','알람','브라우저 알림','utility',0],
+    ['stopwatch','🛑','스톱워치','랩타임 저장','utility',0],
+    ['random','🎲','랜덤 뽑기','이름·숫자·항목을 랜덤으로 선택','game',1],
+    ['roulette','🎡','룰렛','친구들과 결정','game',0],
+    ['rps','✊','가위바위보','간단한 대결','game',0],
+    ['calc','🧮','계산기','일반 계산부터 공학 계산까지','utility',1],
+    ['unit','🔄','단위 변환기','길이·무게·온도','utility',0],
+    ['password','🔐','비밀번호 생성기','조건을 정하고 안전한 문자열 생성','utility',1],
+    ['memo','📝','메모장','간단한 메모 저장','utility',0],
+    ['todo','✅','할 일 목록','체크하면 완료','utility',0],
+    ['calendar','📅','간단 캘린더','일정 확인','utility',0],
+    ['url','🔗','URL 도구','주소 확인·정리','utility',0],
+    ['qr','📱','QR 코드 생성기','텍스트나 링크를 바로 QR로 변환','creative',1],
+    ['color','🎨','색상 도구','HEX / RGB 변환','creative',0],
+    ['compress','🖼️','이미지 압축기','이미지 용량 줄이기','creative',0],
+    ['metronome','🎵','메트로놈','BPM 조절','creative',0],
+    ['piano','🎹','웹 피아노','키보드로 연주','creative',0],
+    ['sound','🔊','사운드보드','효과음 버튼','creative',0],
+    ['aim','🎯','에임 테스트','빠르게 클릭하기','game',0],
+    ['reaction','⚡','반응속도 테스트','화면이 바뀌는 순간 빠르게 클릭','game',1],
+    ['cps','👀','CPS 테스트','5초 동안 클릭','game',0],
+    ['score','🔢','점수판','팀 A/B 점수','game',0],
+    ['ranking','🏆','간단 순위표','친구들 점수 저장','game',0],
+    ['teams','👥','팀 자동 나누기','이름을 랜덤 배정','game',0],
+    ['lottery','🎁','제비뽑기','당첨 개수 설정','game',0],
+    ['bomb','💣','폭탄 돌리기','랜덤 시간 게임','game',0]
+  ].map(([id, icon, name, desc, cat, featured]) => ({
+    id, icon, name, desc, cat, status: 'on', featured: !!featured, url: '/services.html#' + id
+  })).concat([
+    ['chat','💬','채팅방','서버 계정끼리 실시간 채팅'],
+    ['money','💰','용돈 기록장','수입·지출 기록'],
+    ['suggest','📨','건의함','관리자에게 의견 보내기'],
+    ['notice','📰','서버 공지','관리자 공지 등록'],
+    ['status','🟢','서버 상태','정상·점검·장애 표시'],
+    ['stats','📈','서버 통계','접속자·사용량 확인'],
+    ['myinfo','🕵️','내 접속 정보','브라우저·OS·화면 정보'],
+    ['anon','📝','익명 한마디','이름 없이 메시지 남기기']
+  ].map(([id, icon, name, desc]) => ({
+    id, icon, name, desc, cat: 'server', status: 'on', featured: false, url: ''
+  })));
+
+  const $ = (id) => document.getElementById(id);
+  let apps = [];
+  let editingId = null;
+
+  /* ---------- 저장소 ---------- */
+  function load() {
+    try {
+      const raw = localStorage.getItem(DATA_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (e) { /* 저장소를 쓸 수 없는 경우 기본값 사용 */ }
+    return JSON.parse(JSON.stringify(DEFAULTS));
+  }
+  function save() {
+    try { localStorage.setItem(DATA_KEY, JSON.stringify(apps)); }
+    catch (e) { toast('저장소에 쓸 수 없습니다. JSON 내보내기를 이용해 주세요.'); }
+  }
+
+  /* ---------- 유틸 ---------- */
+  async function sha256(text) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+  function toast(text) {
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.textContent = text;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2200);
+  }
+  function uid() { return 'app_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5); }
+  function el(tag, cls, text) {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined) n.textContent = text;
+    return n;
+  }
+  function safeUrl(u) {
+    u = (u || '').trim();
+    if (!u) return '';
+    if (/^(javascript|data|vbscript):/i.test(u)) return null;
+    return u;
+  }
+
+  /* ---------- 로그인 ---------- */
+  function lockedLeft() {
+    try {
+      const l = JSON.parse(sessionStorage.getItem(LOCK_KEY) || '{}');
+      return l.until && l.until > Date.now() ? Math.ceil((l.until - Date.now()) / 1000) : 0;
+    } catch (e) { return 0; }
+  }
+  function addFail() {
+    let l = {};
+    try { l = JSON.parse(sessionStorage.getItem(LOCK_KEY) || '{}'); } catch (e) {}
+    l.tries = (l.tries || 0) + 1;
+    if (l.tries >= MAX_TRIES) { l.until = Date.now() + LOCK_MS; l.tries = 0; }
+    try { sessionStorage.setItem(LOCK_KEY, JSON.stringify(l)); } catch (e) {}
+  }
+  function showPanel() {
+    $('loginView').hidden = true;
+    $('panelView').hidden = false;
+    let hasLocal = false;
+    try { hasLocal = !!localStorage.getItem(DATA_KEY); } catch (e) {}
+    apps = load();
+    render();
+    if (!hasLocal) loadLive();
+  }
+  function showLogin() {
+    $('panelView').hidden = true;
+    $('loginView').hidden = false;
+    $('pw').value = '';
+    $('pw').focus();
+  }
+
+  $('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msg = $('loginMsg');
+    msg.className = 'msg';
+    const left = lockedLeft();
+    if (left) { msg.textContent = '시도 횟수를 초과했습니다. ' + left + '초 후 다시 시도해 주세요.'; return; }
+    if (!window.crypto || !crypto.subtle) { msg.textContent = 'HTTPS 환경에서만 사용할 수 있습니다.'; return; }
+    $('loginBtn').disabled = true;
+    try {
+      const h = await sha256($('pw').value);
+      if (h === PASS_HASH) {
+        try { sessionStorage.setItem(SESSION_KEY, '1'); sessionStorage.removeItem(LOCK_KEY); } catch (e) {}
+        msg.textContent = '';
+        showPanel();
+      } else {
+        addFail();
+        msg.textContent = '비밀번호가 올바르지 않습니다.';
+        $('pw').select();
+      }
+    } finally { $('loginBtn').disabled = false; }
+  });
+
+  $('logoutBtn').addEventListener('click', () => {
+    try { sessionStorage.removeItem(SESSION_KEY); sessionStorage.removeItem('yd_gh_token'); } catch (e) {}
+    $('syToken').value = '';
+    showLogin();
+  });
+
+  /* ---------- 목록 ---------- */
+  function render() {
+    const q = $('q').value.trim().toLowerCase();
+    const cf = $('catFilter').value;
+    const box = $('list');
+    box.textContent = '';
+    $('count').textContent = apps.length;
+
+    const shown = apps.filter(a =>
+      (cf === 'all' || a.cat === cf) &&
+      (!q || (a.name + ' ' + a.desc).toLowerCase().includes(q))
+    );
+
+    if (!shown.length) {
+      box.appendChild(el('div', 'empty', apps.length ? '검색 결과가 없습니다.' : '등록된 앱이 없습니다. "앱 추가"를 눌러 첫 앱을 만들어 보세요.'));
+      return;
+    }
+
+    shown.forEach(a => {
+      const row = el('div', 'row');
+      row.appendChild(el('div', 'ico', a.icon || '🧩'));
+
+      const info = el('div');
+      const h = el('h3', '', a.name);
+      h.appendChild(el('span', 'tag', CAT[a.cat] || a.cat));
+      if (a.featured) h.appendChild(el('span', 'tag star', '대표'));
+      if (a.status === 'off') h.appendChild(el('span', 'tag off', '비공개'));
+      info.appendChild(h);
+      info.appendChild(el('p', '', a.desc || '설명 없음'));
+      info.appendChild(el('div', 'meta', a.url || '링크 없음 (준비 중)'));
+      row.appendChild(info);
+
+      const act = el('div', 'row-actions');
+      const edit = el('button', 'btn ghost', '수정');
+      edit.type = 'button';
+      edit.addEventListener('click', () => openForm(a.id));
+      const del = el('button', 'btn danger', '삭제');
+      del.type = 'button';
+      del.addEventListener('click', () => removeApp(a.id));
+      act.append(edit, del);
+      row.appendChild(act);
+
+      box.appendChild(row);
+    });
+  }
+
+  $('q').addEventListener('input', render);
+  $('catFilter').addEventListener('change', render);
+
+  /* ---------- 추가 / 수정 / 삭제 ---------- */
+  function openForm(id) {
+    editingId = id || null;
+    const a = apps.find(x => x.id === id) || { icon: '', name: '', desc: '', cat: 'utility', status: 'on', url: '', featured: false };
+    $('dlgTitle').textContent = id ? '앱 수정' : '앱 추가';
+    $('fIcon').value = a.icon;
+    $('fName').value = a.name;
+    $('fDesc').value = a.desc;
+    $('fCat').value = a.cat;
+    $('fStatus').value = a.status;
+    $('fUrl').value = a.url;
+    $('fFeatured').checked = !!a.featured;
+    $('formMsg').textContent = '';
+    $('dlg').showModal();
+    $('fName').focus();
+  }
+
+  $('addBtn').addEventListener('click', () => openForm(null));
+  $('cancelBtn').addEventListener('click', () => $('dlg').close());
+
+  $('appForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = $('fName').value.trim();
+    const url = safeUrl($('fUrl').value);
+    if (!name) { $('formMsg').textContent = '이름을 입력해 주세요.'; return; }
+    if (url === null) { $('formMsg').textContent = '사용할 수 없는 링크 형식입니다.'; return; }
+
+    const data = {
+      icon: $('fIcon').value.trim() || '🧩',
+      name,
+      desc: $('fDesc').value.trim(),
+      cat: $('fCat').value,
+      status: $('fStatus').value,
+      url,
+      featured: $('fFeatured').checked
+    };
+
+    if (editingId) {
+      const i = apps.findIndex(x => x.id === editingId);
+      if (i >= 0) apps[i] = Object.assign({}, apps[i], data);
+      toast('수정했습니다.');
+    } else {
+      apps.unshift(Object.assign({ id: uid() }, data));
+      toast('추가했습니다.');
+    }
+    save();
+    render();
+    $('dlg').close();
+  });
+
+  function removeApp(id) {
+    const a = apps.find(x => x.id === id);
+    if (!a) return;
+    if (!confirm('"' + a.name + '" 앱을 삭제할까요? 이 작업은 되돌릴 수 없습니다.')) return;
+    apps = apps.filter(x => x.id !== id);
+    save();
+    render();
+    toast('삭제했습니다.');
+  }
+
+  /* ---------- 내보내기 / 가져오기 ---------- */
+  function json() { return JSON.stringify({ updated: new Date().toISOString(), apps }, null, 2); }
+
+  $('exportBtn').addEventListener('click', () => {
+    const blob = new Blob([json()], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'apps.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  });
+
+  $('copyBtn').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(json()); toast('JSON을 복사했습니다.'); }
+    catch (e) { toast('복사에 실패했습니다. 내보내기를 이용해 주세요.'); }
+  });
+
+  $('importBtn').addEventListener('click', () => $('importFile').click());
+  $('importFile').addEventListener('change', async (e) => {
+    const f = e.target.files[0];
+    e.target.value = '';
+    if (!f) return;
+    try {
+      const parsed = JSON.parse(await f.text());
+      const list = Array.isArray(parsed) ? parsed : parsed.apps;
+      if (!Array.isArray(list)) throw new Error('형식 오류');
+      const clean = list.filter(x => x && x.name).map(x => ({
+        id: String(x.id || uid()),
+        icon: String(x.icon || '🧩'),
+        name: String(x.name),
+        desc: String(x.desc || ''),
+        cat: CAT[x.cat] ? x.cat : 'utility',
+        status: x.status === 'off' ? 'off' : 'on',
+        url: safeUrl(x.url) || '',
+        featured: !!x.featured
+      }));
+      if (!confirm(clean.length + '개의 앱으로 현재 목록을 덮어쓸까요?')) return;
+      apps = clean;
+      save();
+      render();
+      toast('가져왔습니다.');
+    } catch (err) {
+      toast('올바른 JSON 파일이 아닙니다.');
+    }
+  });
+
+  $('resetBtn').addEventListener('click', () => {
+    if (!confirm('모든 변경을 지우고 기본 목록으로 되돌릴까요?')) return;
+    apps = JSON.parse(JSON.stringify(DEFAULTS));
+    save();
+    render();
+    toast('기본값으로 되돌렸습니다.');
+  });
+
+  /* ---------- 사이트 반영 (GitHub) ---------- */
+  const SYNC_KEY = 'yd_sync';
+  const TOKEN_KEY = 'yd_gh_token';
+
+  function normalize(x) {
+    return {
+      id: String(x.id || uid()),
+      icon: String(x.icon || '🧩'),
+      name: String(x.name),
+      desc: String(x.desc || ''),
+      cat: CAT[x.cat] ? x.cat : 'utility',
+      status: x.status === 'off' ? 'off' : 'on',
+      url: safeUrl(x.url) || '',
+      featured: !!x.featured
+    };
+  }
+  function parseApps(data) {
+    const list = Array.isArray(data) ? data : data && data.apps;
+    if (!Array.isArray(list)) throw new Error('형식 오류');
+    return list.filter(x => x && x.name).map(normalize);
+  }
+
+  function loadSync() {
+    try {
+      const s = JSON.parse(localStorage.getItem(SYNC_KEY) || '{}');
+      if (s.repo) $('syRepo').value = s.repo;
+      if (s.branch) $('syBranch').value = s.branch;
+      if (s.path) $('syPath').value = s.path;
+      $('syRemember').checked = !!s.remember;
+    } catch (e) {}
+    let t = '';
+    try { t = localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY) || ''; } catch (e) {}
+    $('syToken').value = t;
+    if (!t) $('syncBox').open = true;
+  }
+  function saveSync() {
+    const remember = $('syRemember').checked;
+    try {
+      localStorage.setItem(SYNC_KEY, JSON.stringify({
+        repo: $('syRepo').value.trim(),
+        branch: $('syBranch').value.trim(),
+        path: $('syPath').value.trim(),
+        remember
+      }));
+      const tok = $('syToken').value.trim();
+      sessionStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(TOKEN_KEY);
+      if (tok) (remember ? localStorage : sessionStorage).setItem(TOKEN_KEY, tok);
+    } catch (e) {}
+  }
+  function cfg() {
+    saveSync();
+    const c = {
+      repo: $('syRepo').value.trim(),
+      branch: $('syBranch').value.trim() || 'main',
+      path: $('syPath').value.trim().replace(/^\/+/, ''),
+      token: $('syToken').value.trim()
+    };
+    if (!/^[\w.-]+\/[\w.-]+$/.test(c.repo)) throw new Error('저장소 형식은 "계정/저장소"여야 합니다.');
+    if (!c.path) throw new Error('파일 경로를 입력해 주세요.');
+    if (!c.token) { $('syncBox').open = true; throw new Error('GitHub 토큰을 입력해 주세요.'); }
+    return c;
+  }
+  function state(text, kind) {
+    const s = $('syncState');
+    s.textContent = text;
+    s.className = 'sync-state' + (kind ? ' ' + kind : '');
+  }
+  function endpoint(c) {
+    return 'https://api.github.com/repos/' + c.repo + '/contents/' + c.path.split('/').map(encodeURIComponent).join('/');
+  }
+  function headers(c) {
+    return { 'Accept': 'application/vnd.github+json', 'Authorization': 'Bearer ' + c.token, 'X-GitHub-Api-Version': '2022-11-28' };
+  }
+  function toB64(str) {
+    const bytes = new TextEncoder().encode(str);
+    let bin = '';
+    for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+    return btoa(bin);
+  }
+  function fromB64(b) {
+    const bin = atob(b.replace(/\s/g, ''));
+    return new TextDecoder().decode(Uint8Array.from(bin, ch => ch.charCodeAt(0)));
+  }
+  async function apiError(res) {
+    let detail = '';
+    try { detail = (await res.json()).message || ''; } catch (e) {}
+    if (res.status === 401) return '토큰이 올바르지 않거나 만료되었습니다.';
+    if (res.status === 403 || res.status === 404) return '권한이 없거나 저장소를 찾을 수 없습니다. 토큰의 저장소 접근 권한과 Contents 쓰기 권한을 확인해 주세요.';
+    if (res.status === 409 || res.status === 422) return '다른 곳에서 파일이 바뀌었습니다. "사이트에서 불러오기" 후 다시 시도해 주세요.';
+    return '요청 실패 (' + res.status + ') ' + detail;
+  }
+
+  async function publish() {
+    let c;
+    try { c = cfg(); } catch (e) { state(e.message, 'err'); return; }
+    if (!apps.length && !confirm('앱이 하나도 없습니다. 그래도 사이트에 반영할까요?')) return;
+    $('publishBtn').disabled = true;
+    state('반영 중...');
+    try {
+      let sha;
+      const cur = await fetch(endpoint(c) + '?ref=' + encodeURIComponent(c.branch), { headers: headers(c), cache: 'no-store' });
+      if (cur.ok) sha = (await cur.json()).sha;
+      else if (cur.status !== 404) throw new Error(await apiError(cur));
+
+      const body = { message: 'Update apps via admin', content: toB64(json()), branch: c.branch };
+      if (sha) body.sha = sha;
+      const put = await fetch(endpoint(c), {
+        method: 'PUT',
+        headers: Object.assign({ 'Content-Type': 'application/json' }, headers(c)),
+        body: JSON.stringify(body)
+      });
+      if (!put.ok) throw new Error(await apiError(put));
+      state('저장소에 반영했습니다. 사이트 적용까지 1~2분 걸립니다.', 'ok');
+      toast('반영했습니다.');
+    } catch (e) {
+      state(e.message || '반영에 실패했습니다.', 'err');
+    } finally { $('publishBtn').disabled = false; }
+  }
+
+  async function pull() {
+    let c;
+    try { c = cfg(); } catch (e) { state(e.message, 'err'); return; }
+    if (!confirm('저장소의 현재 목록으로 이 화면의 내용을 덮어쓸까요?')) return;
+    $('pullBtn').disabled = true;
+    state('불러오는 중...');
+    try {
+      const res = await fetch(endpoint(c) + '?ref=' + encodeURIComponent(c.branch), { headers: headers(c), cache: 'no-store' });
+      if (res.status === 404) throw new Error('저장소에 아직 파일이 없습니다. 먼저 "사이트에 반영"을 눌러 주세요.');
+      if (!res.ok) throw new Error(await apiError(res));
+      const file = await res.json();
+      apps = parseApps(JSON.parse(fromB64(file.content)));
+      save();
+      render();
+      state('불러왔습니다.', 'ok');
+    } catch (e) {
+      state(e.message || '불러오기에 실패했습니다.', 'err');
+    } finally { $('pullBtn').disabled = false; }
+  }
+
+  async function loadLive() {
+    try {
+      const r = await fetch('../data/apps.json?t=' + Date.now(), { cache: 'no-store' });
+      if (!r.ok) return;
+      const list = parseApps(await r.json());
+      if (list.length) { apps = list; save(); render(); }
+    } catch (e) { /* 파일이 없으면 기본 목록 유지 */ }
+  }
+
+  $('publishBtn').addEventListener('click', publish);
+  $('pullBtn').addEventListener('click', pull);
+  ['syRepo', 'syBranch', 'syPath', 'syToken', 'syRemember'].forEach(id => $(id).addEventListener('change', saveSync));
+  loadSync();
+
+  /* ---------- 시작 ---------- */
+  let logged = false;
+  try { logged = sessionStorage.getItem(SESSION_KEY) === '1'; } catch (e) {}
+  if (logged) showPanel();
+})();
+</script>
+</body>
+</html>
