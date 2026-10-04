@@ -227,69 +227,6 @@
       font: 12px var(--mono);
     }
 
-    .services {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-    }
-
-    .service {
-      min-height: 190px;
-      padding: 22px;
-      border: 1px solid var(--line);
-      background: linear-gradient(145deg, rgba(18,23,30,.82), rgba(7,10,14,.72));
-      position: relative;
-      overflow: hidden;
-      transition: transform .2s ease, border-color .2s ease, background .2s ease;
-    }
-
-    .service:hover {
-      transform: translateY(-4px);
-      border-color: rgba(98,232,255,.28);
-      background: linear-gradient(145deg, rgba(20,29,37,.95), rgba(7,10,14,.82));
-    }
-
-    .service::before {
-      content: "";
-      position: absolute;
-      width: 90px;
-      height: 90px;
-      right: -35px;
-      top: -35px;
-      border-radius: 50%;
-      background: rgba(98,232,255,.06);
-      filter: blur(10px);
-    }
-
-    .service-num {
-      color: #46525e;
-      font: 700 10px var(--mono);
-    }
-
-    .service h3 {
-      margin: 28px 0 9px;
-      font-size: 19px;
-      letter-spacing: -.03em;
-    }
-
-    .service p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.7;
-    }
-
-    .service .arrow {
-      position: absolute;
-      right: 20px;
-      bottom: 19px;
-      color: var(--cyan);
-      font-family: var(--mono);
-      transition: transform .2s ease;
-    }
-
-    .service:hover .arrow { transform: translateX(5px); }
-
     .infra {
       display: grid;
       grid-template-columns: 1.15fr .85fr;
@@ -445,7 +382,6 @@
     }
 
     @media (max-width: 800px) {
-      .services { grid-template-columns: 1fr 1fr; }
       .infra { grid-template-columns: 1fr; }
     }
 
@@ -456,14 +392,13 @@
       .hero { min-height: auto; padding: 72px 0 60px; }
       .hero h1 { font-size: clamp(48px, 18vw, 78px); }
       section { padding: 62px 0; }
-      .services { grid-template-columns: 1fr; }
       .section-head { display: block; }
       .section-note { display: block; margin-top: 12px; }
       .metrics { grid-template-columns: 1fr; }
       .footer-inner { display: block; }
       .footer-inner span:last-child { display: block; margin-top: 8px; }
     }
-  
+
     .service-section { margin-top: 28px; }
 
     .section-status {
@@ -558,7 +493,6 @@
       .service-grid { grid-template-columns: 1fr; }
     }
 
-  
     .section-link{color:var(--green);text-decoration:none;font:11px var(--mono);letter-spacing:.08em;border:1px solid rgba(97,255,154,.2);padding:8px 11px;border-radius:999px;transition:.2s ease}
     .section-link:hover{border-color:rgba(97,255,154,.5);background:rgba(97,255,154,.05)}
     .featured-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -574,16 +508,19 @@
     .service-list small,.server-tool-grid small{margin-top:3px;color:var(--muted);font-size:11px;line-height:1.45}
     .server-tools{margin-top:34px;padding-top:28px;border-top:1px dashed rgba(255,255,255,.08)}
     .server-tool-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+    .server-tool-grid a[data-soon]{cursor:not-allowed;opacity:.62}
+    .server-tool-grid a[data-soon]:hover{transform:none}
     @media(max-width:900px){.service-list,.server-tool-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(max-width:620px){.featured-grid{grid-template-columns:1fr}.service-list,.server-tool-grid{grid-template-columns:1fr}.all-services-head{align-items:flex-start}}
 
+    a:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
   </style>
 </head>
 
 <body>
   <div class="shell">
     <nav>
-      <a class="brand" href="/">
+      <a class="brand" href="index.html">
         <span class="brand-mark">&gt;_</span>
         <span>YouthDeveloper</span>
       </a>
@@ -628,7 +565,7 @@
       <section id="html-playground">
         <div class="section-head">
           <div>
-            <div class="section-kicker">02 / HTML PLAYGROUND</div>
+            <div class="section-kicker">01 / HTML PLAYGROUND</div>
             <h2>Write. See. Build.</h2>
           </div>
           <div class="section-note">live preview</div>
@@ -704,82 +641,80 @@
           </div>
         </div>
       </section>
-    
-    <section class="section service-section" id="services">
-      <div class="section-head">
-        <div>
-          <div class="eyebrow">03 / SERVICES</div>
-          <h2>서비스</h2>
-        </div>
-        <a class="section-link" href="#all-services">모든 서비스 →</a>
-      </div>
 
-      <div class="service-grid featured-grid">
-        <a class="service-card" href="#" aria-label="타이머"><div class="service-top"><span class="service-icon">⏱️</span><span class="service-state">READY</span></div><h3>타이머</h3><p>여러 개의 타이머를 동시에 실행</p><span class="service-arrow">→</span></a>
-        <a class="service-card" href="#" aria-label="랜덤 뽑기"><div class="service-top"><span class="service-icon">🎲</span><span class="service-state">READY</span></div><h3>랜덤 뽑기</h3><p>이름·숫자·항목을 랜덤으로 선택</p><span class="service-arrow">→</span></a>
-        <a class="service-card" href="#" aria-label="계산기"><div class="service-top"><span class="service-icon">🧮</span><span class="service-state">READY</span></div><h3>계산기</h3><p>일반 계산부터 공학 계산까지</p><span class="service-arrow">→</span></a>
-        <a class="service-card" href="#" aria-label="비밀번호 생성기"><div class="service-top"><span class="service-icon">🔐</span><span class="service-state">READY</span></div><h3>비밀번호 생성기</h3><p>조건을 정하고 안전한 문자열 생성</p><span class="service-arrow">→</span></a>
-        <a class="service-card" href="#" aria-label="QR 코드 생성기"><div class="service-top"><span class="service-icon">📱</span><span class="service-state">READY</span></div><h3>QR 코드 생성기</h3><p>텍스트나 링크를 바로 QR로 변환</p><span class="service-arrow">→</span></a>
-        <a class="service-card" href="#" aria-label="반응속도 테스트"><div class="service-top"><span class="service-icon">⚡</span><span class="service-state">READY</span></div><h3>반응속도 테스트</h3><p>화면이 바뀌는 순간 빠르게 클릭</p><span class="service-arrow">→</span></a>
-      </div>
-
-      <div class="all-services" id="all-services">
-        <div class="all-services-head">
-          <div><div class="eyebrow">04 / ALL SERVICES</div><h2>전체 서비스</h2></div>
-          <span class="section-status">28 TOOLS</span>
+      <section class="service-section" id="services">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">03 / SERVICES</div>
+            <h2>서비스</h2>
+          </div>
+          <a class="section-link" href="#all-services">모든 서비스 →</a>
         </div>
 
-        <div class="service-list">
-          <a href="#"><span>⏱️</span><strong>타이머</strong><small>여러 개 동시 실행</small></a>
-          <a href="#"><span>⏰</span><strong>알람</strong><small>브라우저 알림</small></a>
-          <a href="#"><span>🛑</span><strong>스톱워치</strong><small>랩타임 저장</small></a>
-          <a href="#"><span>🎲</span><strong>랜덤 뽑기</strong><small>랜덤 선택</small></a>
-          <a href="#"><span>🎡</span><strong>룰렛</strong><small>친구들과 결정</small></a>
-          <a href="#"><span>✊</span><strong>가위바위보</strong><small>간단한 대결</small></a>
-          <a href="#"><span>🧮</span><strong>계산기</strong><small>일반 + 공학용</small></a>
-          <a href="#"><span>🔄</span><strong>단위 변환기</strong><small>길이·무게·온도·용량</small></a>
-          <a href="#"><span>🔐</span><strong>비밀번호 생성기</strong><small>조건별 랜덤 생성</small></a>
-          <a href="#"><span>📝</span><strong>메모장</strong><small>간단한 메모 저장</small></a>
-          <a href="#"><span>✅</span><strong>할 일 목록</strong><small>체크하면 완료</small></a>
-          <a href="#"><span>📅</span><strong>간단 캘린더</strong><small>일정 확인</small></a>
-          <a href="#"><span>🔗</span><strong>URL 단축기</strong><small>긴 주소 줄이기</small></a>
-          <a href="#"><span>📱</span><strong>QR 코드 생성기</strong><small>글·링크를 QR로</small></a>
-          <a href="#"><span>🎨</span><strong>색상 도구</strong><small>HEX / RGB 변환</small></a>
-          <a href="#"><span>🖼️</span><strong>이미지 압축기</strong><small>이미지 용량 줄이기</small></a>
-          <a href="#"><span>🎵</span><strong>메트로놈</strong><small>BPM 조절</small></a>
-          <a href="#"><span>🎹</span><strong>웹 피아노</strong><small>키보드로 연주</small></a>
-          <a href="#"><span>🔊</span><strong>사운드보드</strong><small>효과음 버튼</small></a>
-          <a href="#"><span>🎯</span><strong>에임 테스트</strong><small>빠르게 클릭하기</small></a>
-          <a href="#"><span>⚡</span><strong>반응속도 테스트</strong><small>클릭 속도 측정</small></a>
-          <a href="#"><span>👀</span><strong>CPS 테스트</strong><small>5초 동안 클릭</small></a>
-          <a href="#"><span>🔢</span><strong>점수판</strong><small>팀 A/B 점수</small></a>
-          <a href="#"><span>🏆</span><strong>간단 순위표</strong><small>친구들 점수 저장</small></a>
-          <a href="#"><span>👥</span><strong>팀 자동 나누기</strong><small>이름을 랜덤 배정</small></a>
-          <a href="#"><span>🎁</span><strong>제비뽑기</strong><small>당첨 개수 설정</small></a>
-          <a href="#"><span>💣</span><strong>폭탄 돌리기</strong><small>랜덤 시간 게임</small></a>
-          <a href="#"><span>🔗</span><strong>URL 도구</strong><small>주소 확인·정리</small></a>
+        <div class="service-grid featured-grid">
+          <a class="service-card" href="services.html#timer" aria-label="타이머"><div class="service-top"><span class="service-icon">⏱️</span><span class="service-state">READY</span></div><h3>타이머</h3><p>여러 개의 타이머를 동시에 실행</p><span class="service-arrow">→</span></a>
+          <a class="service-card" href="services.html#random" aria-label="랜덤 뽑기"><div class="service-top"><span class="service-icon">🎲</span><span class="service-state">READY</span></div><h3>랜덤 뽑기</h3><p>이름·숫자·항목을 랜덤으로 선택</p><span class="service-arrow">→</span></a>
+          <a class="service-card" href="services.html#calc" aria-label="계산기"><div class="service-top"><span class="service-icon">🧮</span><span class="service-state">READY</span></div><h3>계산기</h3><p>일반 계산부터 공학 계산까지</p><span class="service-arrow">→</span></a>
+          <a class="service-card" href="services.html#password" aria-label="비밀번호 생성기"><div class="service-top"><span class="service-icon">🔐</span><span class="service-state">READY</span></div><h3>비밀번호 생성기</h3><p>조건을 정하고 안전한 문자열 생성</p><span class="service-arrow">→</span></a>
+          <a class="service-card" href="services.html#qr" aria-label="QR 코드 생성기"><div class="service-top"><span class="service-icon">📱</span><span class="service-state">READY</span></div><h3>QR 코드 생성기</h3><p>텍스트나 링크를 바로 QR로 변환</p><span class="service-arrow">→</span></a>
+          <a class="service-card" href="services.html#reaction" aria-label="반응속도 테스트"><div class="service-top"><span class="service-icon">⚡</span><span class="service-state">READY</span></div><h3>반응속도 테스트</h3><p>화면이 바뀌는 순간 빠르게 클릭</p><span class="service-arrow">→</span></a>
         </div>
 
-        <div class="server-tools">
+        <div class="all-services" id="all-services">
           <div class="all-services-head">
-            <div><div class="eyebrow">SERVER TOOLS</div><h2>서버 도구</h2></div>
-            <span class="section-status">PRIVATE</span>
+            <div><div class="eyebrow">04 / ALL SERVICES</div><h2>전체 서비스</h2></div>
+            <span class="section-status">27 TOOLS</span>
           </div>
-          <div class="server-tool-grid">
-            <a href="#"><span>💬</span><strong>채팅방</strong><small>서버 계정끼리 실시간 채팅</small></a>
-            <a href="#"><span>💰</span><strong>용돈 기록장</strong><small>수입·지출 기록</small></a>
-            <a href="#"><span>📨</span><strong>건의함</strong><small>관리자에게 의견 보내기</small></a>
-            <a href="#"><span>📰</span><strong>서버 공지</strong><small>관리자 공지 등록</small></a>
-            <a href="#"><span>🟢</span><strong>서버 상태</strong><small>정상·점검·장애 표시</small></a>
-            <a href="#"><span>📈</span><strong>서버 통계</strong><small>접속자·사용량 확인</small></a>
-            <a href="#"><span>🕵️</span><strong>내 접속 정보</strong><small>브라우저·OS·화면 정보</small></a>
-            <a href="#"><span>📝</span><strong>익명 한마디</strong><small>이름 없이 메시지 남기기</small></a>
+
+          <div class="service-list">
+            <a href="services.html#timer"><span>⏱️</span><strong>타이머</strong><small>여러 개 동시 실행</small></a>
+            <a href="services.html#alarm"><span>⏰</span><strong>알람</strong><small>브라우저 알림</small></a>
+            <a href="services.html#stopwatch"><span>🛑</span><strong>스톱워치</strong><small>랩타임 저장</small></a>
+            <a href="services.html#random"><span>🎲</span><strong>랜덤 뽑기</strong><small>랜덤 선택</small></a>
+            <a href="services.html#roulette"><span>🎡</span><strong>룰렛</strong><small>친구들과 결정</small></a>
+            <a href="services.html#rps"><span>✊</span><strong>가위바위보</strong><small>간단한 대결</small></a>
+            <a href="services.html#calc"><span>🧮</span><strong>계산기</strong><small>일반 + 공학용</small></a>
+            <a href="services.html#unit"><span>🔄</span><strong>단위 변환기</strong><small>길이·무게·온도·용량</small></a>
+            <a href="services.html#password"><span>🔐</span><strong>비밀번호 생성기</strong><small>조건별 랜덤 생성</small></a>
+            <a href="services.html#memo"><span>📝</span><strong>메모장</strong><small>간단한 메모 저장</small></a>
+            <a href="services.html#todo"><span>✅</span><strong>할 일 목록</strong><small>체크하면 완료</small></a>
+            <a href="services.html#calendar"><span>📅</span><strong>간단 캘린더</strong><small>일정 확인</small></a>
+            <a href="services.html#qr"><span>📱</span><strong>QR 코드 생성기</strong><small>글·링크를 QR로</small></a>
+            <a href="services.html#color"><span>🎨</span><strong>색상 도구</strong><small>HEX / RGB 변환</small></a>
+            <a href="services.html#compress"><span>🖼️</span><strong>이미지 압축기</strong><small>이미지 용량 줄이기</small></a>
+            <a href="services.html#metronome"><span>🎵</span><strong>메트로놈</strong><small>BPM 조절</small></a>
+            <a href="services.html#piano"><span>🎹</span><strong>웹 피아노</strong><small>키보드로 연주</small></a>
+            <a href="services.html#sound"><span>🔊</span><strong>사운드보드</strong><small>효과음 버튼</small></a>
+            <a href="services.html#aim"><span>🎯</span><strong>에임 테스트</strong><small>빠르게 클릭하기</small></a>
+            <a href="services.html#reaction"><span>⚡</span><strong>반응속도 테스트</strong><small>클릭 속도 측정</small></a>
+            <a href="services.html#cps"><span>👀</span><strong>CPS 테스트</strong><small>5초 동안 클릭</small></a>
+            <a href="services.html#score"><span>🔢</span><strong>점수판</strong><small>팀 A/B 점수</small></a>
+            <a href="services.html#ranking"><span>🏆</span><strong>간단 순위표</strong><small>친구들 점수 저장</small></a>
+            <a href="services.html#teams"><span>👥</span><strong>팀 자동 나누기</strong><small>이름을 랜덤 배정</small></a>
+            <a href="services.html#lottery"><span>🎁</span><strong>제비뽑기</strong><small>당첨 개수 설정</small></a>
+            <a href="services.html#bomb"><span>💣</span><strong>폭탄 돌리기</strong><small>랜덤 시간 게임</small></a>
+            <a href="services.html#url"><span>🔗</span><strong>URL 도구</strong><small>주소 확인·정리</small></a>
+          </div>
+
+          <div class="server-tools">
+            <div class="all-services-head">
+              <div><div class="eyebrow">SERVER TOOLS</div><h2>서버 도구</h2></div>
+              <span class="section-status">PRIVATE</span>
+            </div>
+            <div class="server-tool-grid">
+              <a href="#" data-soon title="준비 중입니다"><span>💬</span><strong>채팅방</strong><small>서버 계정끼리 실시간 채팅</small></a>
+              <a href="#" data-soon title="준비 중입니다"><span>💰</span><strong>용돈 기록장</strong><small>수입·지출 기록</small></a>
+              <a href="#" data-soon title="준비 중입니다"><span>📨</span><strong>건의함</strong><small>관리자에게 의견 보내기</small></a>
+              <a href="#" data-soon title="준비 중입니다"><span>📰</span><strong>서버 공지</strong><small>관리자 공지 등록</small></a>
+              <a href="#" data-soon title="준비 중입니다"><span>🟢</span><strong>서버 상태</strong><small>정상·점검·장애 표시</small></a>
+              <a href="#" data-soon title="준비 중입니다"><span>📈</span><strong>서버 통계</strong><small>접속자·사용량 확인</small></a>
+              <a href="#" data-soon title="준비 중입니다"><span>🕵️</span><strong>내 접속 정보</strong><small>브라우저·OS·화면 정보</small></a>
+              <a href="#" data-soon title="준비 중입니다"><span>📝</span><strong>익명 한마디</strong><small>이름 없이 메시지 남기기</small></a>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
-
-  </main>
+      </section>
+    </main>
 
     <footer>
       <div class="footer-inner">
@@ -790,6 +725,7 @@
   </div>
 
   <script>
+    // HTML 플레이그라운드
     (() => {
       const input = document.getElementById("htmlInput");
       const preview = document.getElementById("htmlPreview");
@@ -822,7 +758,11 @@
 
       render();
     })();
-  </script>
 
+    // 아직 준비되지 않은 서버 도구는 눌러도 맨 위로 올라가지 않게 막기
+    document.querySelectorAll("a[data-soon]").forEach((a) => {
+      a.addEventListener("click", (e) => e.preventDefault());
+    });
+  </script>
 </body>
 </html>
