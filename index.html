@@ -1,1 +1,542 @@
-<h1>안녕하세요, 박재윤&정택준의 서버 입니다</h1>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#05070a">
+  <meta name="description" content="PJY Server — Developer Infrastructure">
+  <title>PJY SERVER // Developer Portal</title>
+
+  <style>
+    :root {
+      --bg: #05070a;
+      --panel: rgba(12, 16, 22, .78);
+      --panel-strong: #0c1016;
+      --line: rgba(255,255,255,.09);
+      --text: #edf2f7;
+      --muted: #7d8996;
+      --green: #61ff9a;
+      --cyan: #62e8ff;
+      --purple: #9d7bff;
+      --danger: #ff667d;
+      --mono: "SFMono-Regular", "Cascadia Code", "Roboto Mono", Consolas, monospace;
+      --sans: Inter, Pretendard, "Noto Sans KR", system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 80% 15%, rgba(98,232,255,.09), transparent 28rem),
+        radial-gradient(circle at 15% 70%, rgba(157,123,255,.08), transparent 30rem),
+        var(--bg);
+      font-family: var(--sans);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .17;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(to bottom, black, transparent 85%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .shell {
+      width: min(1160px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    nav {
+      height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line);
+      font-family: var(--mono);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-weight: 800;
+      letter-spacing: -.03em;
+    }
+
+    .brand-mark {
+      width: 31px;
+      height: 31px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(97,255,154,.5);
+      color: var(--green);
+      box-shadow: 0 0 24px rgba(97,255,154,.1);
+      font-size: 13px;
+    }
+
+    .brand span:last-child { color: #fff; }
+
+    .nav-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 12px var(--green);
+    }
+
+    .hero {
+      min-height: 620px;
+      display: grid;
+      align-items: center;
+      padding: 88px 0 80px;
+      position: relative;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 440px;
+      height: 440px;
+      right: -150px;
+      top: 60px;
+      border: 1px solid rgba(98,232,255,.07);
+      border-radius: 50%;
+      box-shadow:
+        0 0 0 55px rgba(98,232,255,.018),
+        0 0 0 110px rgba(98,232,255,.012);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      color: var(--green);
+      font: 700 12px var(--mono);
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      max-width: 850px;
+      font-size: clamp(50px, 9vw, 106px);
+      line-height: .88;
+      letter-spacing: -.075em;
+      font-weight: 850;
+    }
+
+    .hero h1 .accent {
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(255,255,255,.42);
+    }
+
+    .hero-copy {
+      max-width: 620px;
+      margin: 32px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.8;
+    }
+
+    .hero-copy code {
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: .92em;
+    }
+
+    .terminal {
+      width: min(650px, 100%);
+      margin-top: 34px;
+      border: 1px solid var(--line);
+      background: rgba(7,10,14,.82);
+      box-shadow: 0 30px 80px rgba(0,0,0,.3);
+      font: 13px/1.8 var(--mono);
+    }
+
+    .terminal-bar {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      padding: 10px 13px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .terminal-bar i {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #39434e;
+    }
+
+    .terminal-bar span {
+      margin-left: 7px;
+      color: #586572;
+      font-size: 10px;
+    }
+
+    .terminal-body { padding: 15px 17px 17px; color: #aeb9c4; }
+    .prompt { color: var(--green); }
+    .command { color: #e9eef2; }
+    .output { color: #687583; }
+
+    section { padding: 88px 0; }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 30px;
+      margin-bottom: 28px;
+    }
+
+    .section-kicker {
+      font: 700 11px var(--mono);
+      color: var(--cyan);
+      letter-spacing: .16em;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(30px, 5vw, 48px);
+      letter-spacing: -.05em;
+    }
+
+    .section-note {
+      color: var(--muted);
+      font: 12px var(--mono);
+    }
+
+    .services {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .service {
+      min-height: 190px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      background: linear-gradient(145deg, rgba(18,23,30,.82), rgba(7,10,14,.72));
+      position: relative;
+      overflow: hidden;
+      transition: transform .2s ease, border-color .2s ease, background .2s ease;
+    }
+
+    .service:hover {
+      transform: translateY(-4px);
+      border-color: rgba(98,232,255,.28);
+      background: linear-gradient(145deg, rgba(20,29,37,.95), rgba(7,10,14,.82));
+    }
+
+    .service::before {
+      content: "";
+      position: absolute;
+      width: 90px;
+      height: 90px;
+      right: -35px;
+      top: -35px;
+      border-radius: 50%;
+      background: rgba(98,232,255,.06);
+      filter: blur(10px);
+    }
+
+    .service-num {
+      color: #46525e;
+      font: 700 10px var(--mono);
+    }
+
+    .service h3 {
+      margin: 28px 0 9px;
+      font-size: 19px;
+      letter-spacing: -.03em;
+    }
+
+    .service p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .service .arrow {
+      position: absolute;
+      right: 20px;
+      bottom: 19px;
+      color: var(--cyan);
+      font-family: var(--mono);
+      transition: transform .2s ease;
+    }
+
+    .service:hover .arrow { transform: translateX(5px); }
+
+    .infra {
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 12px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      padding: 25px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 1px;
+      margin-top: 18px;
+      background: var(--line);
+    }
+
+    .stack-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 16px;
+      background: var(--panel-strong);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .stack-item span:first-child { color: #c8d0d8; }
+    .stack-item span:last-child { color: var(--muted); }
+
+    .state {
+      color: var(--green) !important;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+      margin-top: 18px;
+    }
+
+    .metric {
+      padding: 17px;
+      border: 1px solid var(--line);
+      background: #090d12;
+    }
+
+    .metric small {
+      display: block;
+      color: var(--muted);
+      font: 10px var(--mono);
+      margin-bottom: 9px;
+    }
+
+    .metric strong {
+      font: 700 22px var(--mono);
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 28px 0 42px;
+      color: #56616d;
+      font: 11px var(--mono);
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    @media (max-width: 800px) {
+      .services { grid-template-columns: 1fr 1fr; }
+      .infra { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 560px) {
+      .shell { width: min(100% - 28px, 1160px); }
+      nav { height: 64px; }
+      .nav-status { display: none; }
+      .hero { min-height: auto; padding: 72px 0 60px; }
+      .hero h1 { font-size: clamp(48px, 18vw, 78px); }
+      section { padding: 62px 0; }
+      .services { grid-template-columns: 1fr; }
+      .section-head { display: block; }
+      .section-note { display: block; margin-top: 12px; }
+      .metrics { grid-template-columns: 1fr; }
+      .footer-inner { display: block; }
+      .footer-inner span:last-child { display: block; margin-top: 8px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <nav>
+      <a class="brand" href="/">
+        <span class="brand-mark">&gt;_</span>
+        <span>PJY.SERVER</span>
+      </a>
+      <div class="nav-status">
+        <span class="dot"></span>
+        ALL SYSTEMS OPERATIONAL
+      </div>
+    </nav>
+
+    <main>
+      <section class="hero">
+        <div>
+          <div class="eyebrow">// developer infrastructure</div>
+          <h1>
+            BUILD.<br>
+            <span class="accent">SHIP.</span><br>
+            REPEAT.
+          </h1>
+          <p class="hero-copy">
+            웹 서비스부터 API, 데이터, 자동화까지.<br>
+            <code>GitHub Pages</code>와 <code>Cloudflare</code>를 기반으로
+            작고 빠른 서비스를 만듭니다.
+          </p>
+
+          <div class="terminal">
+            <div class="terminal-bar">
+              <i></i><i></i><i></i>
+              <span>server@pjy ~ /home</span>
+            </div>
+            <div class="terminal-body">
+              <div><span class="prompt">$</span> <span class="command">whoami</span></div>
+              <div class="output">pjy-server</div>
+              <div><span class="prompt">$</span> <span class="command">status --all</span></div>
+              <div class="output">services: online · edge: connected · deploy: ready</div>
+              <div><span class="prompt">$</span> <span class="command">echo "let's build."</span></div>
+              <div class="output">let's build.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="services">
+        <div class="section-head">
+          <div>
+            <div class="section-kicker">01 / SERVICES</div>
+            <h2>Things we build.</h2>
+          </div>
+          <div class="section-note">/apps/*</div>
+        </div>
+
+        <div class="services">
+          <a class="service" href="#">
+            <div class="service-num">APP.001</div>
+            <h3>Messenger</h3>
+            <p>실시간 커뮤니케이션과 사용자 서비스를 위한 메시징 시스템.</p>
+            <span class="arrow">→</span>
+          </a>
+
+          <a class="service" href="#">
+            <div class="service-num">APP.002</div>
+            <h3>NolMap</h3>
+            <p>장소를 탐색하고 새로운 목적지를 발견하는 지도 서비스.</p>
+            <span class="arrow">→</span>
+          </a>
+
+          <a class="service" href="#">
+            <div class="service-num">APP.003</div>
+            <h3>ZETA</h3>
+            <p>AI와 대화하고 새로운 방식으로 정보를 다루는 실험적 서비스.</p>
+            <span class="arrow">→</span>
+          </a>
+
+          <a class="service" href="#">
+            <div class="service-num">APP.004</div>
+            <h3>Music</h3>
+            <p>음악과 오디오를 위한 가볍고 직관적인 웹 인터페이스.</p>
+            <span class="arrow">→</span>
+          </a>
+
+          <a class="service" href="#">
+            <div class="service-num">APP.005</div>
+            <h3>PhoneWiki</h3>
+            <p>휴대전화와 기기 정보를 정리하고 탐색하는 위키 시스템.</p>
+            <span class="arrow">→</span>
+          </a>
+
+          <a class="service" href="#">
+            <div class="service-num">APP.006</div>
+            <h3>More</h3>
+            <p>새로운 아이디어를 빠르게 서비스로 만드는 실험 공간.</p>
+            <span class="arrow">→</span>
+          </a>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-head">
+          <div>
+            <div class="section-kicker">02 / INFRASTRUCTURE</div>
+            <h2>Under the hood.</h2>
+          </div>
+          <div class="section-note">edge-first architecture</div>
+        </div>
+
+        <div class="infra">
+          <div class="panel">
+            <div class="section-kicker">STACK</div>
+            <div class="stack">
+              <div class="stack-item"><span>Frontend</span><span>GitHub Pages</span></div>
+              <div class="stack-item"><span>Compute</span><span>Cloudflare Workers</span></div>
+              <div class="stack-item"><span>Database</span><span>D1 / KV</span></div>
+              <div class="stack-item"><span>Storage</span><span>R2</span></div>
+              <div class="stack-item"><span>Automation</span><span>GitHub Actions</span></div>
+              <div class="stack-item"><span>Network</span><span class="state">● ONLINE</span></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="section-kicker">SYSTEM</div>
+            <div class="metrics">
+              <div class="metric">
+                <small>EDGE</small>
+                <strong>ON</strong>
+              </div>
+              <div class="metric">
+                <small>API</small>
+                <strong>OK</strong>
+              </div>
+              <div class="metric">
+                <small>BUILD</small>
+                <strong>READY</strong>
+              </div>
+            </div>
+            <p style="color:var(--muted);font-size:13px;line-height:1.8;margin:22px 0 0;">
+              작게 시작하고, 빠르게 배포하고,<br>
+              필요한 만큼 확장합니다.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-inner">
+        <span>© 2026 PJY SERVER</span>
+        <span>DESIGNED &amp; BUILT WITH &lt;/&gt;</span>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
