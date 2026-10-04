@@ -363,6 +363,87 @@
       gap: 20px;
     }
 
+    .html-editor {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 360px;
+      border: 1px solid var(--line);
+      background: #090d12;
+      overflow: hidden;
+    }
+
+    .editor-pane,
+    .preview-pane {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .editor-pane {
+      border-right: 1px solid var(--line);
+    }
+
+    .editor-title {
+      height: 40px;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line);
+      background: #0c1016;
+      color: #8c98a4;
+      font: 700 10px var(--mono);
+      letter-spacing: .08em;
+    }
+
+    .editor-state {
+      color: var(--green);
+      font-size: 9px;
+    }
+
+    #htmlInput {
+      flex: 1;
+      width: 100%;
+      min-height: 320px;
+      resize: none;
+      border: 0;
+      outline: 0;
+      padding: 17px;
+      background: #070a0e;
+      color: #dce5df;
+      font: 13px/1.75 var(--mono);
+      tab-size: 2;
+    }
+
+    #htmlInput:focus {
+      box-shadow: inset 0 0 0 1px rgba(97,255,154,.12);
+    }
+
+    #htmlPreview {
+      flex: 1;
+      width: 100%;
+      min-height: 320px;
+      display: block;
+      border: 0;
+      background: #fff;
+    }
+
+    @media (max-width: 700px) {
+      .html-editor {
+        grid-template-columns: 1fr;
+      }
+
+      .editor-pane {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      #htmlInput,
+      #htmlPreview {
+        min-height: 270px;
+      }
+    }
+
     @media (max-width: 800px) {
       .services { grid-template-columns: 1fr 1fr; }
       .infra { grid-template-columns: 1fr; }
@@ -430,6 +511,40 @@
         </div>
       </section>
 
+      <section id="html-playground">
+        <div class="section-head">
+          <div>
+            <div class="section-kicker">02 / HTML PLAYGROUND</div>
+            <h2>Write. See. Build.</h2>
+          </div>
+          <div class="section-note">live preview</div>
+        </div>
+
+        <div class="html-editor">
+          <div class="editor-pane">
+            <div class="editor-title">
+              <span>HTML</span>
+              <span class="editor-state">LIVE</span>
+            </div>
+            <textarea id="htmlInput" spellcheck="false"><h1>Hello, YouthDeveloper!</h1>
+<p>여기에 HTML을 입력해보세요.</p>
+<button>버튼</button></textarea>
+          </div>
+
+          <div class="preview-pane">
+            <div class="editor-title">
+              <span>PREVIEW</span>
+              <span id="previewState" class="editor-state">READY</span>
+            </div>
+            <iframe
+              id="htmlPreview"
+              title="HTML 미리보기"
+              sandbox="allow-scripts"
+            ></iframe>
+          </div>
+        </div>
+      </section>
+
       <section>
         <div class="section-head">
           <div>
@@ -484,5 +599,41 @@
       </div>
     </footer>
   </div>
+
+  <script>
+    (() => {
+      const input = document.getElementById("htmlInput");
+      const preview = document.getElementById("htmlPreview");
+      const state = document.getElementById("previewState");
+
+      if (!input || !preview) return;
+
+      const render = () => {
+        preview.srcdoc = input.value;
+        if (state) state.textContent = "LIVE";
+      };
+
+      let timer;
+      input.addEventListener("input", () => {
+        clearTimeout(timer);
+        timer = setTimeout(render, 80);
+      });
+
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Tab") {
+          event.preventDefault();
+          const start = input.selectionStart;
+          const end = input.selectionEnd;
+          input.value =
+            input.value.slice(0, start) + "  " + input.value.slice(end);
+          input.selectionStart = input.selectionEnd = start + 2;
+          render();
+        }
+      });
+
+      render();
+    })();
+  </script>
+
 </body>
 </html>
