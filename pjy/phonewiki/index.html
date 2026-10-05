@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#f6f7f9"><title>PhoneWiki · PJY Server</title><link rel="stylesheet" href="/pjy/assets/pjy-app.css">
+<style>
+.chip{border:1px solid #dfe1e5;background:#fff;border-radius:999px;padding:8px 13px;font-size:13px;font-weight:750;color:#25272a}
+.chip.on{background:#17181a;color:#fff;border-color:#17181a}
+.card.sel{border-color:#17181a}
+.card h3{margin:10px 0 4px}
+#list .btn{width:100%;margin-top:6px}
+.small b{color:#28530d}
+td b{color:#28530d}
+</style></head><body><main class="app">
+<div class="top"><div class="brand">PJY</div><div><a class="back" href="/pjy/">← PJY Server</a><div class="eyebrow">SMARTPHONE ENCYCLOPEDIA</div></div></div>
+<h1 class="title">PhoneWiki 📱</h1>
+<p class="subtitle">갤럭시와 아이폰, 태블릿·워치까지 출시일과 주요 사양을 검색하고 비교해 보자.</p>
+<section class="panel">
+<div class="field"><label for="q">기종 검색</label><input id="q" class="input" placeholder="예: 갤럭시 S25, 아이폰 16, 아이패드" autocomplete="off"></div>
+<div class="row" id="fb"></div>
+<div class="row" id="fc" style="margin-top:8px"></div>
+<div class="field"><label for="so">정렬</label><select id="so"><option value="n">출시일 최신순</option><option value="o">출시일 오래된순</option><option value="l">가벼운 순</option><option value="h">무거운 순</option></select></div>
+</section>
+<section style="margin-top:18px"><h2 class="section-title" id="cnt">기종 목록</h2><div id="list" class="grid"></div></section>
+<section style="margin-top:22px"><h2 class="section-title">비교</h2><div id="cmp" class="panel"><div class="empty">기종 카드에서 2~4개를 담으면 비교표가 나와.</div></div></section>
+<div class="footer">PJY Server · PhoneWiki</div>
+</main>
+<script>
+// 어드민 Worker 주소. friendschat-api 와 같은 workers.dev 서브도메인으로 바꿔 줘.
+// 아직 연결 전이거나 목록이 비어 있으면 seed.json 을 대신 보여줘.
+const API='https://phonewiki.pjy-server.workers.dev/api/phones';
+const BN={S:'갤럭시',A:'아이폰·애플'},CN={p:'폰',t:'태블릿',o:'워치·기타'},AL={S:' 삼성 갤럭시 galaxy samsung',A:' 애플 아이폰 iphone apple 아이패드 ipad'};
+const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const key=x=>x.id||x.name;
+let D=[],st={b:'',c:'',s:new Set()};
+async function load(){
+  try{const r=await fetch(API);const d=r.ok?await r.json():[];if(Array.isArray(d)&&d.length)return d}catch(e){}
+  return (await fetch('seed.json')).json()}
+function chips(el,items,k){
+  el.innerHTML=items.map(([v,l])=>'<button class="chip'+(st[k]===v?' on':'')+'" data-v="'+v+'">'+l+'</button>').join('');
+  el.onclick=e=>{const v=e.target.dataset.v;if(v!==undefined){st[k]=v;draw()}}}
+function draw(){
+  chips($('#fb'),[['','전체'],['S','갤럭시'],['A','아이폰·애플']],'b');
+  chips($('#fc'),[['','모든 종류'],['p','폰'],['t','태블릿'],['o','워치·기타']],'c');
+  const q=$('#q').value.trim().toLowerCase(),s=$('#so').value;
+  const r=D.filter(x=>(!st.b||x.brand===st.b)&&(!st.c||x.cat===st.c)&&(!q||(x.name+AL[x.brand]+' '+x.chip+' '+CN[x.cat]).toLowerCase().includes(q)));
+  r.sort((a,b)=>s==='n'?b.date.localeCompare(a.date):s==='o'?a.date.localeCompare(b.date):s==='l'?a.weight-b.weight:b.weight-a.weight);
+  $('#cnt').textContent='기종 목록 · '+r.length+'개';
+  $('#list').innerHTML=r.map(x=>{const k=key(x),on=st.s.has(k);
+    return '<article class="card'+(on?' sel':'')+'"><span class="pill">'+BN[x.brand]+' · '+CN[x.cat]+'</span><h3>'+esc(x.name)+'</h3><div class="muted">출시일 · '+esc(x.date)+'</div><p class="muted">카메라 · '+esc(x.camera)+'<br>무게 · '+esc(x.weight)+'g<br>크기 · '+esc(x.size)+' mm<br>화면 · '+esc(x.display)+'<br>칩 · '+esc(x.chip)+'</p><button class="btn'+(on?'':' secondary')+'" data-k="'+esc(k)+'">'+(on?'✓ 비교 담김':'+ 비교 담기')+'</button></article>'}).join('')||'<div class="empty">검색 결과가 없어.</div>';
+  cmp()}
+function cmp(){
+  const a=D.filter(x=>st.s.has(key(x)));
+  if(a.length<2){$('#cmp').innerHTML='<div class="empty">기종 카드에서 2~4개를 담으면 비교표가 나와.</div>';return}
+  const m=Math.min(...a.map(x=>x.weight));
+  const F=[['출시일',x=>esc(x.date)],['카메라',x=>esc(x.camera)],['무게',x=>x.weight===m?'<b>'+esc(x.weight)+'g · 가장 가벼움</b>':esc(x.weight)+'g'],['크기',x=>esc(x.size)+' mm'],['화면',x=>esc(x.display)],['칩',x=>esc(x.chip)]];
+  $('#cmp').innerHTML='<div class="table-wrap"><table><thead><tr><th>항목</th>'+a.map(x=>'<th>'+esc(x.name)+'</th>').join('')+'</tr></thead><tbody>'+F.map(([l,f])=>'<tr><th>'+l+'</th>'+a.map(x=>'<td>'+f(x)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div><p class="small">※ 공식 발표 기준 대표값이며 모델별로 조금 다를 수 있어.</p>'}
+$('#list').onclick=e=>{const k=e.target.dataset.k;if(k===undefined)return;
+  if(st.s.has(k))st.s.delete(k);else if(st.s.size<4)st.s.add(k);else{alert('최대 4개까지 비교할 수 있어.');return}
+  draw()};
+$('#q').oninput=draw;$('#so').onchange=draw;
+load().then(d=>{D=d;draw()}).catch(()=>{$('#list').innerHTML='<div class="empty">데이터를 불러오지 못했어. 잠시 뒤에 다시 시도해 줘.</div>'});
+</script></body></html>
