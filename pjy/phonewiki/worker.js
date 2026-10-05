@@ -46,9 +46,10 @@ function clean(b) {
 
 export default {
   async fetch(req, env) {
-    const origin = env.APP_ORIGIN || 'https://youthdeveloping.github.io/pjy';
+    const siteOrigin = env.APP_ORIGIN || 'https://youthdeveloping.github.io/pjy';
+    const corsOrigin = 'https://youthdeveloping.github.io';
     const cors = {
-      'access-control-allow-origin': origin,
+      'access-control-allow-origin': corsOrigin,
       'access-control-allow-methods': 'GET,POST,PUT,DELETE,OPTIONS',
       'access-control-allow-headers': 'authorization,content-type',
       'access-control-max-age': '86400',
@@ -57,7 +58,7 @@ export default {
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
     let res;
     try {
-      res = await handle(req, env, origin);
+      res = await handle(req, env, siteOrigin);
     } catch (e) {
       console.error(e);
       res = json({ error: '서버 설정 오류예요. KV 연결과 Secret을 확인해 주세요' }, 500);
