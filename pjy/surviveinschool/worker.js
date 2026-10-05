@@ -3,7 +3,7 @@
  * Add NEIS_API_KEY in Worker Settings > Variables and Secrets as a Secret.
  * Never put the actual key in this source file.
  */
-const ALLOWED_ORIGINS = ["https://youthdeveloping.github.io/pjy"];
+const ALLOWED_ORIGINS = ["https://youthdeveloping.github.io", "https://youthdeveloping.github.io/pjy", "https://pjy-server.github.io"];
 const ALLOWED_SERVICES = new Set([
   "schoolInfo", "mealServiceDietInfo", "elsTimetable",
   "misTimetable", "hisTimetable", "SchoolSchedule"
