@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#b7ed78">
+<title>FriendsChat 관리자</title>
+<style>
+:root{--green:#b7ed78;--deep:#39852c;--bg:#f4f8f0;--line:#e4ebdf;--muted:#758071}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;background:var(--bg);color:#263124}
+button,input{font:inherit}button{border:0;border-radius:10px;padding:10px 14px;font-weight:750;cursor:pointer;background:var(--green);color:#20321a}
+.secondary{background:#eef2eb;color:#354334}.danger{background:#ffeded;color:#a52e2e}
+header{height:68px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 24px;background:white;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:3}
+.logo{font-weight:900;font-size:21px}.logo span{color:var(--deep)}.headright{display:flex;align-items:center;gap:10px}.small{font-size:12px;color:var(--muted)}
+main{width:100%;max-width:none;margin:28px 0;padding:0 clamp(16px,2.5vw,40px) 40px}.intro{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:22px}.intro h1{font-size:28px;margin:0 0 5px}.intro p{margin:0;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:18px}.stat,.panel{background:white;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 5px 20px #31451b08}.stat span{color:var(--muted);font-size:13px}.stat strong{display:block;font-size:30px;margin-top:7px}
+.panel h2{font-size:18px;margin:0 0 15px}.toolbar{display:flex;gap:10px;margin-bottom:14px}.toolbar input{flex:1;min-width:0;border:1px solid var(--line);border-radius:11px;padding:11px 13px;outline-color:var(--green)}
+.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:580px}th,td{text-align:left;padding:13px 10px;border-bottom:1px solid #edf0e9;font-size:14px}th{color:var(--muted);font-size:12px;background:#fbfcfa}
+.badge{display:inline-block;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:750}.admin{background:#fff0b7;color:#795a00}.member{background:#edf1eb;color:#53604f}
+#error{display:none;background:#fff0ef;color:#a72d27;border:1px solid #ffd7d4;padding:12px;border-radius:12px;margin-bottom:15px;white-space:pre-wrap}
+#login{max-width:420px;margin:12vh auto;padding:26px;background:white;border:1px solid var(--line);border-radius:20px}#login h1{margin:0 0 6px}#login p{color:var(--muted)}#login button{width:100%;margin-top:12px}
+.empty{text-align:center;padding:28px;color:var(--muted)}.loading{padding:28px;text-align:center;color:var(--muted)}
+@media(max-width:640px){header{padding:0 13px}.headright .small{display:none}main{margin:20px auto;padding:0 12px 28px}.intro{align-items:start;flex-direction:column}.intro h1{font-size:24px}.stats{gap:8px}.stat{padding:13px}.stat strong{font-size:25px}.stat span{font-size:12px}.panel{padding:14px}.toolbar{flex-direction:column}}
+</style>
+</head>
+<body>
+<div id="login" hidden><h1>FriendsChat 관리자</h1><p>먼저 메신저에서 관리자 계정으로 로그인해 줘.</p><button onclick="location.href='./'">메신저로 돌아가기</button></div>
+<div id="admin" hidden>
+<header><div class="logo">Friends<span>Chat</span> <span style="font-size:13px;color:#66735e">ADMIN</span></div><div class="headright"><span id="who" class="small"></span><button class="secondary" onclick="location.href='./'">메신저</button><button class="secondary" id="logout">로그아웃</button></div></header>
+<main>
+<div class="intro"><div><h1>관리자 대시보드</h1><p>회원 현황과 관리자 권한을 관리해.</p></div><button id="reload">↻ 새로고침</button></div>
+<div id="error"></div>
+<div class="stats"><div class="stat"><span>전체 회원</span><strong id="total">—</strong></div><div class="stat"><span>관리자</span><strong id="admins">—</strong></div><div class="stat"><span>일반 회원</span><strong id="members">—</strong></div></div>
+<section class="panel"><h2>회원 관리</h2><div class="toolbar"><input id="search" placeholder="닉네임 또는 아이디 검색"><button class="secondary" id="clear">검색 지우기</button></div><div class="tablewrap"><table><thead><tr><th>닉네임</th><th>아이디</th><th>권한</th><th>관리</th></tr></thead><tbody id="rows"></tbody></table><div id="loading" class="loading">회원 정보를 불러오는 중...</div></div></section>
+<p class="small" style="margin:14px 3px">회원 삭제는 되돌릴 수 없어. 삭제 전 대상 아이디를 꼭 확인해.</p>
+</main></div>
+<script>
+const API_BASE="https://friendschat-api.pjy-server.workers.dev";
+let token=localStorage.getItem("fc_cloudflare_token")||"",me=null,users=[];
+const $=id=>document.getElementById(id);
+function esc(s){return String(s??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#39;")}
+async function api(path,opt={}){const h=new Headers(opt.headers||{});if(token)h.set("Authorization","Bearer "+token);if(opt.body)h.set("Content-Type","application/json");const r=await fetch(API_BASE+path,{...opt,headers:h});const d=await r.json().catch(()=>({error:"서버 응답을 읽을 수 없어."}));if(!r.ok)throw Error(d.error||"요청 실패 ("+r.status+")");return d}
+function error(msg){$("error").textContent=msg;$("error").style.display="block"}
+async function init(){if(!token){$("login").hidden=false;return}try{const d=await api("/auth/me");me=d.user;if(!me.is_admin){$("login").hidden=false;$("login").querySelector("h1").textContent="관리자 권한이 필요해";$("login").querySelector("p").textContent="관리자 계정으로 로그인한 뒤 이용해 줘.";return}$("admin").hidden=false;$("who").textContent=(me.display_name||me.username)+" 관리자";await loadUsers()}catch(e){$("login").hidden=false;$("login").querySelector("p").textContent="로그인 정보가 만료됐어. 메신저에서 다시 로그인해 줘.";error(e.message)}}
+async function loadUsers(){ $("loading").hidden=false;$("loading").textContent="회원 정보를 불러오는 중...";try{const d=await api("/admin/users");users=d.users||[];$("total").textContent=users.length;$("admins").textContent=users.filter(u=>u.is_admin).length;$("members").textContent=users.filter(u=>!u.is_admin).length;render()}catch(e){error(e.message)}finally{$("loading").hidden=true}}
+function render(){
+  const q=$("search").value.trim().toLowerCase();
+  const list=users.filter(u=>(u.username||"").toLowerCase().includes(q)||(u.display_name||"").toLowerCase().includes(q));
+  $("rows").innerHTML=list.map(u=>'<tr><td><b>'+esc(u.display_name||u.username)+'</b>'+(u.id===me.id?' <span class="small">(나)</span>':'')+'</td><td>@'+esc(u.username)+'</td><td><span class="badge '+(u.is_admin?'admin':'member')+'">'+(u.is_admin?'관리자':'일반 회원')+'</span></td><td>'+(u.id===me.id?'<span class="small">내 계정</span>':'<div style="display:flex;gap:6px;flex-wrap:wrap"><button class="'+(u.is_admin?'secondary':'')+'" data-id="'+esc(u.id)+'" data-next="'+(!u.is_admin)+'">'+(u.is_admin?'관리자 해제':'관리자 지정')+'</button><button class="danger" data-delete-id="'+esc(u.id)+'">회원 삭제</button></div>')+'</td></tr>').join("");
+  if(!list.length)$("rows").innerHTML='<tr><td colspan="4" class="empty">검색 결과가 없어.</td></tr>';
+  $("rows").querySelectorAll("button[data-id]").forEach(b=>b.onclick=()=>toggleAdmin(b.dataset.id,b.dataset.next==="true",users.find(u=>String(u.id)===b.dataset.id)));
+  $("rows").querySelectorAll("button[data-delete-id]").forEach(b=>b.onclick=()=>deleteUser(b.dataset.deleteId,users.find(u=>String(u.id)===b.dataset.deleteId)));
+}
+async function deleteUser(id,u){
+  if(!u)return;
+  const check=prompt('회원 삭제는 되돌릴 수 없어.\n삭제할 회원 아이디를 정확히 입력해: '+u.username);
+  if(check!==u.username){if(check!==null)alert('아이디가 일치하지 않아. 삭제하지 않았어.');return;}
+  if(!confirm(u.display_name+' (@'+u.username+') 회원을 정말 삭제할까?'))return;
+  try{
+  await api("/admin/users/"+encodeURIComponent(id),{method:"DELETE"});
+    $("error").style.display="none";
+    await loadUsers();
+    alert("회원 계정을 삭제했어.");
+  }catch(e){error("회원 삭제 실패: "+e.message+"\nCloudflare Worker에 삭제 API를 추가하고 Deploy했는지 확인해 줘.")}
+}
+async function toggleAdmin(id,next,u){const action=next?"관리자 지정":"관리자 해제";if(!confirm(u.display_name+" ("+u.username+") 회원을 "+action+"할까?"))return;try{await api("/admin/users/"+encodeURIComponent(id)+"/admin",{method:"PATCH",body:JSON.stringify({is_admin:next})});$("error").style.display="none";await loadUsers()}catch(e){error("권한 변경 실패: "+e.message)}}
+$("search").addEventListener("input",render);$("clear").onclick=()=>{$("search").value="";render()};$("reload").onclick=loadUsers;$("logout").onclick=()=>{localStorage.removeItem("fc_cloudflare_token");location.href="./"};init();
+</script>
+</body></html>
