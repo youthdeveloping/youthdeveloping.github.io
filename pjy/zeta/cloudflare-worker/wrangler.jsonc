@@ -7,11 +7,11 @@
   "kv_namespaces": [
     {
       "binding": "ZETA_USERS",
-      "id": "REPLACE_WITH_EXISTING_ZETA_USERS_KV_ID"
+      "id": "92ada44ddb56469aa037a2028d9af3b7"
     },
     {
       "binding": "ZETA_CHARACTERS",
-      "id": "REPLACE_WITH_EXISTING_ZETA_CHARACTERS_KV_ID"
+      "id": "fabc823c0df24c919ef31da7839d4fa1"
     }
   ]
 }
