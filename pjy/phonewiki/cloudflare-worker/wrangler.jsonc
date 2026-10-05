@@ -1,0 +1,16 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "phonewiki",
+  "main": "src/index.js",
+  "compatibility_date": "2026-10-05",
+  "workers_dev": true,
+  "vars": {
+    "APP_ORIGIN": "https://youthdeveloping.github.io/pjy"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "PHONES",
+      "id": "356fc7754eca455ea828e60fb44a2aea"
+    }
+  ]
+}
