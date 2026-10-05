@@ -1,4 +1,4 @@
-const ALLOWED_ORIGINS = new Set(["https://youthdeveloping.github.io/pjy","http://localhost:8788","http://127.0.0.1:8788"]);
+const ALLOWED_ORIGINS = new Set(["https://youthdeveloping.github.io","https://youthdeveloping.github.io/pjy","https://pjy-server.github.io","http://localhost:8788","http://127.0.0.1:8788"]);
 const SESSION_DAYS = 30;
 const MAX_MESSAGE_LENGTH = 5000;
 const MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
