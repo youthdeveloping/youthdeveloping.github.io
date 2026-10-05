@@ -1,0 +1,2935 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ZETA 관리자</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap"
+  rel="stylesheet"
+>
+
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+>
+
+<style>
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family:
+    "Inter",
+    "Noto Sans KR",
+    sans-serif;
+
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(124, 58, 237, 0.18),
+      transparent 35%
+    ),
+    radial-gradient(
+      circle at top right,
+      rgba(236, 72, 153, 0.12),
+      transparent 30%
+    ),
+    #07070b;
+
+  color: #fff;
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.glass {
+  background:
+    rgba(17, 17, 25, 0.78);
+
+  border:
+    1px solid rgba(255, 255, 255, 0.08);
+
+  backdrop-filter:
+    blur(18px);
+
+  -webkit-backdrop-filter:
+    blur(18px);
+}
+
+.card {
+  background:
+    rgba(18, 18, 27, 0.78);
+
+  border:
+    1px solid rgba(255, 255, 255, 0.08);
+
+  border-radius: 18px;
+}
+
+.input {
+  width: 100%;
+
+  background:
+    rgba(0, 0, 0, 0.25);
+
+  border:
+    1px solid rgba(255, 255, 255, 0.1);
+
+  color: white;
+
+  border-radius: 10px;
+
+  padding:
+    11px 13px;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+
+.input:focus {
+  border-color:
+    rgba(168, 85, 247, 0.75);
+
+  background:
+    rgba(0, 0, 0, 0.35);
+}
+
+.input::placeholder {
+  color:
+    rgba(255,255,255,0.35);
+}
+
+textarea.input {
+  min-height: 110px;
+  resize: vertical;
+}
+
+select.input {
+  appearance: auto;
+}
+
+.btn {
+  border: 0;
+  border-radius: 10px;
+
+  padding:
+    9px 13px;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  transition:
+    transform 0.15s,
+    opacity 0.15s;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-purple {
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #a855f7
+    );
+
+  color: white;
+}
+
+.btn-blue {
+  background:
+    rgba(59, 130, 246, 0.18);
+
+  color:
+    #93c5fd;
+
+  border:
+    1px solid rgba(59, 130, 246, 0.25);
+}
+
+.btn-yellow {
+  background:
+    rgba(234, 179, 8, 0.14);
+
+  color:
+    #fde047;
+
+  border:
+    1px solid rgba(234, 179, 8, 0.25);
+}
+
+.btn-red {
+  background:
+    rgba(239, 68, 68, 0.13);
+
+  color:
+    #fca5a5;
+
+  border:
+    1px solid rgba(239, 68, 68, 0.25);
+}
+
+.btn-gray {
+  background:
+    rgba(255,255,255,0.07);
+
+  color:
+    rgba(255,255,255,0.8);
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+
+  padding:
+    4px 8px;
+
+  border-radius: 999px;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.modal-bg {
+  position: fixed;
+  inset: 0;
+
+  z-index: 100;
+
+  background:
+    rgba(0,0,0,0.72);
+
+  backdrop-filter:
+    blur(8px);
+
+  -webkit-backdrop-filter:
+    blur(8px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 18px;
+}
+
+.modal {
+  width: 100%;
+  max-width: 700px;
+  max-height: 92vh;
+
+  overflow-y: auto;
+
+  background:
+    #111119;
+
+  border:
+    1px solid rgba(255,255,255,0.1);
+
+  border-radius: 20px;
+
+  box-shadow:
+    0 30px 100px rgba(0,0,0,0.55);
+}
+
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background:
+    rgba(255,255,255,0.12);
+
+  border-radius: 999px;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  color:
+    rgba(255,255,255,0.45);
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  text-align: left;
+
+  padding:
+    12px 14px;
+
+  border-bottom:
+    1px solid rgba(255,255,255,0.07);
+
+  white-space: nowrap;
+}
+
+td {
+  padding:
+    13px 14px;
+
+  border-bottom:
+    1px solid rgba(255,255,255,0.055);
+
+  font-size: 13px;
+
+  vertical-align: middle;
+}
+
+tr:last-child td {
+  border-bottom: 0;
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+
+  border-radius: 12px;
+
+  object-fit: cover;
+
+  background:
+    #222;
+}
+
+#toast {
+  position: fixed;
+
+  left: 50%;
+  bottom: 25px;
+
+  transform:
+    translateX(-50%)
+    translateY(20px);
+
+  opacity: 0;
+
+  pointer-events: none;
+
+  z-index: 999;
+
+  padding:
+    11px 16px;
+
+  border-radius: 12px;
+
+  background:
+    rgba(20,20,30,0.95);
+
+  border:
+    1px solid rgba(255,255,255,0.12);
+
+  box-shadow:
+    0 15px 50px rgba(0,0,0,0.4);
+
+  font-size: 13px;
+
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
+}
+
+#toast.show {
+  opacity: 1;
+
+  transform:
+    translateX(-50%)
+    translateY(0);
+}
+
+.loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.spinner {
+  width: 15px;
+  height: 15px;
+
+  border:
+    2px solid rgba(255,255,255,0.2);
+
+  border-top-color:
+    white;
+
+  border-radius: 50%;
+
+  animation:
+    spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.section-title i {
+  color: #a855f7;
+}
+
+.stat-number {
+  font-size: 27px;
+  font-weight: 800;
+}
+
+.mobile-scroll {
+  overflow-x: auto;
+}
+
+@media (max-width: 700px) {
+
+  .modal-bg {
+    padding: 10px;
+  }
+
+  .modal {
+    max-height: 95vh;
+  }
+
+  .stat-number {
+    font-size: 22px;
+  }
+
+  td,
+  th {
+    padding:
+      10px 9px;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- ========================================================= -->
+<!-- HEADER -->
+<!-- ========================================================= -->
+
+<header
+  class="glass sticky top-0 z-50 border-b border-white/5"
+>
+
+  <div
+    class="max-w-7xl mx-auto px-4 md:px-6 py-4
+           flex items-center justify-between gap-3"
+  >
+
+    <div class="flex items-center gap-3">
+
+      <div
+        class="w-10 h-10 rounded-xl
+               bg-gradient-to-tr from-purple-600 to-pink-500
+               flex items-center justify-center
+               font-extrabold text-xl"
+      >
+        Z
+      </div>
+
+      <div>
+
+        <div
+          class="font-extrabold tracking-wide"
+        >
+          ZETA 관리자
+        </div>
+
+        <div
+          class="text-xs text-white/40"
+        >
+          관리자 대시보드
+        </div>
+
+      </div>
+
+    </div>
+
+    <div
+      class="flex items-center gap-2"
+    >
+
+      <button
+        id="refresh-btn"
+        class="btn btn-gray"
+      >
+        <i class="fa-solid fa-rotate"></i>
+        <span class="hidden sm:inline">
+          새로고침
+        </span>
+      </button>
+
+      <button
+        id="home-btn"
+        class="btn btn-gray"
+      >
+        <i class="fa-solid fa-house"></i>
+        <span class="hidden sm:inline">
+          ZETA
+        </span>
+      </button>
+
+      <button
+        id="logout-btn"
+        class="btn btn-red"
+      >
+        <i class="fa-solid fa-right-from-bracket"></i>
+        <span class="hidden sm:inline">
+          로그아웃
+        </span>
+      </button>
+
+    </div>
+
+  </div>
+
+</header>
+
+
+<!-- ========================================================= -->
+<!-- MAIN -->
+<!-- ========================================================= -->
+
+<main
+  class="max-w-7xl mx-auto px-4 md:px-6 py-6"
+>
+
+  <!-- 로딩 -->
+
+  <div
+    id="page-loading"
+    class="card p-8 text-center"
+  >
+
+    <div class="loading">
+
+      <div class="spinner"></div>
+
+      <span>
+        관리자 정보를 확인하는 중...
+      </span>
+
+    </div>
+
+  </div>
+
+
+  <!-- 실제 페이지 -->
+
+  <div
+    id="admin-page"
+    class="hidden"
+  >
+
+    <!-- ===================================================== -->
+    <!-- 관리자 정보 -->
+    <!-- ===================================================== -->
+
+    <div
+      class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6"
+    >
+
+      <div class="card p-4">
+
+        <div
+          class="text-xs text-white/40 mb-2"
+        >
+          전체 회원
+        </div>
+
+        <div
+          id="stat-users"
+          class="stat-number"
+        >
+          -
+        </div>
+
+      </div>
+
+
+      <div class="card p-4">
+
+        <div
+          class="text-xs text-white/40 mb-2"
+        >
+          온라인 캐릭터
+        </div>
+
+        <div
+          id="stat-characters"
+          class="stat-number"
+        >
+          -
+        </div>
+
+      </div>
+
+
+      <div class="card p-4">
+
+        <div
+          class="text-xs text-white/40 mb-2"
+        >
+          관리자
+        </div>
+
+        <div
+          class="font-bold text-purple-300"
+        >
+          admin
+        </div>
+
+      </div>
+
+
+      <div class="card p-4">
+
+        <div
+          class="text-xs text-white/40 mb-2"
+        >
+          상태
+        </div>
+
+        <div
+          class="text-green-400 font-bold"
+        >
+          <i class="fa-solid fa-circle text-[8px]"></i>
+          정상
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- 회원 관리 -->
+    <!-- ===================================================== -->
+
+    <section class="card overflow-hidden mb-6">
+
+      <div
+        class="p-5 border-b border-white/5
+               flex items-center justify-between gap-3"
+      >
+
+        <div>
+
+          <div class="section-title">
+
+            <i class="fa-solid fa-users"></i>
+
+            <span>
+              회원 관리
+            </span>
+
+          </div>
+
+          <p
+            class="text-xs text-white/35 mt-1"
+          >
+            회원 닉네임·비밀번호를 관리하고, 필요하면 회원을 정지하거나 정지를 해제합니다.
+          </p>
+
+        </div>
+
+        <div
+          class="badge bg-purple-500/10 text-purple-300"
+        >
+          MEMBERS
+        </div>
+
+      </div>
+
+
+      <div class="table-wrap">
+
+        <table>
+
+          <thead>
+
+            <tr>
+
+              <th>
+                아이디
+              </th>
+
+              <th>
+                닉네임
+              </th>
+
+              <th>
+                가입일
+              </th>
+
+              <th>
+                관리
+              </th>
+
+            </tr>
+
+          </thead>
+
+          <tbody
+            id="users-table"
+          >
+
+            <tr>
+
+              <td
+                colspan="4"
+                class="text-center text-white/35 py-10"
+              >
+                회원 정보를 불러오는 중...
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================================================== -->
+    <!-- 캐릭터 관리 -->
+    <!-- ===================================================== -->
+
+    <section class="card overflow-hidden">
+
+      <div
+        class="p-5 border-b border-white/5
+               flex items-center justify-between gap-3"
+      >
+
+        <div>
+
+          <div class="section-title">
+
+            <i class="fa-solid fa-robot"></i>
+
+            <span>
+              캐릭터 관리
+            </span>
+
+          </div>
+
+          <p
+            class="text-xs text-white/35 mt-1"
+          >
+            온라인 캐릭터의 설정을 수정하거나 삭제합니다.
+          </p>
+
+        </div>
+
+        <div
+          class="badge bg-pink-500/10 text-pink-300"
+        >
+          CHARACTERS
+        </div>
+
+      </div>
+
+
+      <div class="table-wrap">
+
+        <table>
+
+          <thead>
+
+            <tr>
+
+              <th>
+                캐릭터
+              </th>
+
+              <th>
+                카테고리
+              </th>
+
+              <th>
+                생성자
+              </th>
+
+              <th>
+                생성일
+              </th>
+
+              <th>
+                관리
+              </th>
+
+            </tr>
+
+          </thead>
+
+          <tbody
+            id="characters-table"
+          >
+
+            <tr>
+
+              <td
+                colspan="5"
+                class="text-center text-white/35 py-10"
+              >
+                캐릭터 정보를 불러오는 중...
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+  </div>
+
+</main>
+
+
+<!-- ========================================================= -->
+<!-- 회원 수정 MODAL -->
+<!-- ========================================================= -->
+
+<div
+  id="user-modal"
+  class="modal-bg hidden"
+>
+
+  <div class="modal">
+
+    <div
+      class="p-5 border-b border-white/5
+             flex items-center justify-between"
+    >
+
+      <div>
+
+        <div
+          class="font-bold text-lg"
+        >
+          회원 수정
+        </div>
+
+        <div
+          id="user-modal-username"
+          class="text-xs text-white/40 mt-1"
+        >
+          -
+        </div>
+
+      </div>
+
+      <button
+        onclick="closeModal('user-modal')"
+        class="text-white/40 hover:text-white text-xl"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+    </div>
+
+
+    <div class="p-5 space-y-5">
+
+      <!-- 닉네임 -->
+
+      <div>
+
+        <label
+          class="block text-xs text-white/50 mb-2"
+        >
+          닉네임
+        </label>
+
+        <input
+          id="edit-user-nickname"
+          class="input"
+          maxlength="20"
+          placeholder="닉네임"
+        >
+
+      </div>
+
+
+      <!-- 비밀번호 -->
+
+      <div>
+
+        <label
+          class="block text-xs text-white/50 mb-2"
+        >
+          새 비밀번호
+        </label>
+
+        <input
+          id="edit-user-password"
+          class="input"
+          type="password"
+          maxlength="100"
+          placeholder="비밀번호를 입력하면 초기화됩니다"
+        >
+
+        <p
+          class="text-[11px] text-white/30 mt-2"
+        >
+          비밀번호를 비워두면 비밀번호는 변경하지 않습니다.
+          입력하면 기존 세션이 모두 종료됩니다.
+        </p>
+
+      </div>
+
+
+      <div
+        class="flex justify-end gap-2 pt-2"
+      >
+
+        <button
+          class="btn btn-gray"
+          onclick="closeModal('user-modal')"
+        >
+          취소
+        </button>
+
+        <button
+          id="save-user-btn"
+          class="btn btn-purple"
+        >
+          <i class="fa-solid fa-floppy-disk"></i>
+          저장
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- 캐릭터 수정 MODAL -->
+<!-- ========================================================= -->
+
+<div
+  id="character-modal"
+  class="modal-bg hidden"
+>
+
+  <div class="modal">
+
+    <div
+      class="p-5 border-b border-white/5
+             flex items-center justify-between"
+    >
+
+      <div>
+
+        <div
+          class="font-bold text-lg"
+        >
+          캐릭터 수정
+        </div>
+
+        <div
+          id="character-modal-id"
+          class="text-xs text-white/40 mt-1"
+        >
+          -
+        </div>
+
+      </div>
+
+      <button
+        onclick="closeModal('character-modal')"
+        class="text-white/40 hover:text-white text-xl"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+    </div>
+
+
+    <div class="p-5 space-y-4">
+
+      <!-- 이름 -->
+
+      <div>
+
+        <label
+          class="block text-xs text-white/50 mb-2"
+        >
+          캐릭터 이름
+        </label>
+
+        <input
+          id="edit-char-name"
+          class="input"
+          maxlength="500"
+        >
+
+      </div>
+
+
+      <!-- 카테고리 -->
+
+      <div>
+
+        <label
+          class="block text-xs text-white/50 mb-2"
+        >
+          카테고리
+        </label>
+
+        <input
+          id="edit-char-category"
+          class="input"
+          maxlength="500"
+        >
+
+      </div>
+
+
+      <!-- 아바타 -->
+
+      <div>
+
+        <label
+          class="block text-xs text-white/50 mb-2"
+        >
+          아바타 이미지 URL
+        </label>
+
+        <input
+          id="edit-char-avatar"
+          class="input"
+          maxlength="500"
+          placeholder="https://..."
+        >
+
+      </div>
+
+
+      <!-- 태그 -->
+
+      <div>
+
+        <label
+          class="block text-xs text-white/50 mb-2"
+        >
+          태그
+        </label>
+
+        <input
+          id="edit-char-tags"
+          class="input"
+          maxlength="500"
+          placeholder="예: 판타지, 마법, 모험"
+        >
+
+        <p
+          class="text-[11px] text-white/30 mt-1"
+        >
+          쉼표(,)로 구분해주세요.
+        </p>
+
+      </div>
+
+
+      <!-- 성격 -->
+
+      <div>
+
+        <label
+          class="block text-xs text-white/50 mb-2"
+        >
+          성격
+        </label>
+
+        <textarea
+          id="edit-char-personality"
+          class="input"
+          maxlength="500"
+          placeholder="캐릭터의 성격"
+        ></textarea>
+
+      </div>
+
+
+      <!-- 시나리오 -->
+
+      <div>
+
+        <label
+          class="block text-xs text-white/50 mb-2"
+        >
+          시나리오
+        </label>
+
+        <textarea
+          id="edit-char-scenario"
+          class="input"
+          maxlength="500"
+          placeholder="캐릭터가 처한 상황"
+        ></textarea>
+
+      </div>
+
+
+      <!-- 첫 메시지 -->
+
+      <div>
+
+        <label
+          class="block text-xs text-white/50 mb-2"
+        >
+          첫 메시지
+        </label>
+
+        <textarea
+          id="edit-char-first"
+          class="input"
+          maxlength="500"
+          placeholder="사용자가 처음 채팅을 시작했을 때의 메시지"
+        ></textarea>
+
+      </div>
+
+
+      <!-- 저장 -->
+
+      <div
+        class="flex justify-end gap-2 pt-2"
+      >
+
+        <button
+          class="btn btn-gray"
+          onclick="closeModal('character-modal')"
+        >
+          취소
+        </button>
+
+        <button
+          id="save-character-btn"
+          class="btn btn-purple"
+        >
+          <i class="fa-solid fa-floppy-disk"></i>
+          저장
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- TOAST -->
+<!-- ========================================================= -->
+
+<div id="toast"></div>
+
+
+<script>
+
+/* ============================================================
+   설정
+============================================================ */
+
+const WORKER =
+  "https://zeta-ai.pjy-server.workers.dev";
+
+const token =
+  localStorage.getItem(
+    "zeta_session"
+  );
+
+let currentUser = null;
+
+let users = [];
+let characters = [];
+
+let editingUsername = null;
+let editingCharacterId = null;
+
+
+/* ============================================================
+   기본 API
+============================================================ */
+
+async function api(
+  path,
+  options = {}
+) {
+
+  const headers = {
+    ...(options.headers || {})
+  };
+
+  if (
+    !headers["Content-Type"] &&
+    options.body
+  ) {
+    headers["Content-Type"] =
+      "application/json";
+  }
+
+  if (token) {
+    headers["Authorization"] =
+      "Bearer " + token;
+  }
+
+  const response =
+    await fetch(
+      WORKER + path,
+      {
+        ...options,
+        headers
+      }
+    );
+
+  let data = {};
+
+  try {
+    data =
+      await response.json();
+  } catch {
+    data = {};
+  }
+
+  if (
+    response.status === 401 ||
+    response.status === 403
+  ) {
+
+    localStorage.removeItem(
+      "zeta_session"
+    );
+
+    location.href = "./";
+
+    throw new Error(
+      "관리자 인증이 만료되었습니다."
+    );
+  }
+
+  if (!response.ok) {
+
+    throw new Error(
+      data.error ||
+      `요청 실패 (${response.status})`
+    );
+  }
+
+  return data;
+}
+
+
+/* ============================================================
+   Toast
+============================================================ */
+
+let toastTimer = null;
+
+function showToast(
+  message
+) {
+
+  const toast =
+    document.getElementById(
+      "toast"
+    );
+
+  toast.textContent =
+    message;
+
+  toast.classList.add(
+    "show"
+  );
+
+  clearTimeout(
+    toastTimer
+  );
+
+  toastTimer =
+    setTimeout(
+      () => {
+        toast.classList.remove(
+          "show"
+        );
+      },
+      2500
+    );
+}
+
+
+/* ============================================================
+   날짜
+============================================================ */
+
+function formatDate(
+  timestamp
+) {
+
+  if (!timestamp)
+    return "-";
+
+  const date =
+    new Date(timestamp);
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return "-";
+  }
+
+  return date.toLocaleString(
+    "ko-KR",
+    {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+
+      hour: "2-digit",
+      minute: "2-digit"
+    }
+  );
+}
+
+
+/* ============================================================
+   관리자 인증
+============================================================ */
+
+async function checkAdmin() {
+
+  if (!token) {
+
+    location.href = "./";
+
+    return false;
+  }
+
+  try {
+
+    const data =
+      await api(
+        "/auth/me"
+      );
+
+    currentUser =
+      data.user;
+
+    if (
+      !currentUser ||
+      currentUser.username !==
+        "admin"
+    ) {
+
+      localStorage.removeItem(
+        "zeta_session"
+      );
+
+      location.href = "./";
+
+      return false;
+    }
+
+    return true;
+
+  } catch (error) {
+
+    console.error(
+      error
+    );
+
+    return false;
+  }
+}
+
+
+/* ============================================================
+   회원 불러오기
+============================================================ */
+
+async function loadUsers() {
+
+  const data =
+    await api(
+      "/admin/users"
+    );
+
+  users =
+    Array.isArray(
+      data.users
+    )
+      ? data.users
+      : [];
+
+  renderUsers();
+
+  document.getElementById(
+    "stat-users"
+  ).textContent =
+    users.length;
+}
+
+
+/* ============================================================
+   회원 렌더링
+============================================================ */
+
+function renderUsers() {
+
+  const tbody =
+    document.getElementById(
+      "users-table"
+    );
+
+  if (!users.length) {
+
+    tbody.innerHTML = `
+      <tr>
+        <td
+          colspan="4"
+          class="text-center text-white/35 py-10"
+        >
+          등록된 회원이 없습니다.
+        </td>
+      </tr>
+    `;
+
+    return;
+  }
+
+  tbody.innerHTML =
+    users.map(
+      user => {
+
+        const isAdmin =
+          user.username ===
+          "admin";
+
+        return `
+          <tr>
+
+            <td>
+
+              <div
+                class="font-bold text-white"
+              >
+                ${escapeHtml(
+                  user.username
+                )}
+              </div>
+
+              ${
+                isAdmin
+                  ? `
+                    <span
+                      class="
+                        badge
+                        bg-purple-500/10
+                        text-purple-300
+                        mt-1
+                      "
+                    >
+                      ADMIN
+                    </span>
+                  `
+                  : ""
+              }
+
+            </td>
+
+
+            <td>
+
+              <span
+                class="text-white/80"
+              >
+                ${escapeHtml(
+                  user.nickname ||
+                  "-"
+                )}
+              </span>
+
+            </td>
+
+
+            <td>
+
+              <span
+                class="text-white/45 text-xs"
+              >
+                ${formatDate(
+                  user.createdAt
+                )}
+              </span>
+
+            </td>
+
+
+            <td>
+
+              <div
+                class="flex flex-wrap gap-2"
+              >
+
+                <button
+                  class="btn btn-blue"
+                  onclick="openUserModal(
+                    '${escapeAttr(
+                      user.username
+                    )}'
+                  )"
+                >
+                  <i
+                    class="fa-solid fa-pen"
+                  ></i>
+                  수정
+                </button>
+
+                ${
+                  !isAdmin
+                    ? `
+                      <button
+                        class="btn btn-red"
+                        onclick="deleteUser(
+                          '${escapeAttr(
+                            user.username
+                          )}'
+                        )"
+                      >
+                        <i
+                          class="fa-solid fa-trash"
+                        ></i>
+                        삭제
+                      </button>
+                    `
+                    : `
+                      <span
+                        class="
+                          badge
+                          bg-white/5
+                          text-white/30
+                        "
+                      >
+                        보호됨
+                      </span>
+                    `
+                }
+
+              </div>
+
+            </td>
+
+          </tr>
+        `;
+      }
+    ).join("");
+}
+
+
+/* ============================================================
+   회원 수정 모달
+============================================================ */
+
+function openUserModal(
+  username
+) {
+
+  const user =
+    users.find(
+      u =>
+        u.username ===
+        username
+    );
+
+  if (!user)
+    return;
+
+  editingUsername =
+    username;
+
+  document.getElementById(
+    "user-modal-username"
+  ).textContent =
+    "@" + username;
+
+  document.getElementById(
+    "edit-user-nickname"
+  ).value =
+    user.nickname || "";
+
+  document.getElementById(
+    "edit-user-password"
+  ).value =
+    "";
+
+  document.getElementById(
+    "user-modal"
+  ).classList.remove(
+    "hidden"
+  );
+}
+
+
+/* ============================================================
+   회원 저장
+============================================================ */
+
+async function saveUser() {
+
+  if (!editingUsername)
+    return;
+
+  const nickname =
+    document.getElementById(
+      "edit-user-nickname"
+    ).value.trim();
+
+  const password =
+    document.getElementById(
+      "edit-user-password"
+    ).value;
+
+  if (!nickname) {
+
+    alert(
+      "닉네임을 입력해주세요."
+    );
+
+    return;
+  }
+
+  if (
+    nickname.length > 20
+  ) {
+
+    alert(
+      "닉네임은 20자 이하로 입력해주세요."
+    );
+
+    return;
+  }
+
+  if (
+    password &&
+    password.length < 6
+  ) {
+
+    alert(
+      "비밀번호는 6자 이상이어야 합니다."
+    );
+
+    return;
+  }
+
+  const button =
+    document.getElementById(
+      "save-user-btn"
+    );
+
+  const original =
+    button.innerHTML;
+
+  button.disabled = true;
+
+  button.innerHTML = `
+    <span class="loading">
+      <span class="spinner"></span>
+      저장 중...
+    </span>
+  `;
+
+  try {
+
+    /* --------------------------
+       닉네임 변경
+    -------------------------- */
+
+    await api(
+      `/admin/users?username=${encodeURIComponent(
+        editingUsername
+      )}`,
+      {
+        method: "PATCH",
+
+        body:
+          JSON.stringify({
+            nickname
+          })
+      }
+    );
+
+
+    /* --------------------------
+       비밀번호 초기화
+    -------------------------- */
+
+    if (password) {
+
+      await api(
+        `/admin/users/reset-password?username=${encodeURIComponent(
+          editingUsername
+        )}`,
+        {
+          method: "POST",
+
+          body:
+            JSON.stringify({
+              password
+            })
+        }
+      );
+
+    }
+
+
+    closeModal(
+      "user-modal"
+    );
+
+    await loadUsers();
+
+    showToast(
+      password
+        ? "닉네임과 비밀번호가 변경되었습니다."
+        : "닉네임이 변경되었습니다."
+    );
+
+  } catch (error) {
+
+    alert(
+      error.message
+    );
+
+  } finally {
+
+    button.disabled =
+      false;
+
+    button.innerHTML =
+      original;
+  }
+}
+
+
+/* ============================================================
+   회원 삭제
+============================================================ */
+
+async function deleteUser(
+  username
+) {
+
+  if (
+    username ===
+    "admin"
+  ) {
+
+    alert(
+      "관리자 계정은 삭제할 수 없습니다."
+    );
+
+    return;
+  }
+
+  const user =
+    users.find(
+      u =>
+        u.username ===
+        username
+    );
+
+  const nickname =
+    user?.nickname ||
+    username;
+
+  const confirmed =
+    confirm(
+      `정말 회원 "${nickname}" (@${username})을 삭제할까요?\n\n이 작업은 되돌릴 수 없습니다.`
+    );
+
+  if (!confirmed)
+    return;
+
+  try {
+
+    await api(
+      `/admin/users?username=${encodeURIComponent(
+        username
+      )}`,
+      {
+        method: "DELETE"
+      }
+    );
+
+    await loadUsers();
+
+    showToast(
+      "회원이 삭제되었습니다."
+    );
+
+  } catch (error) {
+
+    alert(
+      error.message
+    );
+  }
+}
+
+
+/* ============================================================
+   캐릭터 불러오기
+============================================================ */
+
+async function loadCharacters() {
+
+  const data =
+    await api(
+      "/admin/characters"
+    );
+
+  characters =
+    Array.isArray(
+      data.characters
+    )
+      ? data.characters
+      : [];
+
+  renderCharacters();
+
+  document.getElementById(
+    "stat-characters"
+  ).textContent =
+    characters.length;
+}
+
+
+/* ============================================================
+   캐릭터 렌더링
+============================================================ */
+
+function renderCharacters() {
+
+  const tbody =
+    document.getElementById(
+      "characters-table"
+    );
+
+  if (!characters.length) {
+
+    tbody.innerHTML = `
+      <tr>
+        <td
+          colspan="5"
+          class="text-center text-white/35 py-10"
+        >
+          등록된 온라인 캐릭터가 없습니다.
+        </td>
+      </tr>
+    `;
+
+    return;
+  }
+
+  tbody.innerHTML =
+    characters.map(
+      character => {
+
+        const avatar =
+          character.avatar ||
+          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80";
+
+        return `
+          <tr>
+
+            <td>
+
+              <div
+                class="flex items-center gap-3"
+              >
+
+                <img
+                  src="${escapeAttr(
+                    avatar
+                  )}"
+                  class="avatar"
+                  onerror="
+                    this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'
+                  "
+                >
+
+                <div>
+
+                  <div
+                    class="font-bold"
+                  >
+                    ${escapeHtml(
+                      character.name ||
+                      "이름 없음"
+                    )}
+                  </div>
+
+                  <div
+                    class="
+                      text-[10px]
+                      text-white/30
+                      mt-1
+                    "
+                  >
+                    ${escapeHtml(
+                      character.id ||
+                      "-"
+                    )}
+                  </div>
+
+                </div>
+
+              </div>
+
+            </td>
+
+
+            <td>
+
+              <span
+                class="
+                  badge
+                  bg-purple-500/10
+                  text-purple-300
+                "
+              >
+                ${escapeHtml(
+                  character.category ||
+                  "-"
+                )}
+              </span>
+
+            </td>
+
+
+            <td>
+
+              <span
+                class="text-white/70"
+              >
+                ${escapeHtml(
+                  character.creator ||
+                  "-"
+                )}
+              </span>
+
+            </td>
+
+
+            <td>
+
+              <span
+                class="
+                  text-white/45
+                  text-xs
+                "
+              >
+                ${formatDate(
+                  character.createdAt
+                )}
+              </span>
+
+            </td>
+
+
+            <td>
+
+              <div
+                class="flex flex-wrap gap-2"
+              >
+
+                <button
+                  class="btn btn-blue"
+                  onclick="openCharacterModal(
+                    '${escapeAttr(
+                      character.id
+                    )}'
+                  )"
+                >
+                  <i
+                    class="fa-solid fa-pen"
+                  ></i>
+                  수정
+                </button>
+
+
+                <button
+                  class="btn btn-red"
+                  onclick="deleteCharacter(
+                    '${escapeAttr(
+                      character.id
+                    )}'
+                  )"
+                >
+                  <i
+                    class="fa-solid fa-trash"
+                  ></i>
+                  삭제
+                </button>
+
+              </div>
+
+            </td>
+
+          </tr>
+        `;
+      }
+    ).join("");
+}
+
+
+/* ============================================================
+   캐릭터 수정 모달
+============================================================ */
+
+function openCharacterModal(
+  id
+) {
+
+  const character =
+    characters.find(
+      c =>
+        c.id === id
+    );
+
+  if (!character)
+    return;
+
+  editingCharacterId =
+    id;
+
+  document.getElementById(
+    "character-modal-id"
+  ).textContent =
+    id;
+
+
+  document.getElementById(
+    "edit-char-name"
+  ).value =
+    character.name || "";
+
+
+  document.getElementById(
+    "edit-char-category"
+  ).value =
+    character.category || "";
+
+
+  document.getElementById(
+    "edit-char-avatar"
+  ).value =
+    character.avatar || "";
+
+
+  document.getElementById(
+    "edit-char-tags"
+  ).value =
+    Array.isArray(
+      character.tags
+    )
+      ? character.tags.join(", ")
+      : "";
+
+
+  document.getElementById(
+    "edit-char-personality"
+  ).value =
+    character.personality || "";
+
+
+  document.getElementById(
+    "edit-char-scenario"
+  ).value =
+    character.scenario || "";
+
+
+  document.getElementById(
+    "edit-char-first"
+  ).value =
+    character.firstMessage || "";
+
+
+  document.getElementById(
+    "character-modal"
+  ).classList.remove(
+    "hidden"
+  );
+}
+
+
+/* ============================================================
+   캐릭터 저장
+============================================================ */
+
+async function saveCharacter() {
+
+  if (!editingCharacterId)
+    return;
+
+  const name =
+    document.getElementById(
+      "edit-char-name"
+    ).value.trim();
+
+  const category =
+    document.getElementById(
+      "edit-char-category"
+    ).value.trim();
+
+  const avatar =
+    document.getElementById(
+      "edit-char-avatar"
+    ).value.trim();
+
+  const tagsText =
+    document.getElementById(
+      "edit-char-tags"
+    ).value;
+
+  const personality =
+    document.getElementById(
+      "edit-char-personality"
+    ).value.trim();
+
+  const scenario =
+    document.getElementById(
+      "edit-char-scenario"
+    ).value.trim();
+
+  const firstMessage =
+    document.getElementById(
+      "edit-char-first"
+    ).value.trim();
+
+
+  if (
+    !name ||
+    !personality ||
+    !scenario ||
+    !firstMessage
+  ) {
+
+    alert(
+      "캐릭터 이름, 성격, 시나리오, 첫 메시지는 필수입니다."
+    );
+
+    return;
+  }
+
+
+  const tags =
+    tagsText
+      .split(",")
+      .map(
+        tag =>
+          tag.trim()
+      )
+      .filter(Boolean)
+      .slice(0, 10);
+
+
+  const button =
+    document.getElementById(
+      "save-character-btn"
+    );
+
+  const original =
+    button.innerHTML;
+
+  button.disabled =
+    true;
+
+  button.innerHTML = `
+    <span class="loading">
+      <span class="spinner"></span>
+      저장 중...
+    </span>
+  `;
+
+
+  try {
+
+    await api(
+      `/admin/characters?id=${encodeURIComponent(
+        editingCharacterId
+      )}`,
+      {
+        method: "PUT",
+
+        body:
+          JSON.stringify({
+
+            character: {
+
+              name,
+
+              category,
+
+              avatar,
+
+              tags,
+
+              personality,
+
+              scenario,
+
+              firstMessage
+
+            }
+
+          })
+      }
+    );
+
+
+    closeModal(
+      "character-modal"
+    );
+
+    await loadCharacters();
+
+    showToast(
+      "캐릭터가 수정되었습니다."
+    );
+
+  } catch (error) {
+
+    alert(
+      error.message
+    );
+
+  } finally {
+
+    button.disabled =
+      false;
+
+    button.innerHTML =
+      original;
+  }
+}
+
+
+/* ============================================================
+   캐릭터 삭제
+============================================================ */
+
+async function deleteCharacter(
+  id
+) {
+
+  const character =
+    characters.find(
+      c =>
+        c.id === id
+    );
+
+  if (!character)
+    return;
+
+  const confirmed =
+    confirm(
+      `정말 "${character.name || "이 캐릭터"}"을 삭제할까요?\n\n이 작업은 되돌릴 수 없습니다.`
+    );
+
+  if (!confirmed)
+    return;
+
+
+  try {
+
+    await api(
+      `/admin/characters?id=${encodeURIComponent(
+        id
+      )}`,
+      {
+        method: "DELETE"
+      }
+    );
+
+
+    await loadCharacters();
+
+    showToast(
+      "캐릭터가 삭제되었습니다."
+    );
+
+  } catch (error) {
+
+    alert(
+      error.message
+    );
+  }
+}
+
+
+/* ============================================================
+   모달 닫기
+============================================================ */
+
+function closeModal(
+  id
+) {
+
+  const element =
+    document.getElementById(
+      id
+    );
+
+  if (element) {
+
+    element.classList.add(
+      "hidden"
+    );
+  }
+}
+
+
+/* ============================================================
+   HTML 보안
+============================================================ */
+
+function escapeHtml(
+  value
+) {
+
+  return String(
+    value ?? ""
+  )
+    .replaceAll(
+      "&",
+      "&amp;"
+    )
+    .replaceAll(
+      "<",
+      "&lt;"
+    )
+    .replaceAll(
+      ">",
+      "&gt;"
+    )
+    .replaceAll(
+      '"',
+      "&quot;"
+    )
+    .replaceAll(
+      "'",
+      "&#039;"
+    );
+}
+
+
+function escapeAttr(
+  value
+) {
+
+  return String(
+    value ?? ""
+  )
+    .replaceAll(
+      "\\",
+      "\\\\"
+    )
+    .replaceAll(
+      "'",
+      "\\'"
+    )
+    .replaceAll(
+      '"',
+      "&quot;"
+    )
+    .replaceAll(
+      "\n",
+      ""
+    )
+    .replaceAll(
+      "\r",
+      ""
+    );
+}
+
+
+/* ============================================================
+   전체 새로고침
+============================================================ */
+
+async function refreshAll() {
+
+  const refreshButton =
+    document.getElementById(
+      "refresh-btn"
+    );
+
+  const original =
+    refreshButton.innerHTML;
+
+  refreshButton.disabled =
+    true;
+
+  refreshButton.innerHTML = `
+    <span class="loading">
+      <span class="spinner"></span>
+      <span class="hidden sm:inline">
+        불러오는 중
+      </span>
+    </span>
+  `;
+
+
+  try {
+
+    await Promise.all([
+      loadUsers(),
+      loadCharacters()
+    ]);
+
+    showToast(
+      "관리자 데이터가 새로고침되었습니다."
+    );
+
+  } catch (error) {
+
+    console.error(
+      error
+    );
+
+    alert(
+      error.message
+    );
+
+  } finally {
+
+    refreshButton.disabled =
+      false;
+
+    refreshButton.innerHTML =
+      original;
+  }
+}
+
+
+/* ============================================================
+   초기화
+============================================================ */
+
+async function init() {
+
+  const isAdmin =
+    await checkAdmin();
+
+  if (!isAdmin)
+    return;
+
+
+  try {
+
+    await Promise.all([
+      loadUsers(),
+      loadCharacters()
+    ]);
+
+
+    document.getElementById(
+      "page-loading"
+    ).classList.add(
+      "hidden"
+    );
+
+    document.getElementById(
+      "admin-page"
+    ).classList.remove(
+      "hidden"
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      error
+    );
+
+    document.getElementById(
+      "page-loading"
+    ).innerHTML = `
+      <div
+        class="text-red-400"
+      >
+        <i
+          class="fa-solid fa-triangle-exclamation"
+        ></i>
+
+        <div class="mt-2">
+          관리자 데이터를 불러오지 못했습니다.
+        </div>
+
+        <div
+          class="
+            text-xs
+            text-white/35
+            mt-2
+          "
+        >
+          ${escapeHtml(
+            error.message
+          )}
+        </div>
+
+        <button
+          onclick="location.reload()"
+          class="btn btn-purple mt-4"
+        >
+          다시 시도
+        </button>
+      </div>
+    `;
+  }
+}
+
+
+/* ============================================================
+   이벤트
+============================================================ */
+
+document
+  .getElementById(
+    "save-user-btn"
+  )
+  .addEventListener(
+    "click",
+    saveUser
+  );
+
+
+document
+  .getElementById(
+    "save-character-btn"
+  )
+  .addEventListener(
+    "click",
+    saveCharacter
+  );
+
+
+document
+  .getElementById(
+    "refresh-btn"
+  )
+  .addEventListener(
+    "click",
+    refreshAll
+  );
+
+
+document
+  .getElementById(
+    "home-btn"
+  )
+  .addEventListener(
+    "click",
+    () => {
+      location.href = "./";
+    }
+  );
+
+
+document
+  .getElementById(
+    "logout-btn"
+  )
+  .addEventListener(
+    "click",
+    async () => {
+
+      try {
+
+        await api(
+          "/auth/logout",
+          {
+            method: "POST"
+          }
+        );
+
+      } catch {
+        // 로그아웃 요청 실패해도 로컬 토큰 제거
+      }
+
+      localStorage.removeItem(
+        "zeta_session"
+      );
+
+      location.href = "./";
+    }
+  );
+
+
+/* ============================================================
+   모달 바깥 클릭
+============================================================ */
+
+document
+  .getElementById(
+    "user-modal"
+  )
+  .addEventListener(
+    "click",
+    event => {
+
+      if (
+        event.target.id ===
+        "user-modal"
+      ) {
+
+        closeModal(
+          "user-modal"
+        );
+      }
+    }
+  );
+
+
+document
+  .getElementById(
+    "character-modal"
+  )
+  .addEventListener(
+    "click",
+    event => {
+
+      if (
+        event.target.id ===
+        "character-modal"
+      ) {
+
+        closeModal(
+          "character-modal"
+        );
+      }
+    }
+  );
+
+
+/* ============================================================
+   ESC로 모달 닫기
+============================================================ */
+
+document.addEventListener(
+  "keydown",
+  event => {
+
+    if (
+      event.key ===
+      "Escape"
+    ) {
+
+      closeModal(
+        "user-modal"
+      );
+
+      closeModal(
+        "character-modal"
+      );
+    }
+  }
+);
+
+
+/* ============================================================
+   시작
+============================================================ */
+
+init();
+
+</script>
+
+
+<!-- ZETA ADMIN ENHANCEMENT -->
+<script>
+(function(){
+  const WORKER='https://zeta-ai.pjy-server.workers.dev';
+  const token=localStorage.getItem('zeta_session');
+
+  function adminApi(path, options={}){
+    const headers=Object.assign({'Content-Type':'application/json'}, options.headers||{});
+    if(token) headers.Authorization='Bearer '+token;
+    return fetch(WORKER+path,Object.assign({},options,{headers})).then(async r=>{
+      const d=await r.json().catch(()=>({}));
+      if(!r.ok) throw new Error(d.error||('요청 실패 '+r.status));
+      return d;
+    });
+  }
+
+  function installSearch(){
+    if(document.getElementById('zeta-user-search')) return;
+    const sections=document.querySelectorAll('section.card');
+    if(sections.length<2) return;
+
+    const u=document.createElement('div');
+    u.className='px-5 pt-4';
+    u.innerHTML='<input id="zeta-user-search" class="input" placeholder="회원 검색: 아이디 또는 닉네임">';
+    sections[0].querySelector('.table-wrap')?.before(u);
+
+    const c=document.createElement('div');
+    c.className='px-5 pt-4 grid grid-cols-1 md:grid-cols-3 gap-2';
+    c.innerHTML='<input id="zeta-char-search" class="input" placeholder="캐릭터 검색: 이름 또는 생성자"><select id="zeta-char-category" class="input"><option value="">모든 카테고리</option></select><select id="zeta-char-creator" class="input"><option value="">모든 생성자</option></select>';
+    sections[1].querySelector('.table-wrap')?.before(c);
+
+    const cat=document.getElementById('zeta-char-category'); const creator=document.getElementById('zeta-char-creator');
+    const fillCats=()=>{
+      const set=new Set((characters||[]).map(x=>x.category).filter(Boolean));
+      cat.innerHTML='<option value="">모든 카테고리</option>'+[...set].sort().map(x=>'<option>'+escapeHtml(x)+'</option>').join(''); const creators=new Set((characters||[]).map(x=>x.creator).filter(Boolean)); creator.innerHTML='<option value="">모든 생성자</option>'+[...creators].sort().map(x=>'<option>'+escapeHtml(x)+'</option>').join('');
+    };
+
+    const filterUsers=()=>{
+      const q=(document.getElementById('zeta-user-search').value||'').toLowerCase();
+      document.querySelectorAll('#users-table tr').forEach(tr=>tr.style.display=tr.textContent.toLowerCase().includes(q)?'':'none');
+    };
+    const filterChars=()=>{
+      const q=(document.getElementById('zeta-char-search').value||'').toLowerCase();
+      const catv=cat.value;
+      document.querySelectorAll('#characters-table tr').forEach(tr=>{
+        const t=tr.textContent.toLowerCase();
+        const okq=!q||t.includes(q);
+        const okc=!catv||t.includes(catv);
+        tr.style.display=okq&&okc?'':'none';
+      });
+    };
+    document.getElementById('zeta-user-search').oninput=filterUsers;
+    document.getElementById('zeta-char-search').oninput=filterChars;
+    cat.onchange=filterChars; creator.onchange=filterChars;
+
+    const oldU=window.renderUsers;
+    if(typeof oldU==='function' && !window.__zetaRenderWrapped){
+      window.renderUsers=function(){
+        oldU.apply(this,arguments);
+        filterUsers();
+        fillCats();
+        filterChars();
+      };
+      const oldC=window.renderCharacters;
+      window.renderCharacters=function(){
+        oldC.apply(this,arguments);
+        fillCats();
+        filterChars();
+      };
+      window.__zetaRenderWrapped=true;
+    }
+  }
+
+  function installReports(){
+    if(document.getElementById('zeta-reports-section')) return;
+    const main=document.querySelector('main');
+    if(!main) return;
+    const section=document.createElement('section');
+    section.id='zeta-reports-section';
+    section.className='card overflow-hidden mt-6';
+    section.innerHTML='<div class="p-5 border-b border-white/5 flex items-center justify-between gap-3"><div><div class="section-title"><i class="fa-solid fa-flag"></i><span>신고 관리</span></div><p class="text-xs text-white/35 mt-1">사용자가 신고한 캐릭터를 검토하고 처리합니다.</p></div><button id="zeta-report-refresh" class="btn btn-gray"><i class="fa-solid fa-rotate"></i> 새로고침</button></div><div class="table-wrap"><table><thead><tr><th>캐릭터</th><th>신고자</th><th>사유</th><th>상태</th><th>접수일</th><th>관리</th></tr></thead><tbody id="zeta-reports-table"><tr><td colspan="6" class="text-center text-white/35 py-10">불러오는 중...</td></tr></tbody></table></div>';
+    main.appendChild(section);
+
+    async function loadReports(){
+      const tbody=document.getElementById('zeta-reports-table');
+      try{
+        const data=await adminApi('/admin/reports');
+        const reports=Array.isArray(data.reports)?data.reports:[];
+        if(!reports.length){tbody.innerHTML='<tr><td colspan="6" class="text-center text-white/35 py-10">신고가 없습니다.</td></tr>';return;}
+        tbody.innerHTML=reports.map(r=>'<tr>'+
+          '<td><div class="font-bold">'+escapeHtml(r.characterName||'-')+'</div><div class="text-[10px] text-white/30">'+escapeHtml(r.characterId||'')+'</div></td>'+
+          '<td>'+escapeHtml(r.reporterNickname||r.reporterUsername||'-')+'</td>'+
+          '<td><div>'+escapeHtml(r.reason||'-')+'</div><div class="text-[10px] text-white/35 mt-1 max-w-xs truncate" title="'+escapeAttr(r.detail||'')+'">'+escapeHtml(r.detail||'')+'</div></td>'+
+          '<td><select class="input !w-auto !py-1 !px-2" data-report-status="'+escapeAttr(r.id)+'">'+
+            ['pending','reviewing','resolved','dismissed'].map(st=>'<option value="'+st+'" '+(r.status===st?'selected':'')+'>'+st+'</option>').join('')+
+          '</select></td>'+
+          '<td class="text-white/45 text-xs">'+formatDate(r.createdAt)+'</td>'+
+          '<td><button class="btn btn-blue" data-report-save="'+escapeAttr(r.id)+'"><i class="fa-solid fa-floppy-disk"></i></button> <button class="btn btn-red" data-report-delete="'+escapeAttr(r.id)+'"><i class="fa-solid fa-trash"></i></button></td>'+
+        '</tr>').join('');
+        tbody.querySelectorAll('[data-report-save]').forEach(b=>b.onclick=async()=>{
+          const id=b.dataset.reportSave; const status=tbody.querySelector('[data-report-status="'+CSS.escape(id)+'"]').value;
+          try{await adminApi('/admin/reports?id='+encodeURIComponent(id),{method:'PATCH',body:JSON.stringify({status})});showToast('신고 상태가 변경되었습니다.');await loadReports();}catch(e){alert(e.message);}
+        });
+        tbody.querySelectorAll('[data-report-delete]').forEach(b=>b.onclick=async()=>{
+          if(!confirm('이 신고 기록을 삭제할까요?'))return;
+          try{await adminApi('/admin/reports?id='+encodeURIComponent(b.dataset.reportDelete),{method:'DELETE'});showToast('신고 기록이 삭제되었습니다.');await loadReports();}catch(e){alert(e.message);}
+        });
+      }catch(e){tbody.innerHTML='<tr><td colspan="6" class="text-center text-rose-400 py-10">'+escapeHtml(e.message)+'</td></tr>';}
+    }
+    document.getElementById('zeta-report-refresh').onclick=loadReports;
+    window.__zetaLoadReports=loadReports;
+    loadReports();
+  }
+
+  function install(){
+    installSearch();
+    installReports();
+  }
+  window.addEventListener('load',()=>setTimeout(install,500));
+  setInterval(install,2000);
+})();
+</script>
+<!-- END ZETA ADMIN ENHANCEMENT -->\n<!-- ZETA ADMIN SECURITY PATCH -->
+<script>
+(function(){
+  if(window.__zetaSecurityAdminPatch)return;
+  window.__zetaSecurityAdminPatch=true;
+  const WORKER='https://zeta-ai.pjy-server.workers.dev';
+  const token=localStorage.getItem('zeta_session');
+  const api2=(path,options={})=>fetch(WORKER+path,{...options,headers:{'Content-Type':'application/json',Authorization:'Bearer '+token}}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||('요청 실패 '+r.status));return d;});
+
+  function patchUserRows(){
+    document.querySelectorAll('#users-table tr').forEach(tr=>{
+      const cells=tr.querySelectorAll('td'); if(cells.length<4)return;
+      const username=(cells[0].textContent||'').trim().split(/\s+/)[0];
+      const user=(users||[]).find(u=>u.username===username); if(!user)return;
+      const state=user.status||'active';
+      if(!cells[1].querySelector('[data-zeta-status]')){
+        const badge=document.createElement('span');
+        badge.dataset.zetaStatus='1';
+        badge.className='badge '+(state==='suspended'?'bg-red-500/10 text-red-300':'bg-green-500/10 text-green-300');
+        badge.textContent=state==='suspended'?'정지':'정상';
+        cells[1].appendChild(badge);
+      }
+      if(username!=='admin'&&!cells[3].querySelector('[data-zeta-suspend]')){
+        const b=document.createElement('button');
+        b.dataset.zetaSuspend='1'; b.className='btn '+(state==='suspended'?'btn-yellow':'btn-red');
+        b.innerHTML=state==='suspended'?'<i class="fa-solid fa-unlock"></i> 해제':'<i class="fa-solid fa-ban"></i> 정지';
+        b.onclick=async()=>{
+          try{await api2('/admin/users?username='+encodeURIComponent(username),{method:'PATCH',body:JSON.stringify({status:state==='suspended'?'active':'suspended'})});showToast(state==='suspended'?'회원 정지가 해제되었습니다.':'회원이 정지되었습니다.');await loadUsers();}catch(e){alert(e.message);}
+        };
+        cells[3].appendChild(b);
+      }
+    });
+  }
+
+  function patchCharacterRows(){
+    document.querySelectorAll('#characters-table tr').forEach(tr=>{
+      const cells=tr.querySelectorAll('td'); if(cells.length<5)return;
+      const text=tr.textContent||'';
+      const c=(characters||[]).find(x=>text.includes(x.name||'') && text.includes(x.id||'')); if(!c)return;
+      if(!cells[2].querySelector('[data-zeta-visibility]')){
+        const b=document.createElement('span');
+        b.dataset.zetaVisibility='1';
+        b.className='badge '+((c.visibility||'public')==='private'?'bg-yellow-500/10 text-yellow-300':'bg-cyan-500/10 text-cyan-300');
+        b.textContent=(c.visibility||'public')==='private'?'비공개':'공개';
+        cells[2].appendChild(b);
+      }
+    });
+  }
+
+  const install=()=>{
+    patchUserRows();
+    patchCharacterRows();
+  };
+  setTimeout(install,1000);
+  setInterval(install,2000);
+})();
+</script>
+<!-- END ZETA ADMIN SECURITY PATCH -->
+
+
+<!-- ZETA ADMIN FINAL FIX -->
+<script>
+(function(){
+  if(window.__zetaAdminFinalFix)return;
+  window.__zetaAdminFinalFix=true;
+  function fixCharacterFilter(){
+    const q=(document.getElementById('zeta-char-search')?.value||'').toLowerCase();
+    const cat=(document.getElementById('zeta-char-category')?.value||'').toLowerCase();
+    const creator=(document.getElementById('zeta-char-creator')?.value||'').toLowerCase();
+    document.querySelectorAll('#characters-table tr').forEach(tr=>{
+      const t=(tr.textContent||'').toLowerCase();
+      tr.style.display=(!q||t.includes(q))&&(!cat||t.includes(cat))&&(!creator||t.includes(creator))?'':'none';
+    });
+  }
+  function install(){
+    document.getElementById('zeta-char-search')?.addEventListener('input',fixCharacterFilter);
+    document.getElementById('zeta-char-category')?.addEventListener('change',fixCharacterFilter);
+    document.getElementById('zeta-char-creator')?.addEventListener('change',fixCharacterFilter);
+    fixCharacterFilter();
+  }
+  window.addEventListener('load',()=>setTimeout(install,1200));
+  setInterval(install,3000);
+})();
+</script>
+<!-- END ZETA ADMIN FINAL FIX -->
+\n</body>
+</html>
