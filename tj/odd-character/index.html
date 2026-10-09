@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0e1018">
+<title>👀 다른 글자 찾기 | TJ Games</title>
+<style>
+:root{--bg:#0e1018;--panel:#171a26;--line:#262a3b;--tx:#e9ecf8;--dim:#8b91ab;--ac:#7c5cff;--ac2:#22d3ee;--ok:#34d399;--bad:#ff4d6d;--gold:#fbbf24}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--tx);overflow:hidden;touch-action:manipulation;overscroll-behavior:none;
+font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif}
+#app{position:relative;height:100%;height:100dvh;max-width:900px;margin:0 auto;padding:env(safe-area-inset-top) 10px env(safe-area-inset-bottom)}
+.scr{display:none;height:100%;flex-direction:column}
+.scr.on{display:flex}
+h1{margin:0;font-size:clamp(28px,7vw,44px);letter-spacing:-1px;text-align:center}
+.sub{color:var(--dim);text-align:center;margin:6px 0 0;font-size:14px}
+#menu,#result{justify-content:center;align-items:center;gap:14px;text-align:center}
+.btn{font:inherit;font-weight:700;border:0;border-radius:14px;padding:15px 22px;color:#fff;background:var(--ac);cursor:pointer;width:min(360px,100%);font-size:17px;transition:transform .08s,filter .15s}
+.btn:active{transform:scale(.97)}
+.btn:hover{filter:brightness(1.12)}
+.btn small{display:block;font-weight:400;opacity:.8;font-size:12px;margin-top:3px}
+.btn.alt{background:var(--panel);border:1px solid var(--line)}
+.rec{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;width:min(360px,100%);margin-top:6px}
+.rec div,.stats div{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px;font-size:12px;color:var(--dim)}
+.rec b,.stats b{display:block;font-size:20px;color:var(--tx);margin-top:2px}
+.hud{display:grid;grid-template-columns:repeat(4,1fr) auto;gap:6px;padding:8px 0 6px}
+.hud div{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:5px 4px;text-align:center;font-size:10px;color:var(--dim)}
+.hud b{display:block;font-size:clamp(15px,4.5vw,22px);color:var(--tx);font-variant-numeric:tabular-nums}
+.hud .quit{border:0;background:var(--panel);color:var(--dim);font-size:16px;border-radius:10px;cursor:pointer;padding:0 10px}
+#tm.low{color:var(--bad)}
+#tm.pen{color:var(--bad);animation:pen .3s}
+@keyframes pen{50%{transform:scale(1.25)}}
+.bar{height:6px;background:var(--panel);border-radius:4px;overflow:hidden;margin-bottom:8px}
+#bar{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));transform-origin:left}
+#bar.low{background:var(--bad)}
+#field{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;margin-bottom:10px;position:relative}
+#grid{display:grid;justify-content:center;align-content:center;font-family:Verdana,"DejaVu Sans",Arial,sans-serif;font-weight:700}
+.c{display:flex;align-items:center;justify-content:center;font-size:var(--fs);line-height:1;color:var(--tx);cursor:pointer;border-radius:4px;overflow:hidden}
+.c.bad{background:rgba(255,77,109,.35);color:#fff}
+.c.reveal{position:relative;z-index:2;background:var(--ok);color:#06220f;box-shadow:0 0 0 3px #fff,0 0 22px 6px var(--ok);animation:rv .5s infinite alternate}
+@keyframes rv{from{transform:scale(1.5)}to{transform:scale(2.1)}}
+#grid.over .c:not(.reveal){opacity:.35}
+@media (hover:hover){.c:hover{background:rgba(124,92,255,.18)}}
+#field.shake{animation:sh .25s}
+@keyframes sh{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+#cd{position:absolute;inset:0;display:none;align-items:center;justify-content:center;font-size:clamp(70px,22vw,150px);font-weight:900;background:var(--bg);z-index:5;color:var(--ac2)}
+#cd.on{display:flex}
+#cd i{font-style:normal;animation:pop .7s}
+@keyframes pop{0%{transform:scale(1.8);opacity:0}30%{opacity:1}100%{transform:scale(.9)}}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:20}
+.fx{position:fixed;transform:translate(-50%,-50%);font-weight:900;font-size:22px;white-space:nowrap;text-shadow:0 2px 8px #000;animation:up .8s ease-out forwards}
+.fx.ok{color:var(--ok)}.fx.bad{color:var(--bad)}
+.fx.big{font-size:clamp(34px,10vw,64px);color:var(--gold);animation-duration:1s}
+@keyframes up{0%{opacity:0;margin-top:0;scale:.6}15%{opacity:1;scale:1.15}100%{opacity:0;margin-top:-60px;scale:1}}
+.ring{position:fixed;border:3px solid var(--ok);border-radius:50%;transform:translate(-50%,-50%);animation:ring .45s ease-out forwards}
+@keyframes ring{from{opacity:1;scale:1}to{opacity:0;scale:2.6}}
+.grade{font-size:84px;font-weight:900;line-height:1;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.grade.S{background:linear-gradient(135deg,var(--gold),#ff7a45);-webkit-background-clip:text;background-clip:text}
+.newrec{color:var(--gold);font-weight:900;font-size:22px;animation:pulse .8s infinite alternate}
+@keyframes pulse{to{transform:scale(1.08)}}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;width:min(400px,100%)}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important}}
+</style>
+</head>
+<body>
+<div id="app">
+  <section id="menu" class="scr on">
+    <div><h1>👀 다른 글자 찾기</h1><p class="sub">TJ Games · 비슷한 글자 속에 숨은 딱 하나를 찾아라</p></div>
+    <button class="btn" data-mode="stage">🔥 스테이지 모드<small>점점 어려워진다. 시간 초과 시 종료</small></button>
+    <button class="btn" data-mode="sprint" style="background:var(--ac2);color:#06222a">⏱️ 60초 모드<small>60초 동안 최대한 많이 맞히기</small></button>
+    <div class="rec" id="rec"></div>
+  </section>
+
+  <section id="game" class="scr">
+    <div class="hud">
+      <div>스테이지<b id="hSt">1</b></div>
+      <div>점수<b id="hSc">0</b></div>
+      <div>콤보<b id="hCb">0</b></div>
+      <div>남은시간<b id="tm">0.0</b></div>
+      <button class="quit" id="quit" aria-label="나가기">✕</button>
+    </div>
+    <div class="bar"><i id="bar"></i></div>
+    <div id="field"><div id="grid"></div><div id="cd"></div></div>
+  </section>
+
+  <section id="result" class="scr">
+    <div id="newrec" class="newrec" style="display:none">🎉 NEW RECORD!</div>
+    <div class="grade" id="grade">F</div>
+    <div class="sub" id="rmode"></div>
+    <div class="sub" id="ansInfo" style="font-size:16px;color:var(--tx)"></div>
+    <div class="stats" id="stats"></div>
+    <button class="btn" id="again">다시 도전</button>
+    <button class="btn alt" id="toMenu">메뉴로</button>
+  </section>
+</div>
+<div id="fx"></div>
+
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id)};
+var PAIRS=[
+ [["E","F"],["D","O"],["H","N"],["P","R"],["M","W"],["U","V"],["T","Y"],["A","R"]],
+ [["O","0"],["8","B"],["C","G"],["S","5"],["Z","2"],["6","G"],["1","I"],["Q","O"]],
+ [["l","I"],["O","0"],["8","3"],["B","8"],["5","S"],["G","6"],["D","0"],["1","l"],["I","1"],["C","G"],["S","5"],["Z","2"]]
+];
+var MINC=22,KEY="tjgames_diffchar_v1";
+var R={score:0,stage:0,combo:0,time:null};
+try{var sv=JSON.parse(localStorage.getItem(KEY));if(sv)R=Object.assign(R,sv)}catch(e){}
+function saveR(){try{localStorage.setItem(KEY,JSON.stringify(R))}catch(e){}}
+
+var G=null,raf=0,runId=0,lastMode="stage";
+
+function show(id){["menu","game","result"].forEach(function(s){$(s).classList.toggle("on",s===id)})}
+function fmtT(t){return t==null?"-":t.toFixed(2)+"초"}
+function renderRec(){
+ $("rec").innerHTML=
+ "<div>최고 점수<b>"+R.score+"</b></div><div>최고 스테이지<b>"+(R.stage||"-")+"</b></div>"+
+ "<div>최고 콤보<b>"+R.combo+"</b></div><div>가장 빠른 기록<b>"+fmtT(R.time)+"</b></div>";
+}
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+
+/* ---------- 레이아웃 (겹침/이탈 방지) ---------- */
+function layout(){
+ if(!G)return;
+ var f=$("field"),W=f.clientWidth,H=f.clientHeight,n=G.n,best=0,bc=1,br=n;
+ for(var c=1;c<=n;c++){
+  var r=Math.ceil(n/c),s=Math.min(W/c,H/r);
+  if(s>best){best=s;bc=c;br=r}
+ }
+ var s=Math.max(8,Math.floor(best)),g=$("grid");
+ g.style.gridTemplateColumns="repeat("+bc+","+s+"px)";
+ g.style.gridAutoRows=s+"px";
+ g.style.setProperty("--fs",Math.floor(s*0.64)+"px");
+}
+function buildStage(){
+ var st=G.stage,f=$("field"),W=f.clientWidth,H=f.clientHeight;
+ var n=Math.round(25+9*Math.pow(st-1,1.25));
+ n=Math.min(n,360,Math.floor(W/MINC)*Math.floor(H/MINC));
+ n=Math.max(n,4);
+ G.n=n;
+ var pool=st<=3?PAIRS[0]:st<=8?PAIRS[1]:PAIRS[2];
+ var p=pick(pool).slice();
+ if(Math.random()<.5)p.reverse();
+ G.base=p[0];G.odd=p[1];
+ G.ans=Math.floor(Math.random()*n);       // 정답 위치: 매번 랜덤, 정확히 1개
+ var h="";
+ for(var i=0;i<n;i++)h+='<div class="c" data-i="'+i+'">'+(i===G.ans?p[1]:p[0])+"</div>";
+ var g=$("grid");g.innerHTML=h;
+ g.style.opacity=Math.max(.7,1-st*.012);
+ G.sEl=G.el;
+ if(G.mode==="stage"){G.limit=Math.max(5,15-(st-1)*0.5);G.t=G.limit}
+ layout();
+}
+
+/* ---------- 효과 ---------- */
+function fx(x,y,txt,cls){
+ var d=document.createElement("div");d.className="fx "+cls;d.textContent=txt;
+ d.style.left=x+"px";d.style.top=y+"px";$("fx").appendChild(d);
+ setTimeout(function(){d.remove()},1000);
+}
+function ring(r){
+ var d=document.createElement("div");d.className="ring";
+ var s=Math.max(r.width,r.height)*1.1;
+ d.style.cssText="left:"+(r.left+r.width/2)+"px;top:"+(r.top+r.height/2)+"px;width:"+s+"px;height:"+s+"px";
+ $("fx").appendChild(d);setTimeout(function(){d.remove()},500);
+}
+
+/* ---------- 게임 흐름 ---------- */
+function start(mode){
+ lastMode=mode;runId++;var id=runId;
+ G={mode:mode,stage:1,score:0,combo:0,maxCombo:0,correct:0,miss:0,times:[],fast:null,el:0,sEl:0,t:0,limit:0,run:false,n:0,ans:0};
+ show("game");
+ $("grid").innerHTML="";
+ hud();
+ var cd=$("cd"),seq=["3","2","1","GO!"],i=0;
+ cd.classList.add("on");
+ (function step(){
+  if(id!==runId)return;
+  if(i>=seq.length){cd.classList.remove("on");begin();return}
+  cd.innerHTML="<i>"+seq[i++]+"</i>";
+  setTimeout(step,700);
+ })();
+}
+function begin(){
+ if(G.mode==="sprint"){G.limit=60;G.t=60}
+ buildStage();
+ G.run=true;
+ var last=performance.now();
+ function loop(now){
+  if(!G||!G.run)return;
+  var dt=Math.min(.1,(now-last)/1000);last=now;
+  G.el+=dt;G.t-=dt;
+  if(G.t<=0){G.t=0;hud();end();return}
+  hud();
+  raf=requestAnimationFrame(loop);
+ }
+ raf=requestAnimationFrame(loop);
+}
+function hud(){
+ $("hSt").textContent=G.mode==="sprint"?G.correct:G.stage;
+ $("hSc").textContent=G.score;
+ $("hCb").textContent=G.combo;
+ var tm=$("tm");tm.textContent=G.t.toFixed(1);
+ var low=G.t<=3;tm.classList.toggle("low",low);
+ var b=$("bar");b.style.transform="scaleX("+(G.limit?Math.max(0,G.t/G.limit):1)+")";b.classList.toggle("low",low);
+}
+function hit(i,cell){
+ var r=cell.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+ if(i===G.ans){
+  var ft=G.el-G.sEl;
+  G.times.push(ft);if(G.fast===null||ft<G.fast)G.fast=ft;
+  G.correct++;G.combo++;if(G.combo>G.maxCombo)G.maxCombo=G.combo;
+  var pts=100+G.stage*10+Math.max(0,Math.round(60-ft*8))+(G.combo-1)*10;
+  G.score+=pts;
+  ring(r);fx(cx,cy,"정답! +"+pts,"ok");
+  if(G.combo>=5&&G.combo%5===0){
+   var fr=$("field").getBoundingClientRect();
+   fx(fr.left+fr.width/2,fr.top+fr.height/3,G.combo+" COMBO!","big");
+  }
+  G.stage++;
+  buildStage();hud();
+ }else{
+  G.miss++;G.combo=0;G.score=Math.max(0,G.score-50);
+  var pen=G.mode==="sprint"?3:2;G.t-=pen;
+  cell.classList.add("bad");
+  fx(cx,cy,"MISS -"+pen+"s","bad");
+  var f=$("field");f.classList.remove("shake");void f.offsetWidth;f.classList.add("shake");
+  var tm=$("tm");tm.classList.remove("pen");void tm.offsetWidth;tm.classList.add("pen");
+  hud();
+ }
+}
+function grade(){
+ var v=G.mode==="stage"?G.stage:G.correct;
+ var th=G.mode==="stage"?[25,18,12,7,3]:[30,22,15,9,4];
+ var L=["S","A","B","C","D"];
+ for(var i=0;i<5;i++)if(v>=th[i])return L[i];
+ return "F";
+}
+function end(){
+ G.run=false;cancelAnimationFrame(raf);
+ var myId=runId;
+ var ac=$("grid").children[G.ans];
+ if(ac){
+  ac.classList.remove("bad");ac.classList.add("reveal");$("grid").classList.add("over");
+  var fr=$("field").getBoundingClientRect();
+  fx(fr.left+fr.width/2,fr.top+28,"⏰ 시간 초과! 정답은 여기","bad");
+ }
+ setTimeout(function(){
+  $("grid").classList.remove("over");
+  if(myId!==runId)return;
+  var isNew=G.score>R.score;
+  var reached=G.mode==="stage"?G.stage:G.correct;
+  if(G.score>R.score)R.score=G.score;
+  if(reached>R.stage)R.stage=reached;
+  if(G.maxCombo>R.combo)R.combo=G.maxCombo;
+  if(G.fast!==null&&(R.time===null||G.fast<R.time)){R.time=G.fast;isNew=true}
+  if(G.score===0&&G.correct===0)isNew=false;
+  saveR();
+  var g=grade(),avg=G.times.length?G.times.reduce(function(a,b){return a+b},0)/G.times.length:null;
+  $("grade").textContent=g;$("grade").className="grade "+g;
+  $("rmode").textContent=G.mode==="stage"?"스테이지 모드":"60초 모드";
+  $("ansInfo").innerHTML="마지막 정답: <b style=\"color:var(--ok);font-size:22px\">"+G.odd+"</b> <span style=\"color:var(--dim)\">(나머지는 "+G.base+")</span>";
+  $("newrec").style.display=isNew?"block":"none";
+  $("stats").innerHTML=
+   "<div>최종 점수<b>"+G.score+"</b></div>"+
+   "<div>도달 스테이지<b>"+G.stage+"</b></div>"+
+   "<div>정답 개수<b>"+G.correct+"</b></div>"+
+   "<div>MISS 횟수<b>"+G.miss+"</b></div>"+
+   "<div>최고 콤보<b>"+G.maxCombo+"</b></div>"+
+   "<div>평균 찾기 시간<b>"+fmtT(avg)+"</b></div>"+
+   "<div style='grid-column:1/-1'>가장 빠른 기록<b>"+fmtT(G.fast)+"</b></div>";
+  show("result");
+ },2200);
+}
+function quit(){runId++;if(G)G.run=false;cancelAnimationFrame(raf);$("cd").classList.remove("on");renderRec();show("menu")}
+
+/* ---------- 이벤트 ---------- */
+$("grid").addEventListener("pointerdown",function(e){
+ if(!G||!G.run)return;
+ var c=e.target.closest(".c");if(!c)return;
+ e.preventDefault();
+ hit(+c.dataset.i,c);
+});
+$("grid").addEventListener("contextmenu",function(e){e.preventDefault()});
+document.querySelectorAll("[data-mode]").forEach(function(b){b.addEventListener("click",function(){start(b.dataset.mode)})});
+$("again").addEventListener("click",function(){start(lastMode)});
+$("toMenu").addEventListener("click",quit);
+$("quit").addEventListener("click",quit);
+window.addEventListener("resize",layout);
+window.addEventListener("orientationchange",function(){setTimeout(layout,200)});
+["gesturestart","gesturechange","dblclick"].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault()},{passive:false})});
+renderRec();
+})();
+</script>
+</body>
+</html>

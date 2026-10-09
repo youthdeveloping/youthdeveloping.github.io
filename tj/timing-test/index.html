@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>타이밍 감각 테스트</title>
+  <!-- 눈에 잘 띄고 두꺼운 프리텐다드 폰트 적용 -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    }
+
+    body {
+      background-color: #0b0f19;
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    /* 설정 화면 카드 */
+    #setup-screen {
+      background-color: #172033;
+      padding: 36px 28px;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 440px;
+      box-shadow: 0 20px 30px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    .header-area {
+      text-align: center;
+    }
+
+    .header-area .icon {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+
+    .header-area h1 {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .header-area p {
+      font-size: 14px;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #cbd5e1;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .button-group {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .button-group-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .option-btn {
+      background-color: #243049;
+      border: 1px solid #334155;
+      color: #ffffff;
+      padding: 14px 0;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .option-btn.active {
+      background-color: #2563eb;
+      border-color: #60a5fa;
+      box-shadow: 0 0 12px rgba(37, 99, 235, 0.5);
+    }
+
+    .start-btn {
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      padding: 18px;
+      border-radius: 28px;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 8px;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+      transition: all 0.2s;
+    }
+
+    .start-btn:hover {
+      background-color: #1d4ed8;
+    }
+
+    /* 게임 전체화면 */
+    #game-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .round-badge {
+      position: absolute;
+      top: 28px;
+      background-color: rgba(255, 255, 255, 0.15);
+      padding: 6px 16px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .game-icon {
+      font-size: 52px;
+      margin-bottom: 12px;
+    }
+
+    .game-status {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+
+    .timer-display {
+      font-size: 72px;
+      font-weight: 900;
+      margin-bottom: 16px;
+      letter-spacing: -1px;
+    }
+
+    .game-subtext {
+      font-size: 15px;
+      font-weight: 600;
+      opacity: 0.85;
+    }
+
+    .details-text {
+      font-size: 13px;
+      opacity: 0.6;
+      margin-top: 10px;
+    }
+
+    /* 배경 상태 */
+    .bg-ready { background-color: #121829; }
+    .bg-running { background-color: #0284c7; }
+    .bg-blackout { background-color: #000000; }
+    .bg-result { background-color: #0d9488; }
+
+    /* 최종 결과 요약 모달 (이미지와 완전 일치) */
+    #summary-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #0b0f19;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .modal-content {
+      background-color: #172033;
+      padding: 32px 24px;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 420px;
+      text-align: center;
+      box-shadow: 0 20px 30px rgba(0, 0, 0, 0.6);
+    }
+
+    .modal-icon {
+      font-size: 36px;
+      margin-bottom: 10px;
+    }
+
+    .modal-title {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .modal-grade {
+      font-size: 18px;
+      font-weight: 800;
+      color: #38bdf8;
+      margin-bottom: 24px;
+    }
+
+    /* 통계 카드 3개 레이아웃 */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .stat-card {
+      background-color: #0f172a;
+      padding: 14px 6px;
+      border-radius: 12px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .val-yellow { color: #facc15; }
+    .val-green { color: #4ade80; }
+    .val-red { color: #f87171; }
+
+    /* 라운드 기록 리스트 */
+    .round-list {
+      background-color: #0f172a;
+      border-radius: 12px;
+      padding: 8px 12px;
+      max-height: 180px;
+      overflow-y: auto;
+      margin-bottom: 24px;
+    }
+
+    .round-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 4px;
+      font-size: 13px;
+      font-weight: 700;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    .round-item:last-child {
+      border-bottom: none;
+    }
+
+    .round-item-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #cbd5e1;
+    }
+
+    .round-item-right {
+      color: #94a3b8;
+    }
+
+    .restart-btn {
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      padding: 16px;
+      border-radius: 24px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. 설정 화면 -->
+  <div id="setup-screen">
+    <div class="header-area">
+      <div class="icon">👀</div>
+      <h1>타이밍 감각 테스트</h1>
+      <p>완전 암전(Blackout) 상태에서 오직 감각만으로 정지시키세요!</p>
+    </div>
+
+    <div>
+      <div class="section-title">⏰ 목표 시간</div>
+      <div class="button-group" id="target-options">
+        <button class="option-btn" data-val="5">5.00초</button>
+        <button class="option-btn" data-val="10">10.00초</button>
+        <button class="option-btn active" data-val="15">15.00초</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">🔄 라운드 수</div>
+      <div class="button-group" id="round-options">
+        <button class="option-btn" data-val="3">3 라운드</button>
+        <button class="option-btn active" data-val="5">5 라운드</button>
+        <button class="option-btn" data-val="10">10 라운드</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">👓 블라인드 시점</div>
+      <div class="button-group-2" id="blind-options">
+        <button class="option-btn active" data-val="3">3초 후 완전 암전</button>
+        <button class="option-btn" data-val="1">1초 후 완전 암전</button>
+      </div>
+    </div>
+
+    <button class="start-btn" id="start-game-btn">테스트 시작하기 🚀</button>
+  </div>
+
+  <!-- 2. 인게임 화면 -->
+  <div id="game-screen" class="bg-ready">
+    <div class="round-badge" id="round-badge">ROUND 1 / 5</div>
+    
+    <div class="game-icon" id="game-icon">⏰</div>
+    <div class="game-status" id="game-status">클릭하여 시작</div>
+    <div class="timer-display" id="timer-display">00.000s</div>
+    <div class="game-subtext" id="game-subtext">화면 클릭 시 타이머 시작</div>
+    <div class="details-text" id="details-text"></div>
+  </div>
+
+  <!-- 3. 최종 결과 요약 화면 -->
+  <div id="summary-modal">
+    <div class="modal-content">
+      <div class="modal-icon">🏆</div>
+      <div class="modal-title">최종 결과 분석</div>
+      <div class="modal-grade" id="final-grade">C급 둔감한 여행자</div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">평균 오차</div>
+          <div class="stat-value val-yellow" id="stat-avg">±0.000s</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">최고 라운드</div>
+          <div class="stat-value val-green" id="stat-best">±0.000s</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">최저 라운드</div>
+          <div class="stat-value val-red" id="stat-worst">±0.000s</div>
+        </div>
+      </div>
+
+      <div class="round-list" id="round-list-container">
+        <!-- JS dynamic render -->
+      </div>
+
+      <button class="restart-btn" id="restart-btn">설정으로 돌아가기 🔄</button>
+    </div>
+  </div>
+
+  <script>
+    let config = { targetTime: 15, totalRounds: 5, blindTime: 3 };
+    let gameState = 'SETUP';
+    let currentRound = 1;
+    let startTime = 0;
+    let timerInterval = null;
+    let roundResults = []; // { stoppedTime, diff, icon }
+    let stoppedTime = 0;
+
+    const setupScreen = document.getElementById('setup-screen');
+    const gameScreen = document.getElementById('game-screen');
+    const roundBadge = document.getElementById('round-badge');
+    const gameIcon = document.getElementById('game-icon');
+    const gameStatus = document.getElementById('game-status');
+    const timerDisplay = document.getElementById('timer-display');
+    const gameSubtext = document.getElementById('game-subtext');
+    const detailsText = document.getElementById('details-text');
+    const summaryModal = document.getElementById('summary-modal');
+
+    function setupOptionGroup(groupId, key) {
+      const container = document.getElementById(groupId);
+      container.addEventListener('click', (e) => {
+        if (e.target.classList.contains('option-btn')) {
+          container.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('active'));
+          e.target.classList.add('active');
+          config[key] = parseFloat(e.target.getAttribute('data-val'));
+        }
+      });
+    }
+
+    setupOptionGroup('target-options', 'targetTime');
+    setupOptionGroup('round-options', 'totalRounds');
+    setupOptionGroup('blind-options', 'blindTime');
+
+    document.getElementById('start-game-btn').addEventListener('click', () => {
+      currentRound = 1;
+      roundResults = [];
+      setupScreen.style.display = 'none';
+      gameScreen.style.display = 'flex';
+      setReadyState();
+    });
+
+    function setReadyState() {
+      gameState = 'READY';
+      gameScreen.className = 'bg-ready';
+      roundBadge.textContent = `ROUND ${currentRound} / ${config.totalRounds}`;
+      gameIcon.textContent = '⏰';
+      gameStatus.textContent = '클릭하여 시작';
+      timerDisplay.style.display = 'block';
+      timerDisplay.textContent = '00.000s';
+      gameSubtext.textContent = `목표: ${config.targetTime.toFixed(2)}s (화면 클릭 시 타이머 시작)`;
+      detailsText.textContent = '';
+    }
+
+    gameScreen.addEventListener('click', () => {
+      if (gameState === 'READY') startTimer();
+      else if (gameState === 'RUNNING' || gameState === 'BLACKOUT') stopTimer();
+      else if (gameState === 'RESULT') nextRound();
+    });
+
+    function startTimer() {
+      gameState = 'RUNNING';
+      gameScreen.className = 'bg-running';
+      startTime = performance.now();
+      
+      gameIcon.textContent = '👀';
+      gameStatus.textContent = '타이머 동작 중...';
+      gameSubtext.textContent = '잠시 후 완전 암전됩니다!';
+
+      timerInterval = setInterval(() => {
+        const elapsed = (performance.now() - startTime) / 1000;
+        
+        if (elapsed < config.blindTime) {
+          timerDisplay.textContent = `${elapsed.toFixed(3)}s`;
+        } else {
+          if (gameState !== 'BLACKOUT') {
+            gameState = 'BLACKOUT';
+            gameScreen.className = 'bg-blackout';
+            gameIcon.textContent = '🕶';
+            gameStatus.textContent = '칠흑의 암전 상태!';
+            timerDisplay.style.display = 'none';
+            gameSubtext.textContent = `오직 감각으로 정지시키세요! (목표: ${config.targetTime.toFixed(2)}s)`;
+          }
+        }
+      }, 10);
+    }
+
+    function stopTimer() {
+      clearInterval(timerInterval);
+      stoppedTime = (performance.now() - startTime) / 1000;
+      const diff = stoppedTime - config.targetTime;
+
+      const absDiff = Math.abs(diff);
+      let evalText = '';
+      let evalIcon = '🐻';
+
+      if (absDiff < 0.1) { evalIcon = '🎯'; evalText = '신의 감각'; }
+      else if (absDiff < 0.5) { evalIcon = '👍'; evalText = '날카로운 감각'; }
+      else if (absDiff < 1.5) { evalIcon = '🐻'; evalText = '둔감함'; }
+      else { evalIcon = '🗿'; evalText = '시간 감각 상실'; }
+
+      roundResults.push({ stoppedTime, diff, icon: evalIcon });
+
+      gameState = 'RESULT';
+      gameScreen.className = 'bg-result';
+      timerDisplay.style.display = 'block';
+
+      const sign = diff >= 0 ? '+' : '';
+      gameIcon.textContent = evalIcon;
+      gameStatus.textContent = `${evalText} (${sign}${diff.toFixed(3)}s)`;
+      timerDisplay.textContent = `${stoppedTime.toFixed(3)}s`;
+      gameSubtext.textContent = `목표: ${config.targetTime.toFixed(2)}s | 반응: ${stoppedTime.toFixed(3)}s`;
+      detailsText.textContent = '[클릭하여 다음 라운드]';
+    }
+
+    function nextRound() {
+      if (currentRound < config.totalRounds) {
+        currentRound++;
+        setReadyState();
+      } else {
+        showFinalSummary();
+      }
+    }
+
+    function showFinalSummary() {
+      const absDiffs = roundResults.map(r => Math.abs(r.diff));
+      const avgDiff = absDiffs.reduce((a, b) => a + b, 0) / absDiffs.length;
+      const bestDiff = Math.min(...absDiffs);
+      const worstDiff = Math.max(...absDiffs);
+
+      let grade = 'C급 둔감한 여행자';
+      if (avgDiff < 0.15) grade = 'S급 초감각 능력자';
+      else if (avgDiff < 0.5) grade = 'A급 정밀한 시계';
+      else if (avgDiff < 1.0) grade = 'B급 평범한 감각가';
+
+      document.getElementById('final-grade').textContent = grade;
+      document.getElementById('stat-avg').textContent = `±${avgDiff.toFixed(3)}s`;
+      document.getElementById('stat-best').textContent = `±${bestDiff.toFixed(3)}s`;
+      document.getElementById('stat-worst').textContent = `±${worstDiff.toFixed(3)}s`;
+
+      const listContainer = document.getElementById('round-list-container');
+      listContainer.innerHTML = '';
+
+      roundResults.forEach((res, idx) => {
+        const item = document.createElement('div');
+        item.className = 'round-item';
+        const sign = res.diff >= 0 ? '+' : '';
+        item.innerHTML = `
+          <div class="round-item-left">
+            <span>Round ${idx + 1}</span>
+            <span>${res.icon}</span>
+          </div>
+          <div class="round-item-right">
+            ${res.stoppedTime.toFixed(3)}s (${sign}${res.diff.toFixed(3)}s)
+          </div>
+        `;
+        listContainer.appendChild(item);
+      });
+
+      summaryModal.style.display = 'flex';
+    }
+
+    document.getElementById('restart-btn').addEventListener('click', () => {
+      summaryModal.style.display = 'none';
+      gameScreen.style.display = 'none';
+      setupScreen.style.display = 'flex';
+      gameState = 'SETUP';
+    });
+  </script>
+</body>
+</html>

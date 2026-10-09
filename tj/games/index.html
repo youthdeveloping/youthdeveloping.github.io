@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TJ Games</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Orbitron:wght@700;900&display=swap">
+<style>
+:root{--bg:#eef1f7;--card:#fff;--ink:#16213e;--sub:#6b7488;--line:#dde2ee;--accent:#3d5afe;--tile:#eef1ff;--bad:#d93025;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1424;--card:#171d33;--ink:#eef1ff;--sub:#8f99b8;--line:#262e4d;--accent:#7b8cff;--tile:#222a4a;--bad:#ff7b72}}
+:root[data-theme="dark"]{--bg:#0f1424;--card:#171d33;--ink:#eef1ff;--sub:#8f99b8;--line:#262e4d;--accent:#7b8cff;--tile:#222a4a;--bad:#ff7b72}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans KR",system-ui,sans-serif}
+main{max-width:980px;margin:0 auto;padding:40px 24px 110px}
+.top{display:flex;align-items:center;justify-content:space-between}
+.logo{width:60px;height:60px;border-radius:20px 20px 20px 6px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:900;font-size:22px;letter-spacing:-1px}
+.adminlink{font-weight:700;font-size:15px;color:var(--accent);text-decoration:none;padding:8px 14px;border:1px solid var(--line);border-radius:999px;background:var(--card)}
+.adminlink:hover{border-color:var(--accent)}
+h1{font-size:48px;font-weight:900;letter-spacing:-2px;margin:28px 0 8px}
+.lead{color:var(--sub);font-size:17px;margin:0 0 44px}
+h2{font-size:15px;font-weight:700;color:var(--sub);margin:0 0 14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:14px}
+a.card,.soon,.row{display:flex;align-items:center;gap:16px;padding:20px;background:var(--card);border:1px solid var(--line);border-radius:18px;text-decoration:none;color:inherit}
+a.card{transition:transform .15s,border-color .15s}
+a.card:hover{transform:translateY(-2px);border-color:var(--accent)}
+a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.ic{flex:none;width:52px;height:52px;border-radius:14px;background:var(--tile);display:grid;place-items:center;font-size:26px}
+.tx{min-width:0;flex:1}
+.tx b{display:block;font-size:17px;font-weight:700}
+.tx span{display:block;font-size:13.5px;color:var(--sub);margin-top:3px}
+.go{color:var(--sub);font-size:20px}
+.soon{background:transparent;border-style:dashed;color:var(--sub)}
+footer{text-align:center;color:var(--sub);font-size:12.5px;margin-top:56px}
+/* admin */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px;margin-bottom:24px}
+.login{max-width:400px;margin:48px auto}
+label{display:block;font-size:13px;font-weight:700;color:var(--sub);margin:14px 0 6px}
+input,textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:12px 18px;font-weight:700;background:var(--accent);color:#fff}
+button.ghost{background:var(--tile);color:var(--ink)}
+button.del{background:transparent;color:var(--bad);border:1px solid var(--line);padding:8px 12px}
+.full{width:100%;margin-top:20px}
+.err{color:var(--bad);font-size:14px;min-height:20px;margin-top:12px}
+.ok{color:var(--accent);font-size:14px;min-height:20px;margin-top:12px}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:24px}
+.bar h1{font-size:32px;margin:0}
+.two{display:grid;grid-template-columns:90px 1fr;gap:12px}
+.list{display:grid;gap:10px;margin-bottom:8px}
+.row{padding:14px 16px}
+.row.edit{display:block}
+.editbox{display:grid;gap:10px}
+.btns{display:flex;gap:10px}
+button.sm{padding:8px 14px}
+.url{word-break:break-all;font-size:12px;opacity:.8}
+.links{display:flex;gap:8px}
+textarea{resize:vertical}
+button.pick{display:flex;align-items:center;gap:16px;padding:20px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:18px;text-align:left;font-weight:400;width:100%}
+button.pick:hover{border-color:var(--accent)}
+.sel{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.sel b{flex:1;font-size:18px}
+.inq{display:block}
+.ihead{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}
+.muted{color:var(--sub);font-size:13px}
+.imsg{white-space:pre-wrap;word-break:break-word;margin:10px 0 12px}
+.dock{position:fixed;right:20px;bottom:calc(20px + env(safe-area-inset-bottom,0px));display:flex;gap:10px;z-index:5}
+.fab{padding:14px 20px;border-radius:999px;font-weight:700;font-size:15px;text-decoration:none;background:var(--card);color:var(--ink);border:1px solid var(--line);box-shadow:0 6px 20px rgba(22,33,62,.18)}
+.fab.main{background:var(--accent);color:#fff;border-color:var(--accent)}
+.ngroup{margin-bottom:26px}
+.ngroup h2{margin-bottom:10px}
+.note{display:block;margin-bottom:10px}
+.note b{font-size:17px}
+.note p{white-space:pre-wrap;word-break:break-word;margin:8px 0 0;line-height:1.6}
+.hide{display:none}
+@media (max-width:560px){h1{font-size:38px}.bar h1{font-size:26px}}
+
+/* ===== TJ Games: 게이밍 테마 (항상 다크) ===== */
+:root:root:root{--bg:#0a0918;--card:#14122b;--ink:#f2f0ff;--sub:#9d99cc;--line:#2b2756;--accent:#7b5cf5;--tile:#1d1a3f;--bad:#ff5d73;--neon:#00e5ff;color-scheme:dark}
+body{background:radial-gradient(900px 520px at 88% -8%,rgba(123,92,245,.30),transparent 62%),radial-gradient(700px 420px at -8% 18%,rgba(0,229,255,.14),transparent 60%),var(--bg);background-attachment:fixed}
+h1{font-family:Orbitron,"Noto Sans KR",sans-serif;font-weight:900;letter-spacing:2px;background:linear-gradient(90deg,#00e5ff,#7b5cf5 60%,#ff4fd8);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 14px rgba(123,92,245,.45))}
+.bar h1{font-size:28px}
+h2{font-family:Orbitron,"Noto Sans KR",sans-serif;letter-spacing:2px;color:var(--neon);font-size:13px}
+.logo{border-radius:14px;background:linear-gradient(135deg,#7b5cf5,#00e5ff);color:#0a0918;font-family:Orbitron,sans-serif;box-shadow:0 0 24px rgba(0,229,255,.35)}
+.adminlink{border-color:rgba(0,229,255,.45);color:var(--neon);background:rgba(20,18,43,.8)}
+.adminlink:hover{box-shadow:0 0 14px rgba(0,229,255,.4)}
+a.card,.soon,.row,.panel,button.pick{border:1px solid transparent;border-radius:14px;background:linear-gradient(var(--card),var(--card)) padding-box,linear-gradient(135deg,rgba(0,229,255,.45),rgba(123,92,245,.45)) border-box}
+.soon{background:transparent;border:1px dashed var(--line)}
+a.card:hover,button.pick:hover{transform:translateY(-3px);box-shadow:0 0 0 1px rgba(0,229,255,.6),0 10px 30px rgba(123,92,245,.35)}
+.ic{border-radius:12px;background:linear-gradient(135deg,#2b2070,#0f3a4a);box-shadow:inset 0 0 0 1px rgba(0,229,255,.25)}
+.go{color:var(--neon)}
+button{background:linear-gradient(90deg,#7b5cf5,#5b7cff);text-transform:none;letter-spacing:.3px}
+button.ghost{background:var(--tile);color:var(--ink)}
+button.del{background:transparent}
+.fab{background:rgba(20,18,43,.92);border-color:rgba(0,229,255,.45);color:var(--ink);box-shadow:0 0 18px rgba(0,229,255,.2)}
+.fab.main{background:linear-gradient(90deg,#7b5cf5,#00b8d9);border-color:transparent;color:#fff;box-shadow:0 0 22px rgba(123,92,245,.55)}
+input,textarea{background:#0e0c22}
+footer{font-family:Orbitron,sans-serif;letter-spacing:2px;font-size:11px}
+</style>
+</head>
+<body>
+<main>
+<!-- 홈 -->
+<section id="home">
+  <div class="top"><div class="logo">TJ</div><div class="links"><a class="adminlink" href="#/admin">어드민</a></div></div>
+  <h1>TJ GAMES</h1>
+  <p class="lead">TJ의 게임을 한곳에서 즐겨보세요</p>
+  <h2>▸ SELECT GAME</h2>
+  <div class="grid" id="grid"></div>
+  <footer>TJ Games · 2026</footer>
+  <div class="dock"><a class="fab" href="#/notice">공지사항</a><a class="fab main" href="#/inquiry">문의</a></div>
+</section>
+
+<!-- 공지사항 -->
+<section id="notice" class="hide">
+  <div class="bar"><h1>공지사항</h1><a class="adminlink" href="#/">홈으로</a></div>
+  <div id="nlist"></div>
+</section>
+
+<!-- 문의 -->
+<section id="inquiry" class="hide">
+  <div class="bar"><h1>문의하기</h1><a class="adminlink" href="#/">홈으로</a></div>
+  <div id="ipick"><h2>어떤 게임에 문의할까요?</h2><div class="grid" id="ipg"></div></div>
+  <div id="iform" class="hide panel">
+    <div class="sel"><div class="ic" id="iic"></div><b id="inm"></b><button class="ghost sm" id="iback">게임 다시 고르기</button></div>
+    <label for="iname">이름 (선택)</label><input id="iname" maxlength="30" autocomplete="off">
+    <label for="itext">문의 내용</label><textarea id="itext" rows="6" maxlength="1000"></textarea>
+    <div class="err" id="ierr2" role="alert"></div><div class="ok" id="iok"></div>
+    <button class="full" id="isend">문의 보내기</button>
+  </div>
+</section>
+
+<!-- 어드민 로그인 -->
+<section id="login" class="hide">
+  <div class="panel login">
+    <div class="logo" style="margin-bottom:16px">TJ</div>
+    <h1 style="font-size:28px;margin:0 0 4px">어드민 로그인</h1>
+    <form id="lf" autocomplete="off">
+      <label for="em">이메일</label>
+      <input id="em" type="email" autocomplete="off" required>
+      <label for="pw">비밀번호</label>
+      <input id="pw" type="password" autocomplete="new-password" required>
+      <div class="err" id="lerr" role="alert"></div>
+      <button class="full" type="submit">로그인</button>
+    </form>
+    <p style="text-align:center;margin:18px 0 0"><a href="#/" style="color:var(--sub);font-size:14px">홈으로 돌아가기</a></p>
+  </div>
+</section>
+
+<!-- 어드민 관리 -->
+<section id="admin" class="hide">
+  <div class="bar"><h1>어드민 · Games</h1><div><button class="ghost" id="home2">홈 보기</button> <button id="logout">로그아웃</button></div></div>
+
+  <div class="panel">
+    <h2>게임 관리</h2>
+    <div class="list" id="alist"></div>
+    <label>게임 추가하기</label>
+    <div class="two"><input id="ni" placeholder="🙂" maxlength="4" aria-label="아이콘"><input id="nn" placeholder="게임 이름" aria-label="게임 이름"></div>
+    <input id="nd" placeholder="설명" style="margin-top:12px" aria-label="설명">
+    <input id="nu" placeholder="주소 (예: example.com)" style="margin-top:12px" aria-label="주소">
+    <button class="full" id="addapp">게임 추가</button>
+    <div class="err" id="aerr"></div>
+  </div>
+
+  <div class="panel">
+    <h2>공지 등록</h2>
+    <label for="ndate">날짜</label><input id="ndate" type="date">
+    <label for="ntitle">제목</label><input id="ntitle" maxlength="100" autocomplete="off">
+    <label for="nbody">내용</label><textarea id="nbody" rows="5" maxlength="2000"></textarea>
+    <button class="full" id="nadd">공지 등록</button>
+    <div class="err" id="nerr"></div>
+    <label>등록된 공지</label>
+    <div class="list" id="nalist"></div>
+  </div>
+
+  <div class="panel">
+    <h2>받은 문의 <span id="icount"></span></h2>
+    <div class="err" id="ierr"></div>
+    <div class="list" id="ilist"></div>
+  </div>
+
+  <div class="panel">
+    <h2>어드민 아이디 만들기</h2>
+    <label for="ne">새 어드민 이메일</label><input id="ne" type="email" autocomplete="off">
+    <label for="np">비밀번호 (8자 이상)</label><input id="np" type="password" autocomplete="new-password">
+    <button class="full" id="mkadmin">어드민 아이디 만들기</button>
+    <div class="err" id="merr"></div><div class="ok" id="mok"></div>
+  </div>
+</section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+// ▼ Supabase 프로젝트 설정 (Project URL 과 anon(공개) 키만 넣으세요. service_role / secret 키는 절대 넣지 마세요)
+var SUPABASE_URL="https://qbknoxfqlxwokkwqvqdy.supabase.co";
+var SUPABASE_ANON_KEY="sb_publishable_kFddLg0u86eE2IWGL0N8Fg_PUkkh7K2";
+// ▲
+var READY=SUPABASE_URL.indexOf("http")===0&&SUPABASE_ANON_KEY.indexOf("여기에")!==0;
+var OPT={auth:{persistSession:false,autoRefreshToken:true,detectSessionInUrl:false}};  // 로그인 저장 안 함
+var sb=READY?supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,OPT):null;
+
+var apps=[],notices=[],inqs=[],editing=-1,selApp=null,authed=false,timer=null,fails=0,lockUntil=0,lastSend=0;
+function $(id){return document.getElementById(id)}
+function mk(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;return e}
+function field(ph,val,label){var i=document.createElement("input");i.placeholder=ph;i.value=val;i.setAttribute("aria-label",label);return i}
+function chk(r){if(r.error)throw r.error;return r.data}
+function lost(e,el){
+  if(authed&&e&&(e.status===401||/jwt/i.test(e.message||""))){authed=false;route();return}
+  var m=(e&&(e.message||e.code))||"";
+  el.textContent="처리하지 못했어요. "+m;alert("처리하지 못했어요.\n"+m);
+}
+async function run(q,el,need){try{var d=chk(await q);if(need&&(!d||!d.length))throw{message:"권한이 없어서 처리되지 않았어요. 어드민으로 등록됐는지 확인해 주세요."};el.textContent="";return true}catch(e){lost(e,el);return false}}
+function normUrl(u){
+  u=(u||"").trim();
+  if(!u)return "";
+  if(/^https?:\/\//i.test(u))return u;
+  if(/^(javascript|data|vbscript|file|blob):/i.test(u))return null;
+  if(/^(localhost|\d{1,3}(\.\d{1,3}){3})(:|\/|$)/i.test(u))return "http://"+u;
+  return "https://"+u;
+}
+function safeUrl(u){return normUrl(u)||"#"}
+function today(){var d=new Date();return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2)}
+function mapApp(r){return{id:r.id,i:r.icon,n:r.name,d:r.description,u:r.url,p:r.position}}
+function sortedNotices(){return notices.slice().sort(function(a,b){return a.date<b.date?1:a.date>b.date?-1:b.ts-a.ts})}
+
+/* 홈 */
+function renderHome(){
+  var g=$("grid");g.textContent="";
+  apps.forEach(function(a){
+    var el=mk("a","card");el.href=safeUrl(a.u);
+    var tx=mk("div","tx");tx.appendChild(mk("b","",a.n));tx.appendChild(mk("span","",a.d));
+    el.appendChild(mk("div","ic",a.i));el.appendChild(tx);el.appendChild(mk("div","go","›"));g.appendChild(el);
+  });
+  var so=mk("div","soon");
+  so.innerHTML='<div class="ic">＋</div><div class="tx"><b>Coming Soon</b><span>새로운 게임이 추가될 예정입니다</span></div>';
+  g.appendChild(so);
+}
+
+/* 공지 */
+function renderNotices(){
+  var box=$("nlist");box.textContent="";
+  var list=sortedNotices();
+  if(!list.length){box.appendChild(mk("div","muted","등록된 공지가 없어요."));return}
+  var cur=null,grp=null;
+  list.forEach(function(n){
+    if(n.date!==cur){
+      cur=n.date;grp=mk("div","ngroup");
+      grp.appendChild(mk("h2","",new Date(n.date+"T00:00:00").toLocaleDateString("ko-KR",{year:"numeric",month:"long",day:"numeric",weekday:"short"})));
+      box.appendChild(grp);
+    }
+    var c=mk("div","row note");c.appendChild(mk("b","",n.title));c.appendChild(mk("p","",n.body));grp.appendChild(c);
+  });
+}
+function renderNoticeAdmin(){
+  var box=$("nalist");box.textContent="";
+  var list=sortedNotices();
+  if(!list.length){box.appendChild(mk("div","muted","등록된 공지가 없어요."));return}
+  list.forEach(function(n){
+    var r=mk("div","row"),tx=mk("div","tx");tx.appendChild(mk("b","",n.title));tx.appendChild(mk("span","",n.date));
+    var d=mk("button","del","삭제");
+    d.onclick=async function(){
+      if(!confirm("이 공지를 삭제할까요?"))return;
+      await run(sb.from("game_notices").delete().eq("id",n.id).select(),$("nerr"),true);await refresh();
+    };
+    r.appendChild(tx);r.appendChild(d);box.appendChild(r);
+  });
+}
+$("nadd").onclick=async function(){
+  var t=$("ntitle").value.trim(),b=$("nbody").value.trim(),d=$("ndate").value||today();
+  $("nerr").textContent="";
+  if(!t||!b){$("nerr").textContent="제목과 내용을 입력해 주세요.";return}
+  if(await run(sb.from("game_notices").insert({date:d,title:t,body:b}),$("nerr"))){$("ntitle").value=$("nbody").value="";$("ndate").value=today()}
+  await refresh();
+};
+
+/* 게임 관리 */
+function renderAdmin(){
+  var l=$("alist");l.textContent="";
+  apps.forEach(function(a,idx){
+    var r=mk("div","row");
+    if(idx===editing){
+      r.className="row edit";
+      var wrap=mk("div","editbox"),two=mk("div","two");
+      var fi=field("🙂",a.i,"아이콘");fi.maxLength=4;
+      var fn=field("게임 이름",a.n,"게임 이름");two.appendChild(fi);two.appendChild(fn);
+      var fd=field("설명",a.d,"설명"),fu=field("주소 (예: example.com)",a.u,"주소");
+      var err=mk("div","err"),btns=mk("div","btns"),sv=mk("button","","저장");
+      sv.onclick=async function(){
+        var n=fn.value.trim(),u=normUrl(fu.value);
+        if(!n){err.textContent="게임 이름을 입력해 주세요.";return}
+        if(u===null){err.textContent="사용할 수 없는 주소입니다.";return}
+        if(await run(sb.from("game_apps").update({icon:fi.value.trim()||"🎮",name:n,description:fd.value.trim(),url:u}).eq("id",a.id).select(),err,true)){editing=-1;await refresh()}
+      };
+      var cn=mk("button","ghost","취소");cn.onclick=function(){editing=-1;renderAdmin()};
+      btns.appendChild(sv);btns.appendChild(cn);
+      [two,fd,fu,err,btns].forEach(function(x){wrap.appendChild(x)});r.appendChild(wrap);
+    }else{
+      var tx=mk("div","tx");tx.appendChild(mk("b","",a.n));tx.appendChild(mk("span","",a.d));
+      if(a.u)tx.appendChild(mk("span","url",a.u));
+      var ed=mk("button","ghost sm","수정");ed.onclick=function(){editing=idx;renderAdmin()};
+      var d=mk("button","del","빼기");
+      d.onclick=async function(){
+        if(!confirm(a.n+" 게임을 뺄까요?"))return;
+        await run(sb.from("game_apps").delete().eq("id",a.id).select(),$("aerr"),true);editing=-1;await refresh();
+      };
+      r.appendChild(mk("div","ic",a.i));r.appendChild(tx);r.appendChild(ed);r.appendChild(d);
+    }
+    l.appendChild(r);
+  });
+}
+$("addapp").onclick=async function(){
+  var n=$("nn").value.trim(),i=$("ni").value.trim()||"🎮",d=$("nd").value.trim(),u=normUrl($("nu").value);
+  if(!n){$("aerr").textContent="게임 이름을 입력해 주세요.";return}
+  if(u===null){$("aerr").textContent="사용할 수 없는 주소입니다.";return}
+  var pos=apps.reduce(function(m,a){return Math.max(m,a.p||0)},-1)+1;
+  if(await run(sb.from("game_apps").insert({icon:i,name:n,description:d,url:u,position:pos}),$("aerr"))){$("nn").value=$("ni").value=$("nd").value=$("nu").value=""}
+  await refresh();
+};
+
+/* 문의 */
+function renderInquiry(){
+  if(selApp)selApp=apps.filter(function(a){return a.id===selApp.id})[0]||null;
+  var g=$("ipg");g.textContent="";
+  if(selApp){
+    $("ipick").classList.add("hide");$("iform").classList.remove("hide");
+    $("iic").textContent=selApp.i;$("inm").textContent=selApp.n;return;
+  }
+  $("iform").classList.add("hide");$("ipick").classList.remove("hide");
+  apps.forEach(function(a){
+    var b=mk("button","pick"),tx=mk("div","tx");tx.appendChild(mk("b","",a.n));tx.appendChild(mk("span","",a.d));
+    b.appendChild(mk("div","ic",a.i));b.appendChild(tx);b.appendChild(mk("div","go","›"));
+    b.onclick=function(){selApp=a;$("iok").textContent=$("ierr2").textContent="";renderInquiry()};
+    g.appendChild(b);
+  });
+}
+$("iback").onclick=function(){selApp=null;renderInquiry()};
+$("isend").onclick=async function(){
+  var msg=$("itext").value.trim();
+  $("iok").textContent=$("ierr2").textContent="";
+  if(!selApp||!sb)return;
+  if(!msg){$("ierr2").textContent="문의 내용을 입력해 주세요.";return}
+  if(Date.now()-lastSend<10000){$("ierr2").textContent="잠시 후 다시 보내 주세요.";return}
+  var ok=await run(sb.from("game_inquiries").insert({app_id:selApp.id,app_name:selApp.n,name:$("iname").value.trim().slice(0,30),message:msg.slice(0,1000)}),$("ierr2"));
+  if(ok){lastSend=Date.now();$("itext").value="";$("iok").textContent="문의가 접수되었어요. 감사합니다!"}
+};
+function renderInq(){
+  var box=$("ilist");box.textContent="";
+  $("icount").textContent="("+inqs.length+"건)";
+  if(!inqs.length){box.appendChild(mk("div","muted","아직 받은 문의가 없어요."));return}
+  inqs.forEach(function(q){
+    var cur=apps.filter(function(a){return a.id===q.appId})[0];
+    var r=mk("div","row inq"),h=mk("div","ihead");
+    h.appendChild(mk("b","",cur?cur.n:q.appName+" (삭제된 게임)"));
+    h.appendChild(mk("span","muted",(q.name||"익명")+" · "+new Date(q.ts).toLocaleString("ko-KR")));
+    r.appendChild(h);r.appendChild(mk("p","imsg",q.msg));
+    var d=mk("button","del","삭제");
+    d.onclick=async function(){
+      if(!confirm("이 문의를 삭제할까요?"))return;
+      await run(sb.from("game_inquiries").delete().eq("id",q.id).select(),$("ierr"),true);await loadInqs();
+    };
+    r.appendChild(d);box.appendChild(r);
+  });
+}
+async function loadInqs(){
+  if(!authed)return;
+  try{
+    inqs=chk(await sb.from("game_inquiries").select("*").order("created_at",{ascending:false})).map(function(r){return{id:r.id,appId:r.app_id,appName:r.app_name,name:r.name,msg:r.message,ts:Date.parse(r.created_at)}});
+    $("ierr").textContent="";renderInq();
+  }catch(e){lost(e,$("ierr"))}
+}
+
+/* 최신 데이터 불러오기 (다른 기기의 변경 반영) */
+async function refresh(){
+  if(!sb){$("grid").textContent="";$("grid").appendChild(mk("div","muted","index.html 맨 위의 Supabase URL과 키를 먼저 넣어 주세요."));return}
+  try{
+    apps=chk(await sb.from("game_apps").select("*").order("position").order("created_at")).map(mapApp);
+    notices=chk(await sb.from("game_notices").select("*")).map(function(r){return{id:r.id,date:r.date,title:r.title,body:r.body,ts:Date.parse(r.created_at)}});
+    renderHome();renderNotices();
+    if(!$("inquiry").classList.contains("hide"))renderInquiry();
+    if(authed){if(editing<0)renderAdmin();renderNoticeAdmin();renderInq()}
+  }catch(e){if(!apps.length){$("grid").textContent="";$("grid").appendChild(mk("div","muted","데이터를 불러오지 못했어요."))}}
+}
+
+/* 로그인 / 로그아웃 */
+function leaveAdmin(){
+  if(authed){authed=false;editing=-1;if(sb)sb.auth.signOut()}
+  clearInterval(timer);timer=null;
+}
+$("lf").addEventListener("submit",async function(e){
+  e.preventDefault();
+  var em=$("em").value,pw=$("pw").value;
+  $("em").value="";$("pw").value="";
+  if(!sb){$("lerr").textContent="Supabase 설정이 필요해요.";return}
+  var now=Date.now();
+  if(now<lockUntil){$("lerr").textContent="잠시 후 다시 시도해 주세요. ("+Math.ceil((lockUntil-now)/1000)+"초)";return}
+  var ok=false;
+  try{
+    var r=await sb.auth.signInWithPassword({email:em.trim(),password:pw});
+    if(!r.error){
+      var a=await sb.from("admins").select("user_id").maybeSingle();
+      if(a.data)ok=true;else await sb.auth.signOut();
+    }
+  }catch(x){}
+  em=pw="";
+  if(ok){fails=0;authed=true;route()}
+  else{fails++;$("lerr").textContent="이메일 또는 비밀번호가 올바르지 않습니다.";if(fails>=5){lockUntil=Date.now()+30000;fails=0}}
+});
+$("logout").onclick=function(){location.hash="#/"};
+$("home2").onclick=function(){location.hash="#/"};
+$("mkadmin").onclick=async function(){
+  $("merr").textContent=$("mok").textContent="";
+  if(!authed)return;
+  var em=$("ne").value.trim().toLowerCase(),pw=$("np").value;
+  if(!/^\S+@\S+\.\S+$/.test(em)){$("merr").textContent="이메일 형식이 올바르지 않습니다.";return}
+  if(pw.length<8){$("merr").textContent="비밀번호는 8자 이상이어야 합니다.";return}
+  try{
+    var tmp=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,OPT);   // 현재 로그인에 영향 없는 별도 클라이언트
+    var r=await tmp.auth.signUp({email:em,password:pw});
+    if(r.error||!r.data.user||!(r.data.user.identities||[]).length){$("merr").textContent="계정을 만들지 못했어요. 이미 가입된 이메일일 수 있어요.";return}
+    chk(await sb.from("admins").insert({user_id:r.data.user.id}));
+    $("ne").value=$("np").value="";$("mok").textContent="어드민 아이디를 만들었어요. 바로 로그인할 수 있어요.";
+  }catch(e){lost(e,$("merr"))}
+};
+
+/* 라우팅 */
+function route(){
+  var h=location.hash;
+  ["home","login","admin","inquiry","notice"].forEach(function(id){$(id).classList.add("hide")});
+  if(h==="#/admin"){
+    if(authed){
+      $("admin").classList.remove("hide");renderAdmin();renderNoticeAdmin();renderInq();$("ndate").value=today();loadInqs();
+      if(!timer)timer=setInterval(loadInqs,20000);
+    }else{$("login").classList.remove("hide");$("em").value="";$("pw").value="";$("lerr").textContent=""}
+  }else if(h==="#/notice"){$("notice").classList.remove("hide");renderNotices();refresh()}
+  else if(h==="#/inquiry"){$("inquiry").classList.remove("hide");selApp=null;renderInquiry();refresh()}
+  else{$("home").classList.remove("hide");refresh()}
+  window.scrollTo(0,0);
+}
+window.addEventListener("hashchange",function(){
+  if(location.hash!=="#/admin")leaveAdmin();
+  route();
+});
+setInterval(refresh,20000);
+route();
+})();
+</script>
+</body>
+</html>

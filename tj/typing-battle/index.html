@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0d17">
+<title>타자 배틀 · TJ Games</title>
+<style>
+*{box-sizing:border-box;margin:0}
+:root{--bg:#0b0d17;--p:#141829;--l:#262c47;--tx:#e8ebff;--mu:#8089b0;--ac:#7c5cff;--hot:#ff4d6d;--ok:#2ee6a6;--gd:#ffc857}
+body{min-height:100vh;background:radial-gradient(900px 500px at 12% -10%,#2a1f66 0,transparent 60%),radial-gradient(700px 400px at 100% 0,#4a1a3a 0,transparent 55%),var(--bg);color:var(--tx);font:16px/1.5 Pretendard,"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;padding:env(safe-area-inset-top) 12px env(safe-area-inset-bottom)}
+main{max-width:860px;margin:0 auto;padding:14px 0 40px}
+.top{display:flex;gap:10px;align-items:baseline;margin-bottom:14px}
+.logo{font-weight:900;letter-spacing:.08em;background:linear-gradient(90deg,var(--ac),var(--hot));-webkit-background-clip:text;background-clip:text;color:transparent}
+.top span{color:var(--mu);font-size:14px}
+.scr{display:none}.scr.on{display:block;animation:in .55s ease}
+@keyframes in{from{opacity:0;transform:translateY(12px)}}
+.card{background:var(--p);border:1px solid var(--l);border-radius:16px;padding:18px;margin-bottom:12px}
+h1{font-size:clamp(28px,6vw,42px);line-height:1.2;margin-bottom:6px}
+.mu{color:var(--mu);font-size:14px}
+h3{font-size:15px;margin-bottom:10px}
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+button{font:inherit;color:inherit;cursor:pointer}
+.opt{background:#0f1222;border:2px solid var(--l);border-radius:12px;padding:14px 10px;font-weight:700;transition:.15s}
+.opt:hover{border-color:#4b5388}
+.opt.sel{border-color:var(--ac);background:#1d1946;box-shadow:0 0 18px #7c5cff55}
+.diffs{display:flex;gap:10px}.diffs .opt{flex:1}
+.go{width:100%;border:0;border-radius:14px;padding:16px;font-size:19px;font-weight:800;background:linear-gradient(90deg,var(--ac),var(--hot));color:#fff;box-shadow:0 8px 28px #7c5cff55}
+.go:active{transform:scale(.98)}
+.ghost{background:transparent;border:1px solid var(--l);border-radius:10px;padding:8px 14px;color:var(--mu)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.st{background:var(--p);border:1px solid var(--l);border-radius:12px;padding:8px 6px;text-align:center}
+.st i{display:block;font-style:normal;font-size:11px;color:var(--mu)}
+.st b{font-size:clamp(16px,3.6vw,22px);font-variant-numeric:tabular-nums}
+.bar{height:6px;background:#0f1222;border-radius:9px;overflow:hidden;margin-bottom:12px}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--ac),var(--hot))}
+.sentbox{position:relative;transition:border-color .2s}
+.sentbox.flash{animation:fl .55s}
+@keyframes fl{0%{border-color:var(--ok);box-shadow:0 0 0 0 #2ee6a688;transform:scale(1.02)}100%{box-shadow:0 0 0 24px #2ee6a600;transform:none}}
+.sentbox.ov{border-color:var(--hot)}
+.sent{font-size:clamp(20px,4.6vw,30px);line-height:1.75;white-space:pre-wrap;overflow-wrap:anywhere;min-height:3.5em}
+.sent span{color:#9aa3cf;border-radius:4px}
+.sent .ok{color:var(--ok)}
+.sent .p{color:var(--gd);border-bottom:2px solid var(--gd)}
+.sent .bad{color:#fff;background:var(--hot);animation:sh .3s}
+.sent .cur{background:#7c5cff59}
+@keyframes sh{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.src{margin-top:6px;font-size:13px;color:var(--mu);min-height:20px}
+#inp{width:100%;font:inherit;font-size:20px;padding:14px 16px;background:#0f1222;color:var(--tx);border:2px solid var(--l);border-radius:12px;outline:none}
+#inp:focus{border-color:var(--ac)}
+.fl{position:absolute;right:16px;top:-6px;font-weight:900;color:var(--gd);font-size:22px;pointer-events:none;animation:up .9s forwards}
+@keyframes up{to{transform:translateY(-34px);opacity:0}}
+.pop{position:fixed;left:0;right:0;top:30%;text-align:center;font-size:clamp(36px,12vw,84px);font-weight:900;color:var(--gd);text-shadow:0 0 30px var(--hot);pointer-events:none;opacity:0}
+.pop.on{animation:pp 1s}
+@keyframes pp{0%{opacity:0;transform:scale(.4)}25%{opacity:1;transform:scale(1.1)}100%{opacity:0;transform:scale(1.4) translateY(-30px)}}
+#ov{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:#0b0d17c7;z-index:9;font-size:clamp(60px,20vw,150px);font-weight:900;backdrop-filter:blur(3px)}
+#ov.on{display:flex}
+#ov b{animation:z .7s}
+@keyframes z{from{transform:scale(2.2);opacity:0}to{transform:scale(1);opacity:1}}
+.gr{width:120px;height:120px;border-radius:50%;margin:4px auto 10px;display:flex;align-items:center;justify-content:center;font-size:72px;font-weight:900;border:4px solid currentColor;box-shadow:0 0 36px currentColor}
+.res{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.res div{background:#0f1222;border:1px solid var(--l);border-radius:12px;padding:12px;text-align:center}
+.res i{display:block;font-style:normal;font-size:12px;color:var(--mu)}
+.res b{font-size:24px;font-variant-numeric:tabular-nums}
+.nr{display:block;margin:4px auto 0;width:max-content;background:linear-gradient(90deg,var(--gd),var(--hot));color:#1b1030;font-size:11px;font-weight:800;padding:1px 8px;border-radius:99px;animation:pl .8s infinite alternate}
+@keyframes pl{to{transform:scale(1.1)}}
+.banner{text-align:center;font-size:26px;font-weight:900;color:var(--gd);animation:pl .8s infinite alternate;margin-bottom:6px}
+.row{display:flex;gap:10px}.row .go,.row .opt{flex:1}
+.hub{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.hb{text-align:left;background:var(--p);border:1px solid var(--l);border-radius:16px;padding:22px 18px;display:flex;flex-direction:column;gap:6px;transition:.15s}
+.hb:hover{border-color:var(--ac);box-shadow:0 0 22px #7c5cff44;transform:translateY(-2px)}
+.hb b{font-size:22px}.hb span{color:var(--mu);font-size:14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.chips .opt{padding:8px 12px;font-size:14px}
+.fr{display:grid;grid-template-columns:100px 1fr;gap:10px;align-items:center;margin-bottom:14px}
+.fr label{color:var(--mu);font-size:14px}
+.seg{display:flex;gap:8px}.seg .opt{flex:1;padding:10px 6px}
+select{width:100%;font:inherit;padding:12px;background:#0f1222;color:var(--tx);border:2px solid var(--l);border-radius:10px}
+input[type=range]{width:100%;accent-color:var(--ac)}
+.go:disabled{opacity:.35;box-shadow:none;cursor:not-allowed}
+@media(min-width:720px){.stats{grid-template-columns:repeat(8,1fr)}.res{grid-template-columns:repeat(4,1fr)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<main>
+<header class="top" data-go="home" style="cursor:pointer"><b class="logo">TJ GAMES</b><span>타자 배틀</span></header>
+
+<section id="home" class="scr on">
+  <div class="card"><h1>⌨️ TJ 타자 센터</h1><p class="mu">연습하고, 검정을 치르고, 점수로 겨뤄 보세요.</p></div>
+  <div class="hub">
+    <button class="hb" data-go="prac"><b>⌨️ 타자연습</b><span>자리 · 낱말 · 단문 · 장문</span></button>
+    <button class="hb" data-go="test"><b>📝 타자검정</b><span>1·3·5분 / 독립운동, 현대시, 한글날…</span></button>
+    <button class="hb" data-go="menu"><b>🔥 타자 배틀</b><span>30초 · 60초 · 10문장 점수 대결</span></button>
+  </div>
+</section>
+
+<section id="prac" class="scr">
+  <div class="card"><button class="ghost" data-go="home">← 홈</button><h1 style="margin-top:10px">⌨️ 타자연습</h1><p class="mu" id="pd"></p></div>
+  <div class="card">
+    <div class="modes" id="ptabs">
+      <button class="opt" data-v="seat">자리연습</button><button class="opt" data-v="word">낱말연습</button>
+      <button class="opt" data-v="short">단문연습</button><button class="opt" data-v="long">장문연습</button>
+    </div>
+    <div class="chips" id="pseat"></div>
+  </div>
+  <button class="go" id="pstart">🔥 연습 시작</button>
+</section>
+
+<section id="test" class="scr">
+  <div class="card"><h3 style="font-size:20px;margin-bottom:16px">📝 타자 검정 설정</h3>
+    <div class="fr"><label>검정 시간</label><div class="seg" id="tt"><button class="opt sel" data-v="60">1분</button><button class="opt" data-v="180">3분</button><button class="opt" data-v="300">5분</button></div></div>
+    <div class="fr"><label>검정 언어</label><div class="seg" id="tl"><button class="opt sel" data-v="ko">한국어</button><button class="opt" data-v="en">영어</button></div></div>
+    <div class="fr"><label>검정 콘텐츠</label><select id="tc"></select></div>
+    <div class="fr"><label>검정 글자판</label><select id="tk"><option>두벌식</option></select></div>
+    <div class="fr"><label>타건음</label><input type="range" id="tv" min="0" max="100" value="0"></div>
+  </div>
+  <div class="row"><button class="opt" data-go="home">검정 종료</button><button class="go" id="tstart" disabled>타자 검정 시작</button></div>
+</section>
+
+<section id="menu" class="scr">
+  <div class="card"><button class="ghost" data-go="home">← 홈</button><h1 style="margin-top:10px">⌨️ 타자 배틀</h1><p class="mu">빠르고 정확하게 입력해서 콤보를 쌓고 최고 기록에 도전하세요.</p></div>
+  <div class="card"><h3>게임 모드</h3>
+    <div class="modes" id="modes">
+      <button class="opt" data-v="30">⚡ 30초 모드</button>
+      <button class="opt" data-v="60">⏱️ 60초 모드</button>
+      <button class="opt" data-v="10">♾️ 문장 10개 완주</button>
+    </div></div>
+  <div class="card"><h3>난이도</h3>
+    <div class="diffs" id="diffs">
+      <button class="opt" data-v="easy">EASY</button>
+      <button class="opt" data-v="normal">NORMAL</button>
+      <button class="opt" data-v="hard">HARD</button>
+    </div>
+    <p class="mu" id="dd" style="margin-top:10px"></p></div>
+  <div class="card"><h3>언어</h3>
+    <div class="diffs" id="langs">
+      <button class="opt" data-v="ko">🇰🇷 한국어</button>
+      <button class="opt" data-v="en">🇺🇸 영어</button>
+      <button class="opt" data-v="mix">🔀 혼합</button>
+    </div></div>
+  <div class="card"><h3>🏆 내 최고 기록</h3><p id="rec" class="mu"></p></div>
+  <button class="go" id="start">🔥 게임 시작</button>
+</section>
+
+<section id="game" class="scr">
+  <div class="stats">
+    <div class="st"><i>⏱️ 시간</i><b id="vT">0</b></div>
+    <div class="st"><i>⌨️ 타수/분</i><b id="vC">0</b></div>
+    <div class="st"><i>🎯 정확도</i><b id="vA">100%</b></div>
+    <div class="st"><i>입력 글자</i><b id="vN">0</b></div>
+    <div class="st"><i>오타</i><b id="vE">0</b></div>
+    <div class="st"><i>완료 문장</i><b id="vD">0</b></div>
+    <div class="st"><i>🔥 콤보</i><b id="vB">0</b></div>
+    <div class="st"><i>점수</i><b id="vS">0</b></div>
+  </div>
+  <div class="bar"><i id="bar"></i></div>
+  <div class="card sentbox" id="box"><div class="sent" id="sent"></div><div class="src" id="src"></div></div>
+  <input id="inp" type="text" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="여기에 입력하세요">
+  <div style="margin-top:12px"><button class="ghost" id="quit">← 나가기</button></div>
+</section>
+
+<section id="result" class="scr">
+  <div class="card" style="text-align:center">
+    <div class="banner" id="nrb" style="display:none">🎉 NEW RECORD!</div>
+    <p class="mu" id="rt"></p>
+    <div class="gr" id="gr">S</div>
+    <div class="res" id="res"></div>
+  </div>
+  <div class="row"><button class="go" id="again">🔁 다시하기</button><button class="opt" id="rhome">돌아가기</button></div>
+</section>
+</main>
+<div id="ov"><b id="ovt"></b></div>
+<div class="pop" id="pop"></div>
+
+<script>
+(function(){
+"use strict";
+var $=function(s){return document.querySelector(s)};
+var D={
+easy:["안녕하세요 반갑습니다","오늘 날씨가 참 좋아요","나는 사과를 좋아해요","고양이가 야옹 하고 울어요","학교에 가는 길이에요","하늘이 파랗고 맑아요","우리 같이 놀러 가요","The sun is bright","I like to play games","강아지와 산책을 해요","커피 한 잔 마실까요","책을 읽으면 마음이 편해져요","Hello, nice to meet you","저녁에는 맛있는 라면을 먹었어요"],
+normal:["빠르게 치는 것도 중요하지만 정확하게 치는 것이 더 중요합니다","주말에는 친구들과 함께 영화를 보러 가기로 했어요","작은 습관이 모여서 큰 변화를 만들어 냅니다","가는 말이 고우면 오는 말도 곱다","천 리 길도 한 걸음부터 시작된다","Practice makes perfect, so keep typing every day.","오늘 할 일을 내일로 미루지 말자","비 온 뒤에 땅이 굳는다는 말이 있습니다","티제이 게임즈에서 만든 타자 배틀에 오신 것을 환영합니다","The best way to predict the future is to create it.","손가락이 날아다니는 것처럼 빠르게 입력해 보세요","아침 일찍 일어나 산책을 하면 하루가 상쾌합니다","웃으면 복이 온다고 하니 오늘도 활짝 웃어요","실패는 성공의 어머니라는 말을 기억하세요"],
+hard:["동해물과 백두산이 마르고 닳도록 하느님이 보우하사 우리나라 만세. 무궁화 삼천리 화려강산 대한 사람 대한으로 길이 보전하세.|애국가 1절","남산 위에 저 소나무 철갑을 두른 듯 바람서리 불변함은 우리 기상일세. 무궁화 삼천리 화려강산 대한 사람 대한으로 길이 보전하세.|애국가 2절","산허리는 온통 메밀밭이어서 피기 시작한 꽃이 소금을 뿌린 듯이 흐붓하니 흰데, 달빛에 숨이 막힐 지경이다.|이효석, 메밀꽃 필 무렵","죽는 날까지 하늘을 우러러 한 점 부끄럼이 없기를, 잎새에 이는 바람에도 나는 괴로워했다.|윤동주, 서시","나 보기가 역겨워 가실 때에는 말없이 고이 보내 드리오리다. 영변에 약산 진달래꽃 아름 따다 가실 길에 뿌리오리다.|김소월, 진달래꽃","님은 갔습니다. 아아, 사랑하는 나의 님은 갔습니다. 푸른 산빛을 깨치고 단풍나무 숲을 향하여 난 작은 길을 걸어서 차마 떨치고 갔습니다.|한용운, 님의 침묵","별 하나에 추억과, 별 하나에 사랑과, 별 하나에 쓸쓸함과, 별 하나에 동경과, 별 하나에 시와, 별 하나에 어머니, 어머니.|윤동주, 별 헤는 밤","지금은 남의 땅 - 빼앗긴 들에도 봄은 오는가?|이상화, 빼앗긴 들에도 봄은 오는가","2024년 12월 31일 오후 11시 59분 59초에 카운트다운이 시작됩니다!","주문번호 #A-1024: 사과 3개(1,500원) + 배 2개(3,200원) = 4,700원","비밀번호는 영문+숫자+특수문자(!@#$)를 포함해 12자 이상이어야 합니다.","if (score >= 9999) { console.log('NEW RECORD!'); } // TJ Games","정확도 99.5%, 최고 콤보 x25, 평균 타수 487타/분을 달성했습니다!","서울에서 부산까지 약 325.4km, KTX로 2시간 30분이 걸립니다."]
+};
+var DE={
+easy:["The sun is bright today","I like to play games","Hello, nice to meet you","My cat sleeps all day","Let us go to school","She has a red apple","We are good friends","The sky is blue and clear","I drink water every morning","He reads a book at night","Birds sing in the tree","It is time to eat lunch"],
+normal:["Practice makes perfect, so keep typing every day.","The best way to predict the future is to create it.","A journey of a thousand miles begins with a single step.","Fast fingers are good, but accurate fingers are better.","Do not put off until tomorrow what you can do today.","Every small habit adds up to a big change.","Actions speak louder than words.","The early bird catches the worm.","Welcome to Typing Battle by TJ Games.","Believe you can and you are halfway there.","Keep calm and type on with a smile.","Where there is a will, there is a way."],
+hard:["Four score and seven years ago our fathers brought forth on this continent, a new nation, conceived in Liberty, and dedicated to the proposition that all men are created equal.|Abraham Lincoln, Gettysburg Address","We hold these truths to be self-evident, that all men are created equal, that they are endowed by their Creator with certain unalienable Rights.|Declaration of Independence","It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness.|Charles Dickens, A Tale of Two Cities","All that glitters is not gold; often have you heard that told.|William Shakespeare","Order #A-1024: 3 apples ($1.50) + 2 pears ($3.20) = $4.70","Password must include letters, numbers & symbols (!@#$) - 12+ chars.","if (score >= 9999) { console.log('NEW RECORD!'); } // TJ Games","Accuracy 99.5%, max combo x25, average 487 CPM - amazing!","The train from Seoul to Busan takes 2 hours 30 minutes (325.4km)."]
+};
+var LN={ko:"한국어",en:"영어",mix:"혼합"};
+function bkey(){return key(mode,diff)+(lang==="ko"?"":"_"+lang)}
+function bpool(){var ko=D[diff].filter(function(x){return /[가-힣]/.test(x)});return lang==="ko"?ko:lang==="en"?DE[diff]:ko.concat(DE[diff])}
+var DD={easy:"짧고 쉬운 문장",normal:"일반적인 문장과 속담",hard:"긴 문장, 숫자·기호, 애국가와 문학 작품"};
+var MN={30:"⚡ 30초",60:"⏱️ 60초",10:"♾️ 10문장"};
+var lang="ko",mode="30",diff="normal",S=null,seq=0,C=null;
+
+/* 타수 계산: 한글은 자모 키 입력 수로 환산 */
+var J2=[9,10,11,14,15,16,19],JS=[3,7],CD=[1,4,8,10,13],GJ=[2,3,5,6,9,10,11,12,13,14,15,18,20];
+function st(c){var n=c.charCodeAt(0);
+ if(n<44032||n>55203)return /[A-Z~!@#$%^&*()_+{}|:"<>?]/.test(c)?2:1;
+ var s=n-44032,j=s%28,v=(s/28|0)%21,c0=s/588|0;
+ return (CD.indexOf(c0)>-1?2:1)+(J2.indexOf(v)>-1||JS.indexOf(v)>-1?2:1)+(j?(GJ.indexOf(j)>-1?2:1):0)}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.random()*(i+1)|0,t=a[i];a[i]=a[j];a[j]=t}return a}
+function show(id){document.querySelectorAll(".scr").forEach(function(e){e.classList.toggle("on",e.id===id)});window.scrollTo(0,0)}
+
+/* 기록 */
+function key(m,d){return"tbr_"+m+"_"+d}
+function load(k){try{return JSON.parse(localStorage.getItem(k))||null}catch(e){return null}}
+function save(k,r){try{localStorage.setItem(k,JSON.stringify(r))}catch(e){}}
+
+/* 메뉴 */
+function pick(box,fn){$(box).addEventListener("click",function(e){var b=e.target.closest(".opt");if(!b)return;fn(b.dataset.v);menu()})}
+function menu(){
+ document.querySelectorAll("#modes .opt").forEach(function(b){b.classList.toggle("sel",b.dataset.v===mode)});
+ document.querySelectorAll("#langs .opt").forEach(function(b){b.classList.toggle("sel",b.dataset.v===lang)});
+ document.querySelectorAll("#diffs .opt").forEach(function(b){b.classList.toggle("sel",b.dataset.v===diff)});
+ $("#dd").textContent=DD[diff];
+ var r=load(bkey());
+ $("#rec").textContent=r?("최고 타수 "+r.cpm+"타/분  ·  최고 점수 "+r.score.toLocaleString()+"점  ·  최고 정확도 "+r.acc+"%"):"아직 기록이 없어요. 첫 기록을 남겨 보세요!";
+}
+pick("#modes",function(v){mode=v});pick("#diffs",function(v){diff=v});pick("#langs",function(v){lang=v});
+
+/* 게임 시작 */
+var inp=$("#inp");
+function start(){
+ var id=++seq;
+ S={id:id,q:[],t:"",sp:[],val:"",comp:false,cs:0,typed:0,err:0,sErr:0,done:0,combo:0,maxCombo:0,score:0,doneSt:0,peak:0,smp:[],t0:0,sStart:0,state:"count",guard:0,prevT:"",iv:0};
+ show("game");inp.value="";$("#sent").innerHTML="";$("#src").textContent="";$("#box").classList.remove("ov");
+ ui(0,0);inp.focus();
+ var seqs=["3","2","1","START!"],i=0;
+ (function step(){
+  if(!S||S.id!==id)return;
+  if(i>=seqs.length){$("#ov").classList.remove("on");run();return}
+  $("#ovt").textContent=seqs[i];$("#ov").classList.add("on");
+  var b=$("#ovt");b.style.animation="none";void b.offsetWidth;b.style.animation="";
+  b.style.color=i===3?"#2ee6a6":"#e8ebff";
+  i++;setTimeout(step,i===4?650:850);
+ })();
+}
+function run(){S.state="run";S.t0=S.sStart=performance.now();inp.value="";nextSent();S.iv=setInterval(tick,100);inp.focus()}
+function nextSent(){
+ if(!S.q.length)S.q=C.seq?C.pool.slice().reverse():shuffle(C.pool.slice());
+ var s=S.q.pop();if(s===S.cur&&S.q.length&&!C.seq){var x=S.q.pop();S.q.push(s);s=x}
+ S.cur=s;var p=s.split("|");S.t=p[0];
+ $("#src").textContent=p[1]?"— "+p[1]:"";
+ var h="";for(var i=0;i<S.t.length;i++)h+="<span>"+S.t[i].replace("&","&amp;").replace("<","&lt;")+"</span>";
+ var el=$("#sent");el.innerHTML=h;S.sp=el.children;
+ S.val="";S.sErr=0;S.sStart=performance.now();render();
+}
+function render(){
+ var v=inp.value,t=S.t,sp=S.sp;
+ for(var i=0;i<sp.length;i++){
+  var c="";
+  if(i<v.length)c=(S.comp&&i>=S.cs)?"p":(v[i]===t[i]?"ok":"bad");
+  else if(i===v.length)c="cur";
+  if(sp[i].className!==c)sp[i].className=c;
+ }
+ $("#box").classList.toggle("ov",v.length>t.length);
+}
+/* 입력 확정분만 집계: 조합 중에는 오타로 세지 않음. 한 번 입력된 글자 위치는 한 번만 평가 */
+function commit(v){
+ var o=S.val,p=0;
+ while(p<o.length&&p<v.length&&o[p]===v[p])p++;
+ for(var i=p;i<v.length;i++){S.typed++;if(v[i]!==S.t[i]){S.err++;S.sErr++}}
+ S.val=v;
+}
+function handle(composing){
+ if(!S||S.state!=="run"){inp.value="";return}
+ var v=inp.value;
+ if(performance.now()<S.guard&&v&&(v===S.prevT||(v.length<=2&&S.prevT.slice(-v.length)===v))){inp.value="";return}
+ render();
+ if(composing){if(v===S.t||v.length>S.t.length){commit(v);finish()}return}
+ commit(v);
+ if(v.length>=S.t.length)finish();else render();
+}
+inp.addEventListener("compositionstart",function(){if(S&&S.state==="run"){S.comp=true;S.cs=S.val.length}});
+inp.addEventListener("compositionend",function(){if(S){S.comp=false;handle(false)}});
+inp.addEventListener("input",function(e){handle(!!(e.isComposing||(S&&S.comp)))});
+inp.addEventListener("paste",function(e){e.preventDefault()});
+inp.addEventListener("drop",function(e){e.preventDefault()});
+inp.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();setTimeout(function(){if(S&&S.state==="run")handle(false)},0)}else if(S&&S.state==="run")tk()});
+$("#box").addEventListener("click",function(){inp.focus()});
+
+function finish(){
+ var now=performance.now(),dt=(now-S.sStart)/1000,t=S.t,sk=0,i;
+ for(i=0;i<t.length;i++)sk+=st(t[i]);
+ S.doneSt+=sk;S.done++;
+ var perfect=S.sErr===0,pts=t.length*10*(1+Math.min(sk/Math.max(dt,.3)*60,900)/900);
+ if(perfect){S.combo++;if(S.combo>S.maxCombo)S.maxCombo=S.combo;pts*=1+Math.min(S.combo,30)*.05}
+ else{S.combo=0;pts*=Math.max(.3,1-.15*S.sErr)}
+ pts=Math.round(pts);S.score+=pts;
+ var b=$("#box");b.classList.remove("flash");void b.offsetWidth;b.classList.add("flash");
+ var f=document.createElement("div");f.className="fl";f.textContent="+"+pts;b.appendChild(f);setTimeout(function(){f.remove()},900);
+ if(perfect&&S.combo%10===0)pop(S.combo+" COMBO!");
+ S.guard=now+250;S.prevT=t;S.val="";S.comp=false;inp.value="";
+ if(C.n&&S.done>=C.n)return end();
+ nextSent();tick();
+}
+function pop(t){var p=$("#pop");p.textContent=t;p.classList.remove("on");void p.offsetWidth;p.classList.add("on")}
+
+function curSt(){var n=0,v=S.val;for(var i=0;i<v.length;i++)if(v[i]===S.t[i])n+=st(v[i]);return n}
+function accOf(){return S.typed?Math.round((S.typed-S.err)/S.typed*1000)/10:100}
+function ui(e,tot){
+ var lim=C.lim;
+ $("#vT").textContent=lim?Math.max(0,Math.ceil(lim-e))+"s":e.toFixed(1)+"s";
+ $("#vC").textContent=e>0.5?Math.round(tot/Math.max(e,2)*60):0;
+ $("#vA").textContent=accOf()+"%";$("#vN").textContent=S.typed;$("#vE").textContent=S.err;
+ $("#vD").textContent=C.n?S.done+"/"+C.n:S.done;
+ $("#vB").textContent=S.combo;$("#vS").textContent=S.score.toLocaleString();
+ $("#bar").style.width=Math.min(100,(lim?e/lim:S.done/(C.n||10))*100)+"%";
+}
+function tick(){
+ var e=(performance.now()-S.t0)/1000,lim=C.lim;
+ if(lim&&e>=lim)return end();
+ var tot=S.doneSt+curSt();
+ S.smp.push([e,tot]);
+ while(S.smp.length>1&&S.smp[1][0]<=e-5)S.smp.shift();
+ var o=S.smp[0];if(e-o[0]>=4){var r=(tot-o[1])/(e-o[0])*60;if(r>S.peak)S.peak=r}
+ ui(e,tot);
+}
+function end(){
+ if(S.state==="end")return;S.state="end";clearInterval(S.iv);
+ var lim=C.lim,e=(performance.now()-S.t0)/1000;if(lim)e=Math.min(e,lim);e=Math.max(e,1);
+ var tot=S.doneSt+curSt(),avg=Math.round(tot/e*60),acc=accOf();
+ var R={score:S.score,avg:avg,peak:Math.max(Math.round(S.peak),avg),acc:acc,typed:S.typed,err:S.err,done:S.done,combo:S.maxCombo,time:e,key:C.key,label:C.label};
+ inp.blur();inp.value="";
+ $("#ovt").textContent=lim?"TIME UP!":"CLEAR!";$("#ovt").style.color="#ffc857";$("#ov").classList.add("on");
+ var b=$("#ovt");b.style.animation="none";void b.offsetWidth;b.style.animation="";
+ var id=S.id;setTimeout(function(){if(S&&S.id===id){$("#ov").classList.remove("on");result(R)}},1100);
+}
+function result(R){
+ var old=load(R.key),nw={cpm:false,score:false,acc:false};
+ if(R.done>0){
+  nw.cpm=!old||R.peak>old.cpm;nw.score=!old||R.score>old.score;nw.acc=!old||R.acc>old.acc;
+  save(R.key,{cpm:Math.max(R.peak,old?old.cpm:0),score:Math.max(R.score,old?old.score:0),acc:Math.max(R.acc,old?old.acc:0)});
+ }
+ var v=R.avg*Math.pow(R.acc/100,2),g=R.done===0?"F":v>=500?"S":v>=400?"A":v>=300?"B":v>=200?"C":v>=120?"D":"F";
+ var col={S:"#ffc857",A:"#7c5cff",B:"#2ee6a6",C:"#5aa9ff",D:"#ff9f43",F:"#ff4d6d"}[g];
+ var gr=$("#gr");gr.textContent=g;gr.style.color=col;
+ $("#rt").textContent=R.label+" · "+R.time.toFixed(1)+"초";
+ var N='<span class="nr">🎉 NEW RECORD!</span>';
+ var items=[["최종 점수",'<b id="cs">0</b>'+(nw.score?N:"")],["평균 타수","<b>"+R.avg+"</b>"],["최고 순간 타수","<b>"+R.peak+"</b>"+(nw.cpm?N:"")],["정확도","<b>"+R.acc+"%</b>"+(nw.acc?N:"")],["총 입력 글자","<b>"+R.typed+"</b>"],["오타 수","<b>"+R.err+"</b>"],["완료 문장","<b>"+R.done+"</b>"],["최고 콤보","<b>"+R.combo+"</b>"]];
+ $("#res").innerHTML=items.map(function(x){return"<div><i>"+x[0]+"</i>"+x[1]+"</div>"}).join("");
+ $("#nrb").style.display=(nw.cpm||nw.score||nw.acc)?"block":"none";
+ show("result");
+ var t0=performance.now();(function c(){var p=Math.min(1,(performance.now()-t0)/900),el=$("#cs");if(el)el.textContent=Math.round(R.score*(1-Math.pow(1-p,3))).toLocaleString();if(p<1)requestAnimationFrame(c)})();
+}
+function stop(){if(S){clearInterval(S.iv);S.state="end";S.id=0}seq++;$("#ov").classList.remove("on");inp.blur()}
+function quit(){stop();show((C&&C.back)||"home");menu()}
+$("#start").addEventListener("click",function(){C={pool:bpool(),lim:mode==="10"?0:+mode,n:mode==="10"?10:0,label:MN[mode]+" · "+diff.toUpperCase()+" · "+LN[lang],key:bkey(),back:"menu"};start()});
+$("#again").addEventListener("click",start);
+$("#rhome").addEventListener("click",quit);
+$("#quit").addEventListener("click",quit);
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&$("#game").classList.contains("on"))quit()});
+
+/* 홈 · 타자연습 · 타자검정 */
+document.addEventListener("click",function(e){var b=e.target.closest("[data-go]");if(b){stop();show(b.dataset.go);if(b.dataset.go==="menu")menu()}});
+function seg(id,fn){$(id).addEventListener("click",function(e){var b=e.target.closest(".opt");if(!b)return;this.querySelectorAll(".opt").forEach(function(x){x.classList.toggle("sel",x===b)});fn(b.dataset.v)})}
+var AC=null,VOL=0;$("#tv").addEventListener("input",function(){VOL=this.value/100});
+function tk(){if(!VOL)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();var o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime;o.type="square";o.frequency.value=900;g.gain.setValueAtTime(VOL*.15,t);g.gain.exponentialRampToValueAtTime(.001,t+.04);o.connect(g);g.connect(AC.destination);o.start();o.stop(t+.05)}catch(e){}}
+
+var CB={"ㅗ":"ㅏㅐㅣ","ㅜ":"ㅓㅔㅣ","ㅡ":"ㅣ"};
+var SEAT={"기본자리":["ㅁㄴㅇㄹㅎ","ㅗㅓㅏㅣ"],"왼손윗자리":["ㅂㅈㄷㄱㅅ",""],"왼손아랫자리":["ㅋㅌㅊㅍ",""],"가운데자리":["ㅅㅎ","ㅛㅗㅠㅜ"],"오른손윗자리":["","ㅛㅕㅑㅐㅔ"],"오른손아랫자리":["","ㅜㅡ,./"],"전체자리":["ㅂㅈㄷㄱㅅㅁㄴㅇㄹㅎㅋㅌㅊㅍ","ㅛㅕㅑㅐㅔㅗㅓㅏㅣㅜㅡ"],"숫자자리":["1234567890",""]};
+var PN={seat:"자리연습",word:"낱말연습",short:"단문연습",long:"장문연습"};
+var PX={seat:"자판의 자리를 익혀요. 자음과 모음이 따로 나옵니다.",word:"낱말 15개를 차례로 입력해요.",short:"짧은 문장 10개를 입력해요.",long:"긴 문장과 문학 작품 5개를 입력해요."};
+var W="사과 바나나 학교 친구 하늘 컴퓨터 대한민국 무지개 도서관 자전거 행복 별빛 키보드 사랑 여름방학 운동장 고구마 놀이터 비행기 강아지 아침노을 냉장고 스마트폰 우산 꽃길 바다 구름 기차역 햄버거 나무늘보 도깨비".split(" ");
+var ptab="seat",pseat="기본자리";
+function gen(s,v){var o="",c,i=0;for(;i<6;i++){do c=s[Math.random()*s.length|0];while(v&&i&&(CB[o[i-1]]||"").indexOf(c)>-1);o+=c}return o}
+function prac(){
+ document.querySelectorAll("#ptabs .opt").forEach(function(b){b.classList.toggle("sel",b.dataset.v===ptab)});
+ var c=$("#pseat");c.style.display=ptab==="seat"?"flex":"none";
+ c.innerHTML=Object.keys(SEAT).map(function(k){return'<button class="opt'+(k===pseat?" sel":"")+'" data-v="'+k+'">'+k+'</button>'}).join("");
+ $("#pd").textContent=PX[ptab];
+}
+$("#ptabs").addEventListener("click",function(e){var b=e.target.closest(".opt");if(b){ptab=b.dataset.v;prac()}});
+$("#pseat").addEventListener("click",function(e){var b=e.target.closest(".opt");if(b){pseat=b.dataset.v;prac()}});
+$("#pstart").addEventListener("click",function(){
+ var pool,n,k;
+ if(ptab==="seat"){var a=SEAT[pseat],sets=[];if(a[0])sets.push([a[0],0]);if(a[1])sets.push([a[1],1]);pool=[];for(k=0;k<12;k++)pool.push(gen(sets[k%sets.length][0],sets[k%sets.length][1]));n=12}
+ else if(ptab==="word"){pool=shuffle(W.slice()).slice(0,15);n=15}
+ else if(ptab==="short"){pool=D.easy.concat(D.normal);n=10}
+ else{pool=D.hard.slice(0,8);n=5}
+ var sub=ptab==="seat"?" · "+pseat:"";
+ C={pool:pool,lim:0,n:n,label:PN[ptab]+sub,key:"p_"+ptab+(ptab==="seat"?"_"+pseat:""),back:"prac"};start();
+});
+
+var RF="무궁화 삼천리 화려강산 대한 사람 대한으로 길이 보전하세.";
+var AGV=["동해물과 백두산이 마르고 닳도록 하느님이 보우하사 우리나라 만세.","남산 위에 저 소나무 철갑을 두른 듯 바람서리 불변함은 우리 기상일세.","가을 하늘 공활한데 높고 구름 없이 밝은 달은 우리 가슴 일편단심일세.","이 기상과 이 맘으로 충성을 다하여 괴로우나 즐거우나 나라 사랑하세."];
+function T(g,n,t,l){return{g:g,n:n,t:t,l:l||"ko"}}
+var CT=[
+T("독립운동","3.1 독립선언서",["우리는 이에 우리 조선이 독립한 나라임과 조선인이 자주적인 민족임을 선언하노라.","이로써 세계 만국에 알려 인류 평등의 큰 도리를 분명히 하며, 이로써 자손만대에 일러 민족 자존의 정당한 권리를 영원히 누리게 하노라."]),
+T("독립운동","김구",["나는 우리나라가 세계에서 가장 아름다운 나라가 되기를 원한다. 가장 부강한 나라가 되기를 원하지 아니한다.","내가 남의 침략에 가슴이 아팠으니, 내 나라가 남을 침략하는 것을 원치 아니한다.","우리의 부력은 우리의 생활을 풍족히 할 만하고, 우리의 강력은 남의 침략을 막을 만하면 족하다.","오직 한없이 가지고 싶은 것은 높은 문화의 힘이다."]),
+T("독립운동","안중근",["장부가 세상에 처함이여 그 뜻이 크도다.","때가 영웅을 지음이여 영웅이 때를 지으리로다.","하루라도 책을 읽지 않으면 입 안에 가시가 돋는다."]),
+T("독립운동","안창호",["나 하나가 건전한 인격이 되는 것이 민족 갱생의 첫걸음이다.","낙망은 청년의 죽음이요 청년이 죽으면 민족이 죽는다."]),
+T("독립운동","유관순",["내 손톱이 빠져나가고 귀와 코가 잘리고 두 다리가 부러져도 그 고통은 이길 수 있사오나 나라를 잃은 그 고통만은 견딜 수가 없습니다.","대한 독립 만세!"]),
+T("문화유산","독도",["독도는 동해에 있는 우리나라 영토로, 동도와 서도 두 개의 큰 섬과 부속 바위섬들로 이루어져 있습니다.","독도는 울릉도에서 동남쪽으로 약 87킬로미터 떨어져 있으며, 경상북도 울릉군에 속합니다.","독도는 천연기념물 제336호로 보호받고 있습니다."]),
+T("문화유산","석굴암과 불국사",["경주 토함산에 자리한 석굴암과 불국사는 신라 경덕왕 때 김대성이 짓기 시작한 것으로 전해집니다.","1995년 석굴암과 불국사는 유네스코 세계문화유산으로 등재되었습니다."]),
+T("문화유산","애국가",AGV.reduce(function(a,v){return a.concat([v,RF])},[])),
+T("문화유산","애국가 1절",[AGV[0],RF]),
+T("민요","아리랑",["아리랑 아리랑 아라리요 아리랑 고개로 나를 넘겨 주소.","나를 버리고 가시는 님은 십 리도 못 가서 발병 난다."]),
+T("수학개념","수학개념 1",["소수는 1과 자기 자신으로만 나누어떨어지는 1보다 큰 자연수입니다.","2는 유일한 짝수인 소수입니다."]),
+T("수학개념","수학개념 2",["직각삼각형에서 빗변의 길이의 제곱은 나머지 두 변의 길이의 제곱의 합과 같습니다."]),
+T("수학개념","수학개념 3",["원의 넓이는 반지름의 제곱에 원주율을 곱하여 구하며, 원주율은 약 3.14입니다."]),
+T("종교","마하반야바라밀다심경",["관자재보살이 깊은 반야바라밀다를 행할 때 오온이 모두 공한 것을 비추어 보고 일체의 괴로움과 재앙을 건너느니라.","사리자여, 색이 공과 다르지 않고 공이 색과 다르지 않으며 색이 곧 공이요 공이 곧 색이니, 수상행식도 또한 이와 같느니라."]),
+T("현대시_윤동주","별 헤는 밤",["계절이 지나가는 하늘에는 가을로 가득 차 있습니다.","나는 아무 걱정도 없이 가을 속의 별들을 다 헤일 듯합니다.","별 하나에 추억과 별 하나에 사랑과 별 하나에 쓸쓸함과 별 하나에 동경과 별 하나에 시와 별 하나에 어머니, 어머니."]),
+T("현대시_윤동주","서시",["죽는 날까지 하늘을 우러러 한 점 부끄럼이 없기를, 잎새에 이는 바람에도 나는 괴로워했다.","별을 노래하는 마음으로 모든 죽어 가는 것을 사랑해야지.","그리고 나한테 주어진 길을 걸어가야겠다.","오늘 밤에도 별이 바람에 스치운다."]),
+T("현대시_정지용","향수",["넓은 벌 동쪽 끝으로 옛이야기 지줄대는 실개천이 휘돌아 나가고,","얼룩백이 황소가 해설피 금빛 게으른 울음을 우는 곳,","그곳이 차마 꿈엔들 잊힐리야."]),
+T("현대시_한용운","님의 침묵",["님은 갔습니다. 아아, 사랑하는 나의 님은 갔습니다.","푸른 산빛을 깨치고 단풍나무 숲을 향하여 난 작은 길을 걸어서 차마 떨치고 갔습니다.","황금의 꽃같이 굳고 빛나던 옛 맹세는 차디찬 티끌이 되어서 한숨의 미풍에 날아갔습니다."]),
+T("현대시_한용운","사랑하는 까닭",["내가 당신을 사랑하는 것은 까닭이 있습니다.","다른 사람들은 나의 홍안만을 사랑하지마는 당신은 나의 백발도 사랑하는 까닭입니다.","다른 사람들은 나의 미소만을 사랑하지마는 당신은 나의 눈물도 사랑하는 까닭입니다."]),
+T("한글날","세종대왕",["세종대왕은 1443년 훈민정음을 만들고 1446년에 세상에 펴냈습니다.","한글은 소리를 내는 입 모양과 하늘, 땅, 사람의 모양을 본떠 만든 과학적인 문자입니다."]),
+T("한글날","주시경",["말이 오르면 나라도 오르고 말이 내리면 나라도 내리나니.","주시경은 우리말과 글을 연구하고 가르치는 데 평생을 바쳤습니다."]),
+T("한글날","한글날",["한글날은 훈민정음을 세상에 펴낸 것을 기념하는 날로, 해마다 10월 9일입니다.","한글은 만든 사람과 만든 때를 아는 세계 유일의 문자입니다."]),
+T("한글날","훈민정음",["나라의 말이 중국과 달라 한자와는 서로 통하지 아니하므로, 이런 까닭으로 어리석은 백성이 말하고자 하는 바가 있어도 마침내 제 뜻을 능히 펴지 못하는 사람이 많다.","내가 이를 불쌍히 여겨 새로 스물여덟 자를 만드니, 사람마다 쉽게 익혀 날마다 씀에 편안케 하고자 할 따름이다."]),
+T("Speech","Gettysburg Address",["Four score and seven years ago our fathers brought forth on this continent, a new nation, conceived in Liberty, and dedicated to the proposition that all men are created equal.","Now we are engaged in a great civil war, testing whether that nation, or any nation so conceived and so dedicated, can long endure."],"en"),
+T("Document","Declaration of Independence",["We hold these truths to be self-evident, that all men are created equal, that they are endowed by their Creator with certain unalienable Rights, that among these are Life, Liberty and the pursuit of Happiness."],"en"),
+T("Fable","The Thirsty Crow",["A thirsty crow found a pitcher with a little water at the bottom.","The crow dropped pebbles into the pitcher until the water rose, and then it drank."],"en")
+];
+var tt=60,tl="ko";
+function tfill(){var h='<option value="">콘텐츠 선택</option>';CT.forEach(function(c,i){if(c.l===tl)h+='<option value="'+i+'">'+c.g+" / "+c.n+"</option>"});$("#tc").innerHTML=h;$("#tstart").disabled=true}
+seg("#tt",function(v){tt=+v});seg("#tl",function(v){tl=v;tfill()});
+$("#tc").addEventListener("change",function(){$("#tstart").disabled=!this.value});
+$("#tstart").addEventListener("click",function(){var i=+$("#tc").value,c=CT[i];C={pool:c.t,lim:tt,n:0,seq:true,label:"검정 "+tt/60+"분 · "+c.g+" / "+c.n,key:"t_"+tt+"_"+i,back:"test"};start()});
+tfill();prac();
+menu();
+})();
+</script>
+</body>
+</html>

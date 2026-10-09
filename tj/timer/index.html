@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>timer</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F4F0FB;--fg:#1B1530;--mut:#7A7191;--card:#FFFFFF;--line:#DDD5EE;--glow:.22;
+--c-clock:#E8456B;--c-timer:#E59A00;--c-alarm:#6C5CE7;--c-stop:#0FA88F;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#150F26;--fg:#F3EEFF;--mut:#9A90B8;--card:#211A38;--line:#352C55;--glow:.35;
+--c-clock:#FF6B8A;--c-timer:#FFC857;--c-alarm:#9D8FFF;--c-stop:#5EEAD4}}
+:root[data-theme="dark"]{--bg:#150F26;--fg:#F3EEFF;--mut:#9A90B8;--card:#211A38;--line:#352C55;--glow:.35;
+--c-clock:#FF6B8A;--c-timer:#FFC857;--c-alarm:#9D8FFF;--c-stop:#5EEAD4}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:"Gowun Dodum",system-ui,sans-serif;display:flex;justify-content:center;overflow:hidden}
+body[data-t=clock]{--ac:var(--c-clock)}body[data-t=timer]{--ac:var(--c-timer)}
+body[data-t=alarm]{--ac:var(--c-alarm)}body[data-t=stop]{--ac:var(--c-stop)}
+body::before{content:"";position:fixed;inset:0;background:radial-gradient(circle at 50% 28%,var(--ac),transparent 62%);opacity:var(--glow);transition:background .5s;pointer-events:none}
+#app{position:relative;width:100%;max-width:440px;height:100%;display:flex;flex-direction:column}
+.top{position:fixed;top:0;left:0;z-index:5;display:flex;align-items:center;padding:calc(12px + env(safe-area-inset-top,0px)) 18px 8px;text-decoration:none;color:var(--fg)}
+.top .a{font-size:15px;color:var(--mut);display:block}.top:hover .a{color:var(--fg)}
+.top .b{color:var(--mut);opacity:.8;display:block;font:800 13px Nunito,sans-serif;letter-spacing:1.6px;text-transform:uppercase;margin-top:3px}
+main{flex:1;overflow-y:auto;padding:64px 22px 12px}
+.pane{display:none}.pane.on{display:block}
+.mono{font-weight:400;font-family:Nunito,system-ui,sans-serif;font-variant-numeric:tabular-nums}
+h2{font-size:15px;font-weight:600;color:var(--mut);text-align:center;margin-bottom:18px}
+/* clock */
+.face{position:relative;width:min(78vw,300px);aspect-ratio:1;margin:8px auto 26px}
+.face svg{width:100%;height:100%;transform:rotate(-90deg)}
+.face .in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.big{font-size:clamp(46px,15vw,64px);font-weight:300;letter-spacing:-1px;line-height:1}
+#tdisp{font-size:clamp(32px,10vw,42px);font-weight:400}.sec{font-size:22px;color:var(--ac);margin-top:8px}
+.date{text-align:center;font-size:17px;font-weight:600}
+.sub{text-align:center;color:var(--mut);font-size:13px;margin-top:6px}
+.trk{fill:none;stroke:var(--line);stroke-width:8}
+.prg{fill:none;stroke:var(--ac);stroke-width:8;stroke-linecap:round}
+/* buttons */
+.row{display:flex;gap:14px;justify-content:center;margin-top:22px}
+.btn{border:0;border-radius:999px;padding:15px 0;width:118px;font:600 15px "Gowun Dodum",sans-serif;cursor:pointer;background:var(--card);color:var(--fg);box-shadow:inset 0 0 0 1.5px var(--line);transition:transform .1s}
+.btn:active{transform:scale(.95)}
+.btn.pri{background:var(--ac);color:#fff;box-shadow:none}
+body[data-t=timer] .btn.pri,body[data-t=stop] .btn.pri{color:#1B1530}
+.btn:disabled{opacity:.4}
+button:focus-visible,input:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+/* timer */
+.set{display:flex;gap:10px;justify-content:center;align-items:center;margin-top:6px}
+.set label{display:flex;flex-direction:column;align-items:center;font-size:12px;color:var(--mut);gap:6px}
+input.n{width:78px;padding:12px 0;text-align:center;font-size:28px;border-radius:16px;border:1.5px solid var(--line);background:var(--card);color:var(--fg)}
+.chips{display:flex;gap:8px;justify-content:center;margin-top:16px}
+.chip{border:1.5px solid var(--line);background:transparent;color:var(--fg);border-radius:999px;padding:8px 14px;font:500 13px "Gowun Dodum",sans-serif;cursor:pointer}
+.hide{display:none!important}.chips.wrap{flex-wrap:wrap}.chip.sel{background:var(--ac);border-color:var(--ac);color:#1B1530;font-weight:700}.prg{transition:stroke .3s}
+/* alarm */
+.add{display:flex;gap:10px;background:var(--card);padding:12px;border-radius:20px;box-shadow:inset 0 0 0 1.5px var(--line)}
+.add input{border:0;background:transparent;color:var(--fg);font:inherit;min-width:0}
+.add input[type=time]{font-family:Nunito,sans-serif;font-size:22px;width:auto;flex:none;padding:0;color-scheme:light dark}
+.add input[type=text]{flex:1;width:0;font-size:15px;border-left:1.5px solid var(--line);padding-left:12px}
+.add button{border:0;border-radius:14px;background:var(--ac);color:#fff;width:46px;font-size:24px;cursor:pointer}
+.al{display:flex;align-items:center;gap:12px;padding:16px 6px;border-bottom:1px solid var(--line)}
+.al .t{font-size:34px;font-weight:300;flex:1}.al .l{display:block;font:400 13px "Gowun Dodum",sans-serif;color:var(--mut);margin-top:2px}
+.al.off .t{opacity:.35}
+.sw{width:50px;height:30px;border-radius:999px;border:0;background:var(--line);position:relative;cursor:pointer;transition:background .2s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .2s}
+.sw.on{background:var(--ac)}.sw.on::after{transform:translateX(20px)}
+.x{border:0;background:none;color:var(--mut);font-size:20px;cursor:pointer;padding:6px}
+.empty{text-align:center;color:var(--mut);font-size:14px;padding:36px 0}
+/* stopwatch */
+.laps{margin-top:18px}
+.lap{display:flex;justify-content:space-between;padding:12px 4px;border-bottom:1px solid var(--line);font-size:16px}
+.lap span:first-child{color:var(--mut);font-family:"Gowun Dodum"}
+.lap.best{color:var(--c-stop)}.lap.worst{color:var(--c-clock)}
+/* tabs */
+nav{display:flex;margin:6px 14px 10px;padding:6px;border-radius:24px;background:var(--card);box-shadow:inset 0 0 0 1.5px var(--line)}
+nav button{flex:1;border:0;background:none;border-radius:18px;padding:9px 0 7px;color:var(--mut);font:600 11px "Gowun Dodum",sans-serif;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
+nav button b{font-size:20px;font-weight:400}
+nav button.on{background:var(--ac);color:#fff}
+body[data-t=timer] nav button.on,body[data-t=stop] nav button.on{color:#1B1530}
+/* ringing */
+#ring{position:fixed;inset:0;z-index:9;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:24px}
+#ring.on{display:flex}
+#ring .bell{font-size:72px;animation:sh .5s infinite}
+@keyframes sh{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(14deg)}}
+#ring h3{font-size:30px}#ring p{color:var(--mut)}
+@media (prefers-reduced-motion:reduce){#ring .bell{animation:none}.btn{transition:none}}
+</style>
+</head>
+<body data-t="clock">
+<div id="app">
+<a class="top" href="https://tjserver26.github.io" target="_blank" rel="noopener"><span><span class="a">← tjserver로 돌아가기</span><span class="b">timer</span></span></a>
+<main>
+ <section class="pane on" id="p-clock">
+  <div class="face"><svg viewBox="0 0 240 240"><circle class="trk" cx="120" cy="120" r="110"/><circle class="prg" id="cring" cx="120" cy="120" r="110" stroke-dasharray="691.15" stroke-dashoffset="691.15"/></svg>
+   <div class="in"><div class="big mono" id="hm">00:00</div><div class="sec mono" id="ss">00</div></div></div>
+  <div class="date" id="date"></div><div class="sub" id="ampm"></div>
+  <div class="row"><button class="btn" id="fmt">12/24시간 전환</button></div>
+ </section>
+
+ <section class="pane" id="p-timer">
+  <h2>타이머</h2>
+  <div class="face"><svg viewBox="0 0 240 240"><circle class="trk" cx="120" cy="120" r="110"/><circle class="prg" id="tring" cx="120" cy="120" r="110" stroke-dasharray="691.15" stroke-dashoffset="0"/></svg>
+   <div class="in"><div class="big mono" id="tdisp">00:05:00</div><div class="sub" id="tmsg">시간을 설정하세요</div></div></div>
+  <div id="tset">
+   <div class="set">
+    <label>시간<input class="n mono" id="th" type="number" min="0" max="99" value="0" inputmode="numeric"></label>
+    <label>분<input class="n mono" id="tm" type="number" min="0" max="59" value="5" inputmode="numeric"></label>
+    <label>초<input class="n mono" id="ts" type="number" min="0" max="59" value="0" inputmode="numeric"></label>
+   </div>
+   <div class="chips"><button class="chip" data-s="60">1분</button><button class="chip" data-s="180">3분</button><button class="chip" data-s="300">5분</button><button class="chip" data-s="600">10분</button><button class="chip" data-s="1800">30분</button></div>
+   <div class="sub" style="margin-top:22px">종료음 · 누르면 미리 들어볼 수 있어요</div><div class="chips wrap" id="snds"></div>
+  </div>
+  <div class="row"><button class="btn" id="treset">초기화</button><button class="btn pri" id="tgo">시작</button></div>
+ </section>
+
+ <section class="pane" id="p-alarm">
+  <h2>알람</h2>
+  <div class="add"><input type="time" id="atime" value="07:00" aria-label="알람 시간"><input type="text" id="alabel" placeholder="이름 (선택)" maxlength="20"><button id="aadd" aria-label="알람 추가">+</button></div>
+  <div id="alist"></div>
+ </section>
+
+ <section class="pane" id="p-stop">
+  <h2>스톱워치</h2>
+  <div class="face"><svg viewBox="0 0 240 240"><circle class="trk" cx="120" cy="120" r="110"/><circle class="prg" id="sring" cx="120" cy="120" r="110" stroke-dasharray="691.15" stroke-dashoffset="691.15"/></svg>
+   <div class="in"><div class="big mono" id="sdisp">00:00</div><div class="sec mono" id="sms">.00</div></div></div>
+  <div class="row"><button class="btn" id="slap" disabled>랩</button><button class="btn pri" id="sgo">시작</button></div>
+  <div class="laps mono" id="laps"></div>
+ </section>
+</main>
+<nav>
+ <button class="on" data-t="clock"><b>🕐</b>시계</button>
+ <button data-t="timer"><b>⏲️</b>타이머</button>
+ <button data-t="alarm"><b>⏰</b>알람</button>
+ <button data-t="stop"><b>⏱️</b>스톱워치</button>
+</nav>
+</div>
+<div id="ring" role="alertdialog"><div class="bell">🔔</div><h3 id="rt"></h3><p id="rs"></p>
+ <div class="row"><button class="btn" id="snz">5분 뒤 다시</button><button class="btn pri" id="stp">끄기</button></div></div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],p2=n=>String(n).padStart(2,'0'),C=691.15;
+let h24=true;try{h24=localStorage.getItem('h24')!=='0'}catch(e){}
+/* tabs */
+$$('nav button').forEach(b=>b.onclick=()=>{$$('nav button').forEach(x=>x.classList.toggle('on',x===b));
+ $$('.pane').forEach(p=>p.classList.toggle('on',p.id==='p-'+b.dataset.t));document.body.dataset.t=b.dataset.t;});
+/* sound */
+let ac=null,rt=null;
+document.addEventListener('pointerdown',()=>{if(!ac)try{ac=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}if(ac&&ac.state==='suspended')ac.resume()});
+function beep(f,d,type='sine',at=0,vol=.3){if(!ac)return;const o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.value=f;o.connect(g);g.connect(ac.destination);
+ const t=ac.currentTime+at;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.02);g.gain.linearRampToValueAtTime(0,t+d);o.start(t);o.stop(t+d+.05)}
+const SND={
+ bell:{n:'🔔 벨',p:900,t:[[880,0,.25],[1175,.4,.25],[880,.8,.25]],w:'sine'},
+ beep:{n:'📟 비프',p:1000,t:[[1000,0,.1],[1000,.2,.1],[1000,.4,.1]],w:'square',v:.15},
+ chime:{n:'🎐 차임',p:1600,t:[[659,0,.6],[784,.25,.6],[988,.5,.9]],w:'triangle'},
+ digital:{n:'⏰ 디지털',p:1000,t:[[1500,0,.07],[1500,.13,.07],[1500,.26,.07],[1500,.39,.07]],w:'square',v:.12},
+ melody:{n:'🎵 멜로디',p:1900,t:[[523,0,.3],[659,.3,.3],[784,.6,.3],[1047,.9,.7]],w:'sine'}};
+let snd='bell';try{snd=localStorage.getItem('snd')||'bell';if(!SND[snd])snd='bell'}catch(e){}
+function play(id){const k=SND[id];k.t.forEach(([f,a,d])=>beep(f,d,k.w,a,k.v||.3))}
+let snoozeFn=null;
+function ring(title,sub,snooze,sid){sid=sid||"bell";$('#rt').textContent=title;$('#rs').textContent=sub;$('#ring').classList.add('on');$('#snz').classList.toggle('hide',!snooze);snoozeFn=snooze;
+ clearInterval(rt);const go=()=>play(sid);go();rt=setInterval(go,SND[sid].p+500);
+ if(navigator.vibrate)navigator.vibrate([300,150,300])}
+function stopRing(){clearInterval(rt);$('#ring').classList.remove('on')}
+$('#stp').onclick=stopRing;$('#snz').onclick=()=>{stopRing();snoozeFn&&snoozeFn()};
+/* clock */
+const days=['일','월','화','수','목','금','토'];
+$('#fmt').onclick=()=>{h24=!h24;try{localStorage.setItem('h24',h24?'1':'0')}catch(e){}tick()};
+function tick(){const d=new Date();let h=d.getHours();
+ $('#ampm').textContent=h24?'24시간 표기':(h<12?'오전':'오후');
+ if(!h24)h=h%12||12;
+ $('#hm').textContent=p2(h)+':'+p2(d.getMinutes());$('#ss').textContent=p2(d.getSeconds());
+ $('#cring').style.strokeDashoffset=C*(1-(d.getSeconds()+d.getMilliseconds()/1000)/60);
+ $('#date').textContent=`${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 ${days[d.getDay()]}요일`;
+ alarmCheck(d)}
+/* timer */
+let tDur=300000,tLeft=300000,tEnd=0,tRun=false,tRaf=0;
+const tin=()=>((+$('#th').value||0)*3600+(+$('#tm').value||0)*60+(+$('#ts').value||0))*1000;
+const fmtT=ms=>{const s=Math.ceil(ms/1000);return p2(Math.floor(s/3600))+':'+p2(Math.floor(s/60)%60)+':'+p2(s%60)};
+function tShow(){const sec=tLeft/1000;$('#tring').style.stroke=sec<5?'#EF4444':sec<=15?'#FB923C':sec<=30?'#FACC15':'#22C55E';$('#tdisp').textContent=fmtT(tLeft);$('#tring').style.strokeDashoffset=tDur?C*(1-tLeft/tDur):0}
+function tSync(){if(tRun||tLeft<tDur)return;tDur=tLeft=tin();tShow()}
+['#th','#tm','#ts'].forEach(i=>$(i).oninput=tSync);
+$$('.chip').forEach(c=>c.onclick=()=>{const s=+c.dataset.s;$('#th').value=Math.floor(s/3600);$('#tm').value=Math.floor(s/60)%60;$('#ts').value=s%60;tLeft=tDur=-1;tDur=tLeft=tin();tShow()});
+function tLoop(){tLeft=Math.max(0,tEnd-Date.now());tShow();if(tLeft<=0){tRun=false;tUI();ring('타이머 종료',fmtT(tDur)+' 완료',null,snd);return}tRaf=requestAnimationFrame(tLoop)}
+function tUI(){const idle=!tRun&&tLeft>=tDur;$('#tset').classList.toggle('hide',!idle);
+ $('#tgo').textContent=tRun?'일시정지':(idle?'시작':'계속');$('#tmsg').textContent=tRun?'카운트다운 중':(idle?'시간을 설정하세요':(tLeft<=0?'종료':'일시정지됨'))}
+$('#tgo').onclick=()=>{if(tRun){tRun=false;cancelAnimationFrame(tRaf);tUI();return}
+ if(tLeft<=0||(tLeft>=tDur&&!tRun)){tDur=tLeft=tin()}if(tLeft<=0)return;
+ tEnd=Date.now()+tLeft;tRun=true;tUI();tLoop()};
+$('#treset').onclick=()=>{tRun=false;cancelAnimationFrame(tRaf);tDur=tLeft=tin();tShow();tUI()};
+function sRender(){const B=$('#snds');B.innerHTML='';Object.keys(SND).forEach(id=>{const b=document.createElement('button');b.className='chip'+(id===snd?' sel':'');b.textContent=SND[id].n;
+ b.onclick=()=>{snd=id;try{localStorage.setItem('snd',id)}catch(e){}if(!ac)try{ac=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}play(id);sRender()};B.appendChild(b)})}
+/* alarm */
+let alarms=[];try{alarms=JSON.parse(localStorage.getItem('alarms')||'[]')}catch(e){}
+let fired='',snoozeAt=0;
+const save=()=>{try{localStorage.setItem('alarms',JSON.stringify(alarms))}catch(e){}};
+function aRender(){const L=$('#alist');
+ if(!alarms.length){L.innerHTML='<div class="empty">알람이 없어요.<br>시간을 고르고 +를 눌러 추가하세요.</div>';return}
+ L.innerHTML='';alarms.sort((a,b)=>a.time.localeCompare(b.time)).forEach(a=>{
+  const r=document.createElement('div');r.className='al'+(a.on?'':' off');
+  const [h,m]=a.time.split(':').map(Number);const ap=h<12?'오전':'오후';
+  r.innerHTML=`<div class="t mono">${a.time}<span class="l">${ap} ${h%12||12}:${p2(m)}${a.label?' · '+esc(a.label):''}</span></div>
+  <button class="sw${a.on?' on':''}" aria-label="알람 켜기/끄기"></button><button class="x" aria-label="삭제">✕</button>`;
+  r.querySelector('.sw').onclick=()=>{a.on=!a.on;save();aRender()};
+  r.querySelector('.x').onclick=()=>{alarms=alarms.filter(z=>z!==a);save();aRender()};
+  L.appendChild(r)})}
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+$('#aadd').onclick=()=>{const t=$('#atime').value;if(!t)return;alarms.push({time:t,label:$('#alabel').value.trim(),on:true});$('#alabel').value='';save();aRender()};
+function alarmCheck(d){const key=d.toDateString()+p2(d.getHours())+':'+p2(d.getMinutes());
+ if(snoozeAt&&Date.now()>=snoozeAt){snoozeAt=0;fire('다시 알림','')}
+ if(key===fired)return;
+ const hit=alarms.find(a=>a.on&&a.time===p2(d.getHours())+':'+p2(d.getMinutes()));
+ if(hit){fired=key;fire(hit.label||'알람',hit.time)}}
+function fire(t,s){ring(t,s,()=>{snoozeAt=Date.now()+300000})}
+/* stopwatch */
+let sEl=0,sStart=0,sRun=false,sRaf=0,laps=[];
+const sNow=()=>sEl+(sRun?performance.now()-sStart:0);
+function sFmt(ms){const m=Math.floor(ms/60000),s=Math.floor(ms/1000)%60,c=Math.floor(ms/10)%100;return[p2(m)+':'+p2(s),'.'+p2(c)]}
+function sShow(){const t=sNow(),[a,b]=sFmt(t);$('#sdisp').textContent=a;$('#sms').textContent=b;$('#sring').style.strokeDashoffset=C*(1-(t%60000)/60000)}
+function sLoop(){sShow();if(sRun)sRaf=requestAnimationFrame(sLoop)}
+function lRender(){const L=$('#laps');L.innerHTML='';if(!laps.length)return;
+ const d=laps.map((t,i)=>t-(laps[i-1]||0)),mn=Math.min(...d),mx=Math.max(...d);
+ for(let i=laps.length-1;i>=0;i--){const r=document.createElement('div');
+  r.className='lap'+(laps.length>2?(d[i]===mn?' best':d[i]===mx?' worst':''):'');
+  const x=sFmt(d[i]),y=sFmt(laps[i]);r.innerHTML=`<span>랩 ${i+1}</span><span>${x[0]+x[1]}</span><span style="color:var(--mut)">${y[0]+y[1]}</span>`;L.appendChild(r)}}
+$('#sgo').onclick=()=>{if(sRun){sEl+=performance.now()-sStart;sRun=false;cancelAnimationFrame(sRaf);$('#sgo').textContent='계속';$('#slap').textContent='초기화'}
+ else{sStart=performance.now();sRun=true;sLoop();$('#sgo').textContent='정지';$('#slap').textContent='랩';$('#slap').disabled=false}};
+$('#slap').onclick=()=>{if(sRun){laps.push(sNow());lRender()}else{sEl=0;laps=[];sShow();lRender();$('#slap').textContent='랩';$('#slap').disabled=true;$('#sgo').textContent='시작'}};
+/* init */
+aRender();sRender();tShow();tUI();sShow();tick();setInterval(tick,100);
+</script>
+</body>
+</html>

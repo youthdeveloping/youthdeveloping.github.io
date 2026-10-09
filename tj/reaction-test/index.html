@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>⚡ 반응속도 테스트 | TJ Games</title>
+<style>
+  :root {
+    --bg: #0d1020;
+    --panel: #161a30;
+    --line: #262c4d;
+    --text: #eef0ff;
+    --muted: #8d93b8;
+    --accent: #7c5cff;
+    --go: #19d98b;
+    --wait: #ff4d6d;
+    --warn: #ffb020;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: radial-gradient(1200px 600px at 50% -10%, #1e2350 0%, var(--bg) 60%);
+    color: var(--text);
+    font-family: "Pretendard", -apple-system, "Segoe UI", "Noto Sans KR", "Malgun Gothic", sans-serif;
+    display: flex; flex-direction: column; align-items: center;
+    padding: max(20px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+  }
+  h1 { font-size: clamp(1.6rem, 5vw, 2.2rem); margin: 8px 0 4px; letter-spacing: -0.02em; }
+  .sub { color: var(--muted); margin: 0 0 18px; font-size: .95rem; }
+  main { width: 100%; max-width: 520px; flex: 1; justify-content: center; padding-bottom: 8vh; display: flex; flex-direction: column; gap: 14px; }
+
+  .stats { display: flex; gap: 10px; }
+  .stat { flex: 1; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; }
+  .stat small { color: var(--muted); display: block; font-size: .75rem; }
+  .stat b { font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+
+  #pad {
+    position: relative; border: 0; width: 100%; min-height: clamp(200px, 36dvh, 280px); border-radius: 22px;
+    background: var(--panel); color: var(--text); cursor: pointer; font: inherit;
+    box-shadow: 0 0 0 1px var(--line), 0 18px 40px rgba(0,0,0,.35);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+    padding: 24px; text-align: center; user-select: none; touch-action: manipulation;
+    transition: background .25s ease, transform .12s ease, box-shadow .25s ease;
+  }
+  #pad:active { transform: scale(.985); }
+  #pad:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  #pad.wait { background: var(--wait); box-shadow: 0 0 40px rgba(255,77,109,.35); }
+  #pad.go { background: var(--go); color: #04281a; box-shadow: 0 0 50px rgba(25,217,139,.55); }
+  #pad.early { background: var(--warn); color: #3a2600; }
+  #pad.result { background: var(--panel); }
+  #msg { font-size: clamp(1.6rem, 6vw, 2.2rem); font-weight: 800; letter-spacing: -0.02em; }
+  #hint { font-size: .95rem; opacity: .8; }
+  #big { font-size: clamp(2.6rem, 12vw, 4rem); font-weight: 800; font-variant-numeric: tabular-nums; }
+  .pop { animation: pop .3s ease; }
+  @keyframes pop { from { transform: scale(.92); opacity: .4; } to { transform: scale(1); opacity: 1; } }
+
+  .rounds { display: flex; gap: 8px; }
+  .dot {
+    flex: 1; background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+    padding: 8px 4px; text-align: center; transition: border-color .2s, background .2s;
+  }
+  .dot small { color: var(--muted); display: block; font-size: .7rem; }
+  .dot b { font-size: .95rem; font-variant-numeric: tabular-nums; }
+  .dot.done { border-color: var(--accent); background: #1c2142; }
+  .dot.now { border-color: var(--text); }
+
+  .summary { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 18px; text-align: center; }
+  .hidden { display: none !important; }
+  .grade { font-size: 1.6rem; font-weight: 800; margin: 6px 0; }
+  .avg { color: var(--muted); }
+  .avg b { color: var(--text); font-size: 1.3rem; }
+  .newbest { color: var(--go); font-weight: 700; margin-top: 6px; }
+
+  .btn {
+    border: 0; border-radius: 14px; padding: 14px 20px; width: 100%; font: inherit; font-weight: 700; font-size: 1.05rem;
+    background: var(--accent); color: #fff; cursor: pointer;
+    box-shadow: 0 8px 22px rgba(124,92,255,.4);
+    transition: transform .12s ease, box-shadow .2s ease, filter .2s;
+  }
+  .btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  .btn:active { transform: translateY(1px) scale(.98); }
+  .btn:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+
+  #game { display: flex; flex-direction: column; gap: 14px; }
+  #home { display: flex; flex-direction: column; gap: 14px; }
+  #home, #game { animation: screenIn .35s cubic-bezier(.2,.8,.2,1); }
+  @keyframes screenIn { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
+  .home-card { background: var(--panel); border: 1px solid var(--line); border-radius: 22px; padding: 22px 18px; text-align: center;
+    box-shadow: 0 18px 40px rgba(0,0,0,.35); }
+  .home-card h2 { margin: 0 0 14px; font-size: 1.25rem; letter-spacing: -0.01em; }
+  .home-card .sub { margin: 0 0 8px; }
+  .homebest { margin-top: 14px; color: var(--muted); font-size: .85rem; }
+  .homebest b { color: var(--text); }
+  .choices { margin-bottom: 14px !important; }
+  .home-card p { margin: 0 0 18px; color: var(--muted); font-size: .92rem; }
+  .choices { display: flex; gap: 10px; margin-bottom: 4px; }
+  .choice { flex: 1; border: 2px solid var(--line); background: #1c2142; color: var(--text); border-radius: 16px; padding: 14px 0; font: inherit; cursor: pointer;
+    transition: transform .12s, border-color .2s, background .2s; }
+  .choice b { display: block; font-size: 1.6rem; }
+  .choice:hover { transform: translateY(-2px); }
+  .choice.sel { border-color: var(--accent); background: #2a2563; box-shadow: 0 0 0 3px rgba(124,92,255,.25); }
+  .choice:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .animal { font-size: 4rem; line-height: 1.1; }
+  .desc { color: var(--muted); font-size: .9rem; }
+  .btn-row { display: flex; gap: 10px; }
+  .btn.ghost { background: var(--panel); box-shadow: 0 0 0 1px var(--line); }
+  .rounds { flex-wrap: wrap; }
+  .dot { flex: 1 1 15%; min-width: 44px; padding: 6px 2px; }
+  .back { align-self: flex-start; width: 100%; max-width: 520px; margin-bottom: 4px; }
+  .back a { display: inline-block; color: var(--text); text-decoration: none; font-size: .9rem; font-weight: 600;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px;
+    transition: transform .12s, border-color .2s; }
+  .back a:hover { border-color: var(--accent); transform: translateX(-2px); }
+  .back a:active { transform: scale(.96); }
+  .back a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  footer { margin-top: 18px; color: var(--muted); font-size: .85rem; letter-spacing: .02em; }
+  footer b { color: var(--text); }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+  <div class="back"><a href="https://tjserver26.github.io/games/">← TJ Games로 돌아가기</a></div>
+  <h1>⚡ 반응속도 테스트</h1>
+
+  <main>
+    <section id="home">
+      <div class="home-card">
+        <p class="sub">초록색으로 바뀌면 최대한 빨리 누르세요</p>
+        <h2>몇 회로 도전할까요?</h2>
+        <div class="choices">
+          <button class="choice" type="button" data-n="3"><b>3회</b></button>
+          <button class="choice" type="button" data-n="5"><b>5회</b></button>
+          <button class="choice" type="button" data-n="10"><b>10회</b></button>
+        </div>
+        <button class="btn" id="startBtn" type="button">시작하기</button>
+        <div class="homebest">내 최고 기록 <b id="homeBest">-</b></div>
+      </div>
+    </section>
+
+    <div id="game" class="hidden">
+    <div class="stats">
+      <div class="stat"><small>최고 기록</small><b id="best">-</b></div>
+      <div class="stat"><small>진행</small><b id="prog">0 / 5</b></div>
+    </div>
+
+    <button id="pad" type="button" aria-live="polite">
+      <div id="big" class="hidden"></div>
+      <div id="msg">시작하기</div>
+      <div id="hint">눌러서 테스트를 시작하세요</div>
+    </button>
+
+    <div class="rounds" id="rounds"></div>
+
+    <section class="summary hidden" id="summary">
+      <div class="avg">평균 반응속도 <b id="avg">0</b> ms</div>
+      <div class="animal" id="animal"></div>
+      <div class="grade" id="grade"></div>
+      <div class="desc" id="desc"></div>
+      <div class="newbest hidden" id="newbest">🎉 최고 기록 갱신!</div>
+    </section>
+
+    <div class="btn-row hidden" id="endBtns">
+      <button class="btn" id="retry" type="button">다시하기</button>
+      <button class="btn ghost" id="homeBtn" type="button">홈으로</button>
+    </div>
+    </div>
+  </main>
+
+  <footer><b>TJ Games</b></footer>
+
+<script>
+(() => {
+  let TOTAL = 5; const KEY = "tjgames_reaction_best";
+  const $ = id => document.getElementById(id);
+  const pad = $("pad"), msg = $("msg"), hint = $("hint"), big = $("big");
+  let state = "idle", timer = null, startTime = 0, times = [];
+
+  const safeGet = () => { try { return parseFloat(localStorage.getItem(KEY)); } catch { return NaN; } };
+  const safeSet = v => { try { localStorage.setItem(KEY, String(v)); } catch {} };
+  let best = safeGet();
+  const renderBest = () => { const t = isNaN(best) ? "-" : best + " ms"; $("best").textContent = t; $("homeBest").textContent = t; };
+
+  function renderRounds() {
+    $("rounds").innerHTML = Array.from({ length: TOTAL }, (_, i) => {
+      const done = i < times.length, now = i === times.length && state !== "finished";
+      return `<div class="dot ${done ? "done" : ""} ${now ? "now" : ""}"><small>${i + 1}회</small><b>${done ? times[i] : "-"}</b></div>`;
+    }).join("");
+    $("prog").textContent = `${times.length} / ${TOTAL}`;
+  }
+
+  function show(cls, m, h, bigText) {
+    pad.className = cls;
+    msg.textContent = m; hint.textContent = h;
+    big.classList.toggle("hidden", !bigText);
+    big.textContent = bigText || "";
+    [msg, big].forEach(el => { el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop"); });
+  }
+
+  function startRound() {
+    state = "waiting";
+    show("wait", "기다리세요…", "초록색이 될 때까지 누르지 마세요");
+    renderRounds();
+    timer = setTimeout(() => {
+      state = "go";
+      show("go", "지금 클릭!", "");
+      startTime = performance.now();
+    }, 1000 + Math.random() * 4000);
+  }
+
+  function gradeOf(ms) {
+    if (ms < 200) return ["🐆", "치타", "번개 같은 반응속도! 거의 초능력이에요", "#ffd93d"];
+    if (ms < 250) return ["🐇", "토끼", "눈 깜짝할 새 반응하는 빠른 손", "#19d98b"];
+    if (ms < 300) return ["🐕", "강아지", "꽤 빠르고 안정적인 반응이에요", "#5cc8ff"];
+    if (ms < 400) return ["🐼", "판다", "여유롭게 반응하는 평화로운 타입", "#c3c8ee"];
+    if (ms < 500) return ["🐢", "거북이", "천천히, 하지만 확실하게!", "#9be58a"];
+    return ["🦥", "나무늘보", "조금 더 집중해서 다시 도전해보세요", "#ff8aa0"];
+  }
+
+  function finish() {
+    state = "finished";
+    const avg = Math.round(times.reduce((a, b) => a + b, 0) / TOTAL);
+    const fastest = Math.min(...times);
+    const isNew = isNaN(best) || fastest < best;
+    if (isNew) { best = fastest; safeSet(best); renderBest(); }
+    const [emoji, name, desc, color] = gradeOf(avg);
+    show("result", "", "", "");
+    pad.classList.add("hidden");
+    $("avg").textContent = avg;
+    $("animal").textContent = emoji;
+    $("grade").textContent = "당신은 " + name + "!"; $("grade").style.color = color;
+    $("desc").textContent = desc;
+    $("newbest").classList.toggle("hidden", !isNew);
+    $("summary").classList.remove("hidden");
+    $("endBtns").classList.remove("hidden");
+    renderRounds();
+  }
+
+  pad.addEventListener("pointerdown", e => {
+    e.preventDefault();
+    if (state === "idle") { times = []; startRound(); }
+    else if (state === "waiting") {
+      clearTimeout(timer); state = "early";
+      show("early", "너무 빨랐어요!", "눌러서 다시 도전하세요");
+    }
+    else if (state === "early" || state === "between") { startRound(); }
+    else if (state === "go") {
+      const ms = Math.round(performance.now() - startTime);
+      times.push(ms);
+      renderRounds();
+      if (times.length >= TOTAL) return finish();
+      state = "between";
+      show("result", "", "눌러서 다음 라운드", ms + " ms");
+      msg.textContent = `${times.length}회차 기록`;
+    }
+  });
+  pad.addEventListener("keydown", e => {
+    if (e.key === " " || e.key === "Enter") { e.preventDefault(); pad.dispatchEvent(new Event("pointerdown")); }
+  });
+
+  function begin() {
+    clearTimeout(timer); times = [];
+    $("summary").classList.add("hidden"); $("endBtns").classList.add("hidden");
+    $("home").classList.add("hidden"); $("game").classList.remove("hidden");
+    startRound();
+  }
+  function goHome() {
+    clearTimeout(timer); state = "idle"; times = [];
+    $("game").classList.add("hidden"); $("home").classList.remove("hidden");
+    renderBest();
+  }
+  document.querySelectorAll(".choice").forEach(btn => btn.addEventListener("click", () => {
+    TOTAL = +btn.dataset.n;
+    document.querySelectorAll(".choice").forEach(b => b.classList.toggle("sel", b === btn));
+  }));
+  $("startBtn").addEventListener("click", begin);
+  $("retry").addEventListener("click", begin);
+  $("homeBtn").addEventListener("click", goHome);
+  document.querySelector('.choice[data-n="5"]').classList.add("sel");
+
+  renderBest(); renderRounds();
+})();
+</script>
+</body>
+</html>
