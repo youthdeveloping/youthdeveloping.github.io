@@ -33,6 +33,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 .go{color:var(--sub);font-size:20px}
 .soon{background:transparent;border-style:dashed;color:var(--sub)}
 footer{text-align:center;color:var(--sub);font-size:12.5px;margin-top:56px}
+.categories{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 22px}.catbtn{padding:9px 16px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--sub);font-size:14px}.catbtn.active{background:var(--accent);color:#fff;border-color:var(--accent)}.coffee-link{background:#ffdd00;color:#1b1b1b;border-color:#ffdd00}.coffee-link:hover{border-color:#e7c900}
 /* admin */
 .panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px;margin-bottom:24px}
 .login{max-width:400px;margin:48px auto}
@@ -80,9 +81,11 @@ button.pick:hover{border-color:var(--accent)}
 <main>
 <!-- 홈 -->
 <section id="home">
-  <div class="top"><div class="logo">TJ</div><div class="links"><a class="adminlink" href="#/admin">어드민</a></div></div>
+  <div class="top"><div class="logo">TJ</div><div class="links"><a class="adminlink coffee-link" href="https://www.buymeacoffee.com/" target="_blank" rel="noopener noreferrer">Buy me a coffee</a><a class="adminlink" href="#/admin">어드민</a></div></div>
   <h1>TJ Server</h1>
   <p class="lead">서비스와 프로젝트를 한곳에서 만나보세요</p>
+  <h2>카테고리</h2>
+  <nav class="categories" id="categories" aria-label="서비스 카테고리"></nav>
   <h2>서비스</h2>
   <div class="grid" id="grid"></div>
   <footer>TJ Server · 2026</footer>
@@ -203,13 +206,30 @@ function mapApp(r){return{id:r.id,i:r.icon,n:r.name,d:r.description,u:r.url,p:r.
 function sortedNotices(){return notices.slice().sort(function(a,b){return a.date<b.date?1:a.date>b.date?-1:b.ts-a.ts})}
 
 /* 홈 */
+var activeCategory="전체";
+function appCategory(a){
+  var t=((a.n||"")+" "+(a.d||"")+" "+(a.u||"")).toLowerCase();
+  if(/timer|타이머|시계|계산기|도구|tool/.test(t))return "도구";
+  if(/game|게임|aim|dodge|trap|cps|memory|number|character|reaction|timing|typing|반응|타이핑|기억|숫자|순발력/.test(t))return "게임";
+  return "기타";
+}
+function renderCategories(){
+  var box=$("categories");if(!box)return;box.textContent="";
+  ["전체","게임","도구","기타"].forEach(function(cat){
+    var b=mk("button","catbtn"+(activeCategory===cat?" active":""),cat);
+    b.type="button";b.setAttribute("aria-pressed",activeCategory===cat?"true":"false");
+    b.onclick=function(){activeCategory=cat;renderCategories();renderHome()};
+    box.appendChild(b);
+  });
+}
 function renderHome(){
   var g=$("grid");g.textContent="";
-  apps.forEach(function(a){
+  apps.filter(function(a){return activeCategory==="전체"||appCategory(a)===activeCategory}).forEach(function(a){
     var el=mk("a","card");el.href=safeUrl(a.u);
     var tx=mk("div","tx");tx.appendChild(mk("b","",a.n));tx.appendChild(mk("span","",a.d));
     el.appendChild(mk("div","ic",a.i));el.appendChild(tx);el.appendChild(mk("div","go","›"));g.appendChild(el);
   });
+  if(!g.children.length)g.appendChild(mk("div","muted","이 카테고리에 등록된 서비스가 없습니다."));
   var so=mk("div","soon");
   so.innerHTML='<div class="ic">＋</div><div class="tx"><b>Coming Soon</b><span>새로운 서비스가 추가될 예정입니다</span></div>';
   g.appendChild(so);
@@ -354,7 +374,7 @@ async function refresh(){
   try{
     apps=chk(await sb.from("apps").select("*").order("position").order("created_at")).map(mapApp);
     notices=chk(await sb.from("notices").select("*")).map(function(r){return{id:r.id,date:r.date,title:r.title,body:r.body,ts:Date.parse(r.created_at)}});
-    renderHome();renderNotices();
+    renderCategories();renderHome();renderNotices();
     if(!$("inquiry").classList.contains("hide"))renderInquiry();
     if(authed){if(editing<0)renderAdmin();renderNoticeAdmin();renderInq()}
   }catch(e){if(!apps.length){$("grid").textContent="";$("grid").appendChild(mk("div","muted","데이터를 불러오지 못했어요."))}}
