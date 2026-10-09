@@ -1,12 +1,18 @@
 /*
  * site-apps.js
- * data/apps.json 을 읽어 메인 페이지와 서비스 페이지에 반영합니다.
- * 파일을 불러오지 못하면 페이지에 이미 들어 있는 기본 내용을 그대로 사용합니다.
+ * data/apps.json 을 읽어 메인 페이지의 서비스 카드(대표 / 전체 / 서버 도구)를 그립니다.
+ * 파일을 불러오지 못하면 index.html 에 들어 있는 기본 카드를 그대로 보여줍니다.
  */
 (() => {
   'use strict';
 
-  const DATA_URL = '/data/apps.json';
+  const featuredBox = document.getElementById('appFeatured');
+  if (!featuredBox) return; // 메인 페이지가 아니면 아무것도 하지 않음
+
+  const allBox = document.getElementById('appAll');
+  const serverBox = document.getElementById('appServer');
+  const serverWrap = document.getElementById('serverTools');
+  const countEl = document.getElementById('toolCount');
 
   function el(tag, cls, text) {
     const n = document.createElement(tag);
@@ -21,100 +27,83 @@
     return u;
   }
 
-  function link(app, cls) {
-    const a = el('a', cls);
+  function isImage(icon) {
+    return /^(https?:\/\/|\/(?!\/)|data:image\/(png|jpeg|gif|webp);)/i.test(icon);
+  }
+
+  function tile(icon) {
+    const t = el('span', 'tile');
+    icon = String(icon || '').trim();
+    if (icon && isImage(icon)) {
+      const img = document.createElement('img');
+      img.src = icon;
+      img.alt = '';
+      img.loading = 'lazy';
+      t.appendChild(img);
+    } else {
+      t.textContent = icon || '🧩';
+    }
+    return t;
+  }
+
+  function card(app) {
     const url = cleanUrl(app.url);
-    a.href = url || '#';
-    a.setAttribute('aria-label', app.name);
-    if (!url) {
-      a.addEventListener('click', (e) => e.preventDefault());
-    } else if (/^https?:\/\//i.test(url) && new URL(url).origin !== location.origin) {
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
+    const c = el(url ? 'a' : 'div', 'card' + (url ? '' : ' off'));
+    if (url) c.href = url;
+
+    const info = el('div', 'info');
+    info.appendChild(el('h3', 'name', app.name));
+    if (app.desc) info.appendChild(el('p', 'desc', app.desc));
+    c.append(tile(app.icon), info);
+
+    if (url) {
+      const chev = el('span', 'chev', '›');
+      chev.setAttribute('aria-hidden', 'true');
+      c.appendChild(chev);
+    } else {
+      c.appendChild(el('span', 'badge', '준비 중'));
     }
-    return a;
+    return c;
   }
 
-  /* ---------- 메인 페이지 ---------- */
-  function renderIndex(apps) {
-    const visible = apps.filter(a => a.status !== 'off');
-    const tools = visible.filter(a => a.cat !== 'server');
-    const servers = visible.filter(a => a.cat === 'server');
-    const featured = tools.filter(a => a.featured);
-
-    const grid = document.querySelector('.featured-grid');
-    if (grid) {
-      grid.textContent = '';
-      featured.forEach(app => {
-        const a = link(app, 'service-card');
-        const top = el('div', 'service-top');
-        top.append(el('span', 'service-icon', app.icon || '🧩'), el('span', 'service-state', app.url ? 'READY' : 'SOON'));
-        a.append(top, el('h3', '', app.name), el('p', '', app.desc || ''), el('span', 'service-arrow', '→'));
-        grid.appendChild(a);
-      });
-    }
-
-    function fillList(container, list) {
-      if (!container) return;
-      container.textContent = '';
-      list.forEach(app => {
-        const a = link(app, '');
-        a.append(el('span', '', app.icon || '🧩'), el('strong', '', app.name), el('small', '', app.desc || ''));
-        container.appendChild(a);
-      });
-    }
-
-    fillList(document.querySelector('.service-list'), tools);
-    fillList(document.querySelector('.server-tool-grid'), servers);
-
-    const count = document.querySelector('#all-services .all-services-head .section-status');
-    if (count) count.textContent = tools.length + ' TOOLS';
-
-    const serverBox = document.querySelector('.server-tools');
-    if (serverBox) serverBox.hidden = servers.length === 0;
+  function soonCard() {
+    const c = el('div', 'card soon');
+    const info = el('div', 'info');
+    info.append(el('h3', 'name', 'Coming Soon'), el('p', 'desc', '새로운 서비스가 추가될 예정입니다'));
+    c.append(el('span', 'tile', '+'), info);
+    return c;
   }
 
-  /* ---------- 서비스 페이지 ---------- */
-  function renderServices(apps) {
-    const style = document.createElement('style');
-    style.textContent = '.card.admin-hide{display:none!important}';
-    document.head.appendChild(style);
-
-    const byId = new Map(apps.map(a => [a.id, a]));
-    const tags = { utility: 'UTILITY', game: 'GAME', creative: 'CREATIVE' };
-
-    document.querySelectorAll('#grid .card').forEach(card => {
-      const app = byId.get(card.id);
-      if (!app || app.status === 'off') {
-        card.classList.add('admin-hide');
-        return;
-      }
-      const h2 = card.querySelector('.cardhead h2');
-      if (h2) h2.textContent = (app.icon ? app.icon + ' ' : '') + app.name;
-      if (tags[app.cat]) {
-        card.dataset.cat = app.cat;
-        const tag = card.querySelector('.cardhead .tag');
-        if (tag) tag.textContent = tags[app.cat];
-      }
-    });
-
-    // 해시로 들어온 경우, 목록이 정리된 뒤 해당 도구로 다시 이동
-    if (location.hash) {
-      const target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
-      if (target && !target.classList.contains('admin-hide')) target.scrollIntoView();
-    }
+  function fill(box, list, extra) {
+    if (!box) return;
+    box.textContent = '';
+    list.forEach(a => box.appendChild(card(a)));
+    if (extra) box.appendChild(extra);
   }
 
-  /* ---------- 시작 ---------- */
-  fetch(DATA_URL + '?t=' + Date.now(), { cache: 'no-store' })
+  function groupOf(a) {
+    return a.group === 'server' || a.cat === 'server' ? 'server' : 'tool';
+  }
+
+  fetch('/data/apps.json?t=' + Date.now(), { cache: 'no-store' })
     .then(res => { if (!res.ok) throw new Error('not found'); return res.json(); })
     .then(data => {
       const list = Array.isArray(data) ? data : data && data.apps;
       if (!Array.isArray(list)) return;
-      const apps = list.filter(a => a && a.id && a.name);
+      const apps = list.filter(a => a && a.name);
       if (!apps.length) return;
-      if (document.getElementById('all-services')) renderIndex(apps);
-      if (document.getElementById('grid')) renderServices(apps);
+
+      const visible = apps.filter(a => a.status !== 'off');
+      const tools = visible.filter(a => groupOf(a) === 'tool');
+      const servers = visible.filter(a => groupOf(a) === 'server');
+      const featured = tools.filter(a => a.featured);
+
+      fill(featuredBox, featured, soonCard());
+      fill(allBox, tools);
+      fill(serverBox, servers);
+
+      if (countEl) countEl.textContent = tools.length + ' TOOLS';
+      if (serverWrap) serverWrap.hidden = servers.length === 0;
     })
-    .catch(() => { /* 기본 내용 유지 */ });
+    .catch(() => { /* 기본 카드 유지 */ });
 })();
