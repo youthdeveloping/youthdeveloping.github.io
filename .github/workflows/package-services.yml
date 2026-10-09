@@ -1,0 +1,40 @@
+name: Package standalone services ZIP
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'services/**'
+      - 'services.html'
+      - 'data/apps.json'
+      - 'index.html'
+      - 'admin/index.html'
+      - '.github/workflows/package-services.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Build ZIP bundle
+        run: |
+          mkdir -p downloads
+          rm -f downloads/services-migration.zip
+          zip -r downloads/services-migration.zip services services.html data/apps.json index.html admin/index.html
+      - name: Commit ZIP bundle
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add downloads/services-migration.zip
+          if git diff --cached --quiet; then
+            echo "ZIP is already up to date."
+            exit 0
+          fi
+          git commit -m "Package standalone services migration ZIP"
+          git push
