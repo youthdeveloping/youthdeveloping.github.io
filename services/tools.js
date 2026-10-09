@@ -333,5 +333,3 @@ function bombStart(){
 
 /* ---------- Per-page initialization ---------- */
 if($('timerSec'))timerRender();if($('swOut'))swRender();
-</script>
-<script src="/site-apps.js">
