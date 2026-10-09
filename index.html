@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3279921355375508"
-     crossorigin="anonymous"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#05070a">
@@ -229,6 +227,69 @@
       font: 12px var(--mono);
     }
 
+    .services {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .service {
+      min-height: 190px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      background: linear-gradient(145deg, rgba(18,23,30,.82), rgba(7,10,14,.72));
+      position: relative;
+      overflow: hidden;
+      transition: transform .2s ease, border-color .2s ease, background .2s ease;
+    }
+
+    .service:hover {
+      transform: translateY(-4px);
+      border-color: rgba(98,232,255,.28);
+      background: linear-gradient(145deg, rgba(20,29,37,.95), rgba(7,10,14,.82));
+    }
+
+    .service::before {
+      content: "";
+      position: absolute;
+      width: 90px;
+      height: 90px;
+      right: -35px;
+      top: -35px;
+      border-radius: 50%;
+      background: rgba(98,232,255,.06);
+      filter: blur(10px);
+    }
+
+    .service-num {
+      color: #46525e;
+      font: 700 10px var(--mono);
+    }
+
+    .service h3 {
+      margin: 28px 0 9px;
+      font-size: 19px;
+      letter-spacing: -.03em;
+    }
+
+    .service p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .service .arrow {
+      position: absolute;
+      right: 20px;
+      bottom: 19px;
+      color: var(--cyan);
+      font-family: var(--mono);
+      transition: transform .2s ease;
+    }
+
+    .service:hover .arrow { transform: translateX(5px); }
+
     .infra {
       display: grid;
       grid-template-columns: 1.15fr .85fr;
@@ -384,6 +445,7 @@
     }
 
     @media (max-width: 800px) {
+      .services { grid-template-columns: 1fr 1fr; }
       .infra { grid-template-columns: 1fr; }
     }
 
@@ -394,13 +456,14 @@
       .hero { min-height: auto; padding: 72px 0 60px; }
       .hero h1 { font-size: clamp(48px, 18vw, 78px); }
       section { padding: 62px 0; }
+      .services { grid-template-columns: 1fr; }
       .section-head { display: block; }
       .section-note { display: block; margin-top: 12px; }
       .metrics { grid-template-columns: 1fr; }
       .footer-inner { display: block; }
       .footer-inner span:last-child { display: block; margin-top: 8px; }
     }
-
+  
     .service-section { margin-top: 28px; }
 
     .section-status {
@@ -495,18 +558,11 @@
       .service-grid { grid-template-columns: 1fr; }
     }
 
+  
     .section-link{color:var(--green);text-decoration:none;font:11px var(--mono);letter-spacing:.08em;border:1px solid rgba(97,255,154,.2);padding:8px 11px;border-radius:999px;transition:.2s ease}
     .section-link:hover{border-color:rgba(97,255,154,.5);background:rgba(97,255,154,.05)}
     .featured-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
     .service-icon{font-size:25px;line-height:1}
-    .categories{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}
-    .catbtn{padding:9px 16px;border:1px solid var(--line);border-radius:999px;background:rgba(12,16,22,.7);color:var(--muted);font:inherit;font-size:13px;cursor:pointer;transition:.18s ease}
-    .catbtn:hover,.catbtn.active{color:var(--green);border-color:rgba(97,255,154,.45);background:rgba(97,255,154,.08)}
-    .coffee-link{display:inline-flex;align-items:center;text-decoration:none;white-space:nowrap}
-    .coffee-link img{width:174px;border:0}
-    .coffee-link:hover{opacity:.9}
-    .nav-status{display:flex;align-items:center;gap:12px}
-    .category-hidden{display:none!important}
     .all-services{margin-top:42px;padding-top:34px;border-top:1px solid var(--line)}
     .all-services-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px}
     .all-services-head h2{margin:6px 0 0;font-size:clamp(24px,3vw,34px);letter-spacing:-.04em}
@@ -518,52 +574,64 @@
     .service-list small,.server-tool-grid small{margin-top:3px;color:var(--muted);font-size:11px;line-height:1.45}
     .server-tools{margin-top:34px;padding-top:28px;border-top:1px dashed rgba(255,255,255,.08)}
     .server-tool-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-    .server-tool-grid a[data-soon]{cursor:not-allowed;opacity:.62}
-    .server-tool-grid a[data-soon]:hover{transform:none}
     @media(max-width:900px){.service-list,.server-tool-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(max-width:620px){.featured-grid{grid-template-columns:1fr}.service-list,.server-tool-grid{grid-template-columns:1fr}.all-services-head{align-items:flex-start}}
 
-
-    .ad-slot{margin:0 auto 24px;min-height:120px;display:flex;align-items:center;justify-content:center;overflow:hidden;text-align:center}
-    .ad-slot ins{display:block;width:100%;min-height:100px}
-    .ad-top{margin-top:18px}.ad-middle{margin:8px auto 8px}.ad-bottom{margin:8px auto 20px}
-
-    a:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+    /* ---- TJ Server 레이아웃의 서비스 카드 (data/apps.json 으로 관리) ---- */
+    .hero{min-height:auto;padding:72px 0 56px}
+    .hero h1{font-size:clamp(40px,8vw,84px);line-height:1;max-width:none}
+    .app-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+    .app-grid .card{position:relative;display:flex;align-items:center;gap:16px;min-height:104px;padding:20px 22px;color:inherit;overflow:hidden;border:1px solid var(--line);border-radius:14px;background:linear-gradient(145deg,rgba(18,23,30,.82),rgba(7,10,14,.72));transition:transform .2s ease,border-color .2s ease,background .2s ease}
+    .app-grid.compact .card{min-height:84px;padding:15px 18px}
+    .app-grid a.card:hover{transform:translateY(-3px);border-color:rgba(97,255,154,.38);background:rgba(17,23,30,.92)}
+    .app-grid .tile{flex:none;width:54px;height:54px;display:grid;place-items:center;overflow:hidden;border-radius:14px;border:1px solid rgba(97,255,154,.16);background:rgba(97,255,154,.06);font-size:26px}
+    .app-grid.compact .tile{width:44px;height:44px;border-radius:12px;font-size:21px}
+    .app-grid .tile img{width:100%;height:100%;object-fit:contain;padding:7px}
+    .app-grid .info{flex:1;min-width:0}
+    .app-grid .name{margin:0;font:600 18px var(--mono);letter-spacing:-.03em;overflow-wrap:anywhere}
+    .app-grid.compact .name{font-size:15px}
+    .app-grid .desc{margin:5px 0 0;color:var(--muted);font-size:13px;line-height:1.6;overflow-wrap:anywhere}
+    .app-grid.compact .desc{font-size:12px;margin-top:3px}
+    .app-grid .chev{flex:none;color:var(--green);font:24px var(--mono);line-height:1;transition:transform .2s ease}
+    .app-grid a.card:hover .chev{transform:translateX(4px)}
+    .app-grid .badge{flex:none;padding:3px 9px;border:1px solid var(--line);border-radius:99px;color:var(--muted);font:10px var(--mono)}
+    .app-grid .card.off{opacity:.78}
+    .app-grid .card.soon{border-style:dashed;background:transparent;opacity:.7}
+    .app-grid .card.soon .tile{background:transparent;border-color:var(--line);color:var(--muted);font-size:30px;font-weight:300}
+    .app-grid .card.soon .name{color:var(--muted)}
+    .coffee{display:flex;align-items:center;flex:none}
+    .coffee img{display:block;height:38px;width:auto;border-radius:8px}
+    @media(max-width:560px){.nav-right{gap:10px}.coffee img{height:32px}}
+    .nav-right{display:flex;align-items:center;gap:16px}
+    .admin-link{padding:7px 13px;border:1px solid rgba(97,255,154,.22);border-radius:999px;color:var(--green);font:11px var(--mono);letter-spacing:.08em;transition:.2s ease}
+    .admin-link:hover{border-color:rgba(97,255,154,.5);background:rgba(97,255,154,.05)}
+    @media(max-width:900px){.app-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:560px){.app-grid{grid-template-columns:1fr}}
   </style>
 </head>
 
 <body>
   <div class="shell">
     <nav>
-      <a class="brand" href="index.html">
+      <a class="brand" href="/">
         <span class="brand-mark">&gt;_</span>
         <span>YouthDeveloper</span>
       </a>
-      <div class="nav-status">
-        <a class="coffee-link" href="https://www.buymeacoffee.com/youthdeveloper" target="_blank" rel="noopener noreferrer" aria-label="Buy me a Coffee"><img src="https://img.buymeacoffee.com/button-api/?text=Buy%20Me%20A%20Coffee&emoji=&slug=youthdeveloper&button_colour=5F7FFF&font_colour=ffffff&font_family=Poppins&outline_colour=000000&coffee_colour=FFDD00" alt="Buy Me A Coffee" style="display:block;max-width:100%;height:auto"></a>
-        <span class="dot"></span>
-        ALL SYSTEMS OPERATIONAL
+      <div class="nav-right">
+        <a class="coffee" href="https://www.buymeacoffee.com/youthdeveloper" target="_blank" rel="noopener noreferrer"><img src="https://img.buymeacoffee.com/button-api/?text=Buy%20Me%20A%20Coffee&emoji=&slug=youthdeveloper&button_colour=5F7FFF&font_colour=ffffff&font_family=Poppins&outline_colour=000000&coffee_colour=FFDD00" alt="Buy Me A Coffee"></a>
+        <div class="nav-status">
+          <span class="dot"></span>
+          ALL SYSTEMS OPERATIONAL
+        </div>
+        <a class="admin-link" href="/admin/">ADMIN</a>
       </div>
     </nav>
 
     <main>
-      <div class="ad-slot ad-top" aria-label="광고">
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-3279921355375508"
-             data-ad-slot="8725460335"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
-        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-      </div>
       <section class="hero">
         <div>
           <div class="eyebrow">// developer infrastructure</div>
-          <h1>
-            BUILD.<br>
-            <span class="accent">SHIP.</span><br>
-            REPEAT.
-          </h1>
+          <h1>YouthDeveloper</h1>
           <p class="hero-copy">
             웹 서비스부터 API, 데이터, 자동화까지.<br>
             <code>GitHub Pages</code>와 <code>Cloudflare</code>를 기반으로
@@ -587,10 +655,85 @@
         </div>
       </section>
 
+    <section class="section service-section" id="services">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">01 / SERVICES</div>
+          <h2>서비스</h2>
+        </div>
+        <a class="section-link" href="#all-services">모든 서비스 →</a>
+      </div>
+
+      <!-- 아래 카드는 data/apps.json 을 불러오지 못할 때 보이는 기본 내용입니다. -->
+      <div class="app-grid" id="appFeatured">
+        <a class="card" href="/services.html#timer"><span class="tile">⏱️</span><div class="info"><h3 class="name">타이머</h3><p class="desc">여러 개의 타이머를 동시에 실행</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <a class="card" href="/services.html#random"><span class="tile">🎲</span><div class="info"><h3 class="name">랜덤 뽑기</h3><p class="desc">이름·숫자·항목을 랜덤으로 선택</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <a class="card" href="/services.html#calc"><span class="tile">🧮</span><div class="info"><h3 class="name">계산기</h3><p class="desc">일반 계산부터 공학 계산까지</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <a class="card" href="/services.html#password"><span class="tile">🔐</span><div class="info"><h3 class="name">비밀번호 생성기</h3><p class="desc">조건을 정하고 안전한 문자열 생성</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <a class="card" href="/services.html#qr"><span class="tile">📱</span><div class="info"><h3 class="name">QR 코드 생성기</h3><p class="desc">텍스트나 링크를 바로 QR로 변환</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <a class="card" href="/services.html#reaction"><span class="tile">⚡</span><div class="info"><h3 class="name">반응속도 테스트</h3><p class="desc">화면이 바뀌는 순간 빠르게 클릭</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <div class="card soon"><span class="tile">+</span><div class="info"><h3 class="name">Coming Soon</h3><p class="desc">새로운 서비스가 추가될 예정입니다</p></div></div>
+      </div>
+
+      <div class="all-services" id="all-services">
+        <div class="all-services-head">
+          <div><div class="eyebrow">02 / ALL SERVICES</div><h2>전체 서비스</h2></div>
+          <span class="section-status" id="toolCount">28 TOOLS</span>
+        </div>
+        <div class="app-grid compact" id="appAll">
+        <a class="card" href="/services.html#timer"><span class="tile">⏱️</span><div class="info"><h3 class="name">타이머</h3><p class="desc">여러 개의 타이머를 동시에 실행</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <a class="card" href="/services.html#alarm"><span class="tile">⏰</span><div class="info"><h3 class="name">알람</h3><p class="desc">브라우저 알림</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <a class="card" href="/services.html#stopwatch"><span class="tile">🛑</span><div class="info"><h3 class="name">스톱워치</h3><p class="desc">랩타임 저장</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <a class="card" href="/services.html#random"><span class="tile">🎲</span><div class="info"><h3 class="name">랜덤 뽑기</h3><p class="desc">이름·숫자·항목을 랜덤으로 선택</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <a class="card" href="/services.html#roulette"><span class="tile">🎡</span><div class="info"><h3 class="name">룰렛</h3><p class="desc">친구들과 결정</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <a class="card" href="/services.html#rps"><span class="tile">✊</span><div class="info"><h3 class="name">가위바위보</h3><p class="desc">간단한 대결</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <a class="card" href="/services.html#calc"><span class="tile">🧮</span><div class="info"><h3 class="name">계산기</h3><p class="desc">일반 계산부터 공학 계산까지</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <a class="card" href="/services.html#unit"><span class="tile">🔄</span><div class="info"><h3 class="name">단위 변환기</h3><p class="desc">길이·무게·온도·용량</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <a class="card" href="/services.html#password"><span class="tile">🔐</span><div class="info"><h3 class="name">비밀번호 생성기</h3><p class="desc">조건을 정하고 안전한 문자열 생성</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <a class="card" href="/services.html#memo"><span class="tile">📝</span><div class="info"><h3 class="name">메모장</h3><p class="desc">간단한 메모 저장</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <a class="card" href="/services.html#todo"><span class="tile">✅</span><div class="info"><h3 class="name">할 일 목록</h3><p class="desc">체크하면 완료</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <a class="card" href="/services.html#calendar"><span class="tile">📅</span><div class="info"><h3 class="name">간단 캘린더</h3><p class="desc">일정 확인</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <div class="card off"><span class="tile">🔗</span><div class="info"><h3 class="name">URL 단축기</h3><p class="desc">긴 주소 줄이기</p></div><span class="badge">준비 중</span></div>
+        <a class="card" href="/services.html#qr"><span class="tile">📱</span><div class="info"><h3 class="name">QR 코드 생성기</h3><p class="desc">텍스트나 링크를 바로 QR로 변환</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <a class="card" href="/services.html#color"><span class="tile">🎨</span><div class="info"><h3 class="name">색상 도구</h3><p class="desc">HEX / RGB 변환</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <a class="card" href="/services.html#compress"><span class="tile">🖼️</span><div class="info"><h3 class="name">이미지 압축기</h3><p class="desc">이미지 용량 줄이기</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <a class="card" href="/services.html#metronome"><span class="tile">🎵</span><div class="info"><h3 class="name">메트로놈</h3><p class="desc">BPM 조절</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <a class="card" href="/services.html#piano"><span class="tile">🎹</span><div class="info"><h3 class="name">웹 피아노</h3><p class="desc">키보드로 연주</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <a class="card" href="/services.html#sound"><span class="tile">🔊</span><div class="info"><h3 class="name">사운드보드</h3><p class="desc">효과음 버튼</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <a class="card" href="/services.html#aim"><span class="tile">🎯</span><div class="info"><h3 class="name">에임 테스트</h3><p class="desc">빠르게 클릭하기</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <a class="card" href="/services.html#reaction"><span class="tile">⚡</span><div class="info"><h3 class="name">반응속도 테스트</h3><p class="desc">화면이 바뀌는 순간 빠르게 클릭</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <a class="card" href="/services.html#cps"><span class="tile">👀</span><div class="info"><h3 class="name">CPS 테스트</h3><p class="desc">5초 동안 클릭</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <a class="card" href="/services.html#score"><span class="tile">🔢</span><div class="info"><h3 class="name">점수판</h3><p class="desc">팀 A/B 점수</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <a class="card" href="/services.html#ranking"><span class="tile">🏆</span><div class="info"><h3 class="name">간단 순위표</h3><p class="desc">친구들 점수 저장</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <a class="card" href="/services.html#teams"><span class="tile">👥</span><div class="info"><h3 class="name">팀 자동 나누기</h3><p class="desc">이름을 랜덤 배정</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <a class="card" href="/services.html#lottery"><span class="tile">🎁</span><div class="info"><h3 class="name">제비뽑기</h3><p class="desc">당첨 개수 설정</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <a class="card" href="/services.html#bomb"><span class="tile">💣</span><div class="info"><h3 class="name">폭탄 돌리기</h3><p class="desc">랜덤 시간 게임</p></div><span class="chev" aria-hidden="true">›</span></a>
+        <a class="card" href="/services.html#url"><span class="tile">🔗</span><div class="info"><h3 class="name">URL 도구</h3><p class="desc">주소 확인·정리</p></div><span class="chev" aria-hidden="true">›</span></a>
+        </div>
+
+        <div class="server-tools" id="serverTools">
+          <div class="all-services-head">
+            <div><div class="eyebrow">SERVER TOOLS</div><h2>서버 도구</h2></div>
+            <span class="section-status">PRIVATE</span>
+          </div>
+          <div class="app-grid compact" id="appServer">
+        <div class="card off"><span class="tile">💬</span><div class="info"><h3 class="name">채팅방</h3><p class="desc">서버 계정끼리 실시간 채팅</p></div><span class="badge">준비 중</span></div>
+        <div class="card off"><span class="tile">💰</span><div class="info"><h3 class="name">용돈 기록장</h3><p class="desc">수입·지출 기록</p></div><span class="badge">준비 중</span></div>
+        <div class="card off"><span class="tile">📨</span><div class="info"><h3 class="name">건의함</h3><p class="desc">관리자에게 의견 보내기</p></div><span class="badge">준비 중</span></div>
+        <div class="card off"><span class="tile">📰</span><div class="info"><h3 class="name">서버 공지</h3><p class="desc">관리자 공지 등록</p></div><span class="badge">준비 중</span></div>
+        <div class="card off"><span class="tile">🟢</span><div class="info"><h3 class="name">서버 상태</h3><p class="desc">정상·점검·장애 표시</p></div><span class="badge">준비 중</span></div>
+        <div class="card off"><span class="tile">📈</span><div class="info"><h3 class="name">서버 통계</h3><p class="desc">접속자·사용량 확인</p></div><span class="badge">준비 중</span></div>
+        <div class="card off"><span class="tile">🕵️</span><div class="info"><h3 class="name">내 접속 정보</h3><p class="desc">브라우저·OS·화면 정보</p></div><span class="badge">준비 중</span></div>
+        <div class="card off"><span class="tile">📝</span><div class="info"><h3 class="name">익명 한마디</h3><p class="desc">이름 없이 메시지 남기기</p></div><span class="badge">준비 중</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
       <section id="html-playground">
         <div class="section-head">
           <div>
-            <div class="section-kicker">01 / HTML PLAYGROUND</div>
+            <div class="section-kicker">03 / HTML PLAYGROUND</div>
             <h2>Write. See. Build.</h2>
           </div>
           <div class="section-note">live preview</div>
@@ -621,20 +764,10 @@
         </div>
       </section>
 
-      <div class="ad-slot ad-middle" aria-label="광고">
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-3279921355375508"
-             data-ad-slot="8725460335"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
-        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-      </div>
-
       <section>
         <div class="section-head">
           <div>
-            <div class="section-kicker">02 / INFRASTRUCTURE</div>
+            <div class="section-kicker">04 / INFRASTRUCTURE</div>
             <h2>Under the hood.</h2>
           </div>
           <div class="section-note">edge-first architecture</div>
@@ -677,96 +810,7 @@
         </div>
       </section>
 
-      <section class="service-section" id="services">
-        <div class="section-head">
-          <div>
-            <div class="eyebrow">03 / SERVICES</div>
-            <h2>서비스</h2>
-          </div>
-          <a class="section-link" href="#all-services">모든 서비스 →</a>
-        </div>
-
-        <div class="categories" role="group" aria-label="서비스 카테고리">
-          <button class="catbtn active" type="button" data-category="all">전체</button>
-          <button class="catbtn" type="button" data-category="tools">도구</button>
-          <button class="catbtn" type="button" data-category="games">게임</button>
-          <button class="catbtn" type="button" data-category="server">서버</button>
-        </div>
-
-        <div class="service-grid featured-grid">
-          <a class="service-card" href="services.html#timer" aria-label="타이머"><div class="service-top"><span class="service-icon">⏱️</span><span class="service-state">READY</span></div><h3>타이머</h3><p>여러 개의 타이머를 동시에 실행</p><span class="service-arrow">→</span></a>
-          <a class="service-card" href="services.html#random" aria-label="랜덤 뽑기"><div class="service-top"><span class="service-icon">🎲</span><span class="service-state">READY</span></div><h3>랜덤 뽑기</h3><p>이름·숫자·항목을 랜덤으로 선택</p><span class="service-arrow">→</span></a>
-          <a class="service-card" href="services.html#calc" aria-label="계산기"><div class="service-top"><span class="service-icon">🧮</span><span class="service-state">READY</span></div><h3>계산기</h3><p>일반 계산부터 공학 계산까지</p><span class="service-arrow">→</span></a>
-          <a class="service-card" href="services.html#password" aria-label="비밀번호 생성기"><div class="service-top"><span class="service-icon">🔐</span><span class="service-state">READY</span></div><h3>비밀번호 생성기</h3><p>조건을 정하고 안전한 문자열 생성</p><span class="service-arrow">→</span></a>
-          <a class="service-card" href="services.html#qr" aria-label="QR 코드 생성기"><div class="service-top"><span class="service-icon">📱</span><span class="service-state">READY</span></div><h3>QR 코드 생성기</h3><p>텍스트나 링크를 바로 QR로 변환</p><span class="service-arrow">→</span></a>
-          <a class="service-card" href="services.html#reaction" aria-label="반응속도 테스트"><div class="service-top"><span class="service-icon">⚡</span><span class="service-state">READY</span></div><h3>반응속도 테스트</h3><p>화면이 바뀌는 순간 빠르게 클릭</p><span class="service-arrow">→</span></a>
-        </div>
-
-        <div class="all-services" id="all-services">
-          <div class="all-services-head">
-            <div><div class="eyebrow">04 / ALL SERVICES</div><h2>전체 서비스</h2></div>
-            <span class="section-status">27 TOOLS</span>
-          </div>
-
-          <div class="service-list">
-            <a href="services.html#timer"><span>⏱️</span><strong>타이머</strong><small>여러 개 동시 실행</small></a>
-            <a href="services.html#alarm"><span>⏰</span><strong>알람</strong><small>브라우저 알림</small></a>
-            <a href="services.html#stopwatch"><span>🛑</span><strong>스톱워치</strong><small>랩타임 저장</small></a>
-            <a href="services.html#random"><span>🎲</span><strong>랜덤 뽑기</strong><small>랜덤 선택</small></a>
-            <a href="services.html#roulette"><span>🎡</span><strong>룰렛</strong><small>친구들과 결정</small></a>
-            <a href="services.html#rps"><span>✊</span><strong>가위바위보</strong><small>간단한 대결</small></a>
-            <a href="services.html#calc"><span>🧮</span><strong>계산기</strong><small>일반 + 공학용</small></a>
-            <a href="services.html#unit"><span>🔄</span><strong>단위 변환기</strong><small>길이·무게·온도·용량</small></a>
-            <a href="services.html#password"><span>🔐</span><strong>비밀번호 생성기</strong><small>조건별 랜덤 생성</small></a>
-            <a href="services.html#memo"><span>📝</span><strong>메모장</strong><small>간단한 메모 저장</small></a>
-            <a href="services.html#todo"><span>✅</span><strong>할 일 목록</strong><small>체크하면 완료</small></a>
-            <a href="services.html#calendar"><span>📅</span><strong>간단 캘린더</strong><small>일정 확인</small></a>
-            <a href="services.html#qr"><span>📱</span><strong>QR 코드 생성기</strong><small>글·링크를 QR로</small></a>
-            <a href="services.html#color"><span>🎨</span><strong>색상 도구</strong><small>HEX / RGB 변환</small></a>
-            <a href="services.html#compress"><span>🖼️</span><strong>이미지 압축기</strong><small>이미지 용량 줄이기</small></a>
-            <a href="services.html#metronome"><span>🎵</span><strong>메트로놈</strong><small>BPM 조절</small></a>
-            <a href="services.html#piano"><span>🎹</span><strong>웹 피아노</strong><small>키보드로 연주</small></a>
-            <a href="services.html#sound"><span>🔊</span><strong>사운드보드</strong><small>효과음 버튼</small></a>
-            <a href="services.html#aim"><span>🎯</span><strong>에임 테스트</strong><small>빠르게 클릭하기</small></a>
-            <a href="services.html#reaction"><span>⚡</span><strong>반응속도 테스트</strong><small>클릭 속도 측정</small></a>
-            <a href="services.html#cps"><span>👀</span><strong>CPS 테스트</strong><small>5초 동안 클릭</small></a>
-            <a href="services.html#score"><span>🔢</span><strong>점수판</strong><small>팀 A/B 점수</small></a>
-            <a href="services.html#ranking"><span>🏆</span><strong>간단 순위표</strong><small>친구들 점수 저장</small></a>
-            <a href="services.html#teams"><span>👥</span><strong>팀 자동 나누기</strong><small>이름을 랜덤 배정</small></a>
-            <a href="services.html#lottery"><span>🎁</span><strong>제비뽑기</strong><small>당첨 개수 설정</small></a>
-            <a href="services.html#bomb"><span>💣</span><strong>폭탄 돌리기</strong><small>랜덤 시간 게임</small></a>
-            <a href="services.html#url"><span>🔗</span><strong>URL 도구</strong><small>주소 확인·정리</small></a>
-          </div>
-
-          <div class="server-tools">
-            <div class="all-services-head">
-              <div><div class="eyebrow">SERVER TOOLS</div><h2>서버 도구</h2></div>
-              <span class="section-status">PRIVATE</span>
-            </div>
-            <div class="server-tool-grid">
-              <a href="#" data-soon title="준비 중입니다"><span>💬</span><strong>채팅방</strong><small>서버 계정끼리 실시간 채팅</small></a>
-              <a href="#" data-soon title="준비 중입니다"><span>💰</span><strong>용돈 기록장</strong><small>수입·지출 기록</small></a>
-              <a href="#" data-soon title="준비 중입니다"><span>📨</span><strong>건의함</strong><small>관리자에게 의견 보내기</small></a>
-              <a href="#" data-soon title="준비 중입니다"><span>📰</span><strong>서버 공지</strong><small>관리자 공지 등록</small></a>
-              <a href="#" data-soon title="준비 중입니다"><span>🟢</span><strong>서버 상태</strong><small>정상·점검·장애 표시</small></a>
-              <a href="#" data-soon title="준비 중입니다"><span>📈</span><strong>서버 통계</strong><small>접속자·사용량 확인</small></a>
-              <a href="#" data-soon title="준비 중입니다"><span>🕵️</span><strong>내 접속 정보</strong><small>브라우저·OS·화면 정보</small></a>
-              <a href="#" data-soon title="준비 중입니다"><span>📝</span><strong>익명 한마디</strong><small>이름 없이 메시지 남기기</small></a>
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <div class="ad-slot ad-bottom" aria-label="광고">
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-3279921355375508"
-             data-ad-slot="8725460335"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
-        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-      </div>
+  </main>
 
     <footer>
       <div class="footer-inner">
@@ -777,7 +821,6 @@
   </div>
 
   <script>
-    // HTML 플레이그라운드
     (() => {
       const input = document.getElementById("htmlInput");
       const preview = document.getElementById("htmlPreview");
@@ -810,35 +853,8 @@
 
       render();
     })();
-
-    // 아직 준비되지 않은 서버 도구는 눌러도 맨 위로 올라가지 않게 막기
-    document.querySelectorAll("a[data-soon]").forEach((a) => {
-      a.addEventListener("click", (e) => e.preventDefault());
-    });
-
-    // 서비스 카테고리 필터
-    (() => {
-      const buttons = document.querySelectorAll(".catbtn");
-      const items = document.querySelectorAll(".featured-grid > a, .service-list > a, .server-tool-grid > a");
-      const categoryOf = (item) => {
-        if (item.closest(".server-tool-grid")) return "server";
-        const text = (item.innerText || item.textContent || "").toLowerCase();
-        const href = (item.getAttribute("href") || "").toLowerCase();
-        if (/게임|game|폭탄 돌리기|가위바위보|제비뽑기|랜덤 뽑기|룰렛|에임|반응속도|cps|점수판|순위표|팀 자동|타이밍|기억력|타자/.test(text + " " + href)) return "games";
-        return "tools";
-      };
-      buttons.forEach((button) => {
-        button.addEventListener("click", () => {
-          const category = button.dataset.category;
-          buttons.forEach((b) => b.classList.toggle("active", b === button));
-          items.forEach((item) => {
-            const show = category === "all" || categoryOf(item) === category;
-            item.classList.toggle("category-hidden", !show);
-          });
-        });
-      });
-    })();
   </script>
+
 <script src="/site-apps.js"></script>
 </body>
 </html>
