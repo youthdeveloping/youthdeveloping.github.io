@@ -499,6 +499,13 @@
     .section-link:hover{border-color:rgba(97,255,154,.5);background:rgba(97,255,154,.05)}
     .featured-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
     .service-icon{font-size:25px;line-height:1}
+    .categories{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}
+    .catbtn{padding:9px 16px;border:1px solid var(--line);border-radius:999px;background:rgba(12,16,22,.7);color:var(--muted);font:inherit;font-size:13px;cursor:pointer;transition:.18s ease}
+    .catbtn:hover,.catbtn.active{color:var(--green);border-color:rgba(97,255,154,.45);background:rgba(97,255,154,.08)}
+    .coffee-link{color:#ffdd00;text-decoration:none;font-size:12px;font-weight:700;border:1px solid rgba(255,221,0,.35);padding:7px 10px;border-radius:999px;white-space:nowrap}
+    .coffee-link:hover{background:rgba(255,221,0,.1)}
+    .nav-status{display:flex;align-items:center;gap:12px}
+    .category-hidden{display:none!important}
     .all-services{margin-top:42px;padding-top:34px;border-top:1px solid var(--line)}
     .all-services-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px}
     .all-services-head h2{margin:6px 0 0;font-size:clamp(24px,3vw,34px);letter-spacing:-.04em}
@@ -532,6 +539,7 @@
         <span>YouthDeveloper</span>
       </a>
       <div class="nav-status">
+        <a class="coffee-link" href="https://www.buymeacoffee.com/" target="_blank" rel="noopener noreferrer">Buy me a coffee ↗</a>
         <span class="dot"></span>
         ALL SYSTEMS OPERATIONAL
       </div>
@@ -677,6 +685,13 @@
           <a class="section-link" href="#all-services">모든 서비스 →</a>
         </div>
 
+        <div class="categories" role="group" aria-label="서비스 카테고리">
+          <button class="catbtn active" type="button" data-category="all">전체</button>
+          <button class="catbtn" type="button" data-category="tools">도구</button>
+          <button class="catbtn" type="button" data-category="games">게임</button>
+          <button class="catbtn" type="button" data-category="server">서버</button>
+        </div>
+
         <div class="service-grid featured-grid">
           <a class="service-card" href="services.html#timer" aria-label="타이머"><div class="service-top"><span class="service-icon">⏱️</span><span class="service-state">READY</span></div><h3>타이머</h3><p>여러 개의 타이머를 동시에 실행</p><span class="service-arrow">→</span></a>
           <a class="service-card" href="services.html#random" aria-label="랜덤 뽑기"><div class="service-top"><span class="service-icon">🎲</span><span class="service-state">READY</span></div><h3>랜덤 뽑기</h3><p>이름·숫자·항목을 랜덤으로 선택</p><span class="service-arrow">→</span></a>
@@ -799,6 +814,29 @@
     document.querySelectorAll("a[data-soon]").forEach((a) => {
       a.addEventListener("click", (e) => e.preventDefault());
     });
+
+    // 서비스 카테고리 필터
+    (() => {
+      const buttons = document.querySelectorAll(".catbtn");
+      const items = document.querySelectorAll(".featured-grid > a, .service-list > a, .server-tool-grid > a");
+      const categoryOf = (item) => {
+        if (item.closest(".server-tool-grid")) return "server";
+        const text = (item.innerText || item.textContent || "").toLowerCase();
+        const href = (item.getAttribute("href") || "").toLowerCase();
+        if (/게임|game|폭탄 돌리기|가위바위보|제비뽑기|랜덤 뽑기|룰렛|에임|반응속도|cps|점수판|순위표|팀 자동|타이밍|기억력|타자/.test(text + " " + href)) return "games";
+        return "tools";
+      };
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const category = button.dataset.category;
+          buttons.forEach((b) => b.classList.toggle("active", b === button));
+          items.forEach((item) => {
+            const show = category === "all" || categoryOf(item) === category;
+            item.classList.toggle("category-hidden", !show);
+          });
+        });
+      });
+    })();
   </script>
 <script src="/site-apps.js"></script>
 </body>
