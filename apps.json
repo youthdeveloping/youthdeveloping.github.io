@@ -1,0 +1,365 @@
+{
+  "updated": "2026-10-09T00:00:00.000Z",
+  "apps": [
+    {
+      "id": "timer",
+      "icon": "⏱️",
+      "name": "타이머",
+      "desc": "여러 개의 타이머를 동시에 실행",
+      "url": "/services.html#timer",
+      "status": "on",
+      "group": "tool",
+      "featured": true
+    },
+    {
+      "id": "alarm",
+      "icon": "⏰",
+      "name": "알람",
+      "desc": "브라우저 알림",
+      "url": "/services.html#alarm",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "stopwatch",
+      "icon": "🛑",
+      "name": "스톱워치",
+      "desc": "랩타임 저장",
+      "url": "/services.html#stopwatch",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "random",
+      "icon": "🎲",
+      "name": "랜덤 뽑기",
+      "desc": "이름·숫자·항목을 랜덤으로 선택",
+      "url": "/services.html#random",
+      "status": "on",
+      "group": "tool",
+      "featured": true
+    },
+    {
+      "id": "roulette",
+      "icon": "🎡",
+      "name": "룰렛",
+      "desc": "친구들과 결정",
+      "url": "/services.html#roulette",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "rps",
+      "icon": "✊",
+      "name": "가위바위보",
+      "desc": "간단한 대결",
+      "url": "/services.html#rps",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "calc",
+      "icon": "🧮",
+      "name": "계산기",
+      "desc": "일반 계산부터 공학 계산까지",
+      "url": "/services.html#calc",
+      "status": "on",
+      "group": "tool",
+      "featured": true
+    },
+    {
+      "id": "unit",
+      "icon": "🔄",
+      "name": "단위 변환기",
+      "desc": "길이·무게·온도·용량",
+      "url": "/services.html#unit",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "password",
+      "icon": "🔐",
+      "name": "비밀번호 생성기",
+      "desc": "조건을 정하고 안전한 문자열 생성",
+      "url": "/services.html#password",
+      "status": "on",
+      "group": "tool",
+      "featured": true
+    },
+    {
+      "id": "memo",
+      "icon": "📝",
+      "name": "메모장",
+      "desc": "간단한 메모 저장",
+      "url": "/services.html#memo",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "todo",
+      "icon": "✅",
+      "name": "할 일 목록",
+      "desc": "체크하면 완료",
+      "url": "/services.html#todo",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "calendar",
+      "icon": "📅",
+      "name": "간단 캘린더",
+      "desc": "일정 확인",
+      "url": "/services.html#calendar",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "urlshort",
+      "icon": "🔗",
+      "name": "URL 단축기",
+      "desc": "긴 주소 줄이기",
+      "url": "",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "qr",
+      "icon": "📱",
+      "name": "QR 코드 생성기",
+      "desc": "텍스트나 링크를 바로 QR로 변환",
+      "url": "/services.html#qr",
+      "status": "on",
+      "group": "tool",
+      "featured": true
+    },
+    {
+      "id": "color",
+      "icon": "🎨",
+      "name": "색상 도구",
+      "desc": "HEX / RGB 변환",
+      "url": "/services.html#color",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "compress",
+      "icon": "🖼️",
+      "name": "이미지 압축기",
+      "desc": "이미지 용량 줄이기",
+      "url": "/services.html#compress",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "metronome",
+      "icon": "🎵",
+      "name": "메트로놈",
+      "desc": "BPM 조절",
+      "url": "/services.html#metronome",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "piano",
+      "icon": "🎹",
+      "name": "웹 피아노",
+      "desc": "키보드로 연주",
+      "url": "/services.html#piano",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "sound",
+      "icon": "🔊",
+      "name": "사운드보드",
+      "desc": "효과음 버튼",
+      "url": "/services.html#sound",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "aim",
+      "icon": "🎯",
+      "name": "에임 테스트",
+      "desc": "빠르게 클릭하기",
+      "url": "/services.html#aim",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "reaction",
+      "icon": "⚡",
+      "name": "반응속도 테스트",
+      "desc": "화면이 바뀌는 순간 빠르게 클릭",
+      "url": "/services.html#reaction",
+      "status": "on",
+      "group": "tool",
+      "featured": true
+    },
+    {
+      "id": "cps",
+      "icon": "👀",
+      "name": "CPS 테스트",
+      "desc": "5초 동안 클릭",
+      "url": "/services.html#cps",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "score",
+      "icon": "🔢",
+      "name": "점수판",
+      "desc": "팀 A/B 점수",
+      "url": "/services.html#score",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "ranking",
+      "icon": "🏆",
+      "name": "간단 순위표",
+      "desc": "친구들 점수 저장",
+      "url": "/services.html#ranking",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "teams",
+      "icon": "👥",
+      "name": "팀 자동 나누기",
+      "desc": "이름을 랜덤 배정",
+      "url": "/services.html#teams",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "lottery",
+      "icon": "🎁",
+      "name": "제비뽑기",
+      "desc": "당첨 개수 설정",
+      "url": "/services.html#lottery",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "bomb",
+      "icon": "💣",
+      "name": "폭탄 돌리기",
+      "desc": "랜덤 시간 게임",
+      "url": "/services.html#bomb",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "url",
+      "icon": "🔗",
+      "name": "URL 도구",
+      "desc": "주소 확인·정리",
+      "url": "/services.html#url",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "chat",
+      "icon": "💬",
+      "name": "채팅방",
+      "desc": "서버 계정끼리 실시간 채팅",
+      "url": "",
+      "status": "on",
+      "group": "server",
+      "featured": false
+    },
+    {
+      "id": "money",
+      "icon": "💰",
+      "name": "용돈 기록장",
+      "desc": "수입·지출 기록",
+      "url": "",
+      "status": "on",
+      "group": "server",
+      "featured": false
+    },
+    {
+      "id": "suggest",
+      "icon": "📨",
+      "name": "건의함",
+      "desc": "관리자에게 의견 보내기",
+      "url": "",
+      "status": "on",
+      "group": "server",
+      "featured": false
+    },
+    {
+      "id": "notice",
+      "icon": "📰",
+      "name": "서버 공지",
+      "desc": "관리자 공지 등록",
+      "url": "",
+      "status": "on",
+      "group": "server",
+      "featured": false
+    },
+    {
+      "id": "status",
+      "icon": "🟢",
+      "name": "서버 상태",
+      "desc": "정상·점검·장애 표시",
+      "url": "",
+      "status": "on",
+      "group": "server",
+      "featured": false
+    },
+    {
+      "id": "stats",
+      "icon": "📈",
+      "name": "서버 통계",
+      "desc": "접속자·사용량 확인",
+      "url": "",
+      "status": "on",
+      "group": "server",
+      "featured": false
+    },
+    {
+      "id": "myinfo",
+      "icon": "🕵️",
+      "name": "내 접속 정보",
+      "desc": "브라우저·OS·화면 정보",
+      "url": "",
+      "status": "on",
+      "group": "server",
+      "featured": false
+    },
+    {
+      "id": "anon",
+      "icon": "📝",
+      "name": "익명 한마디",
+      "desc": "이름 없이 메시지 남기기",
+      "url": "",
+      "status": "on",
+      "group": "server",
+      "featured": false
+    }
+  ]
+}
