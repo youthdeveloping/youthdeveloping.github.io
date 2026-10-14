@@ -2,131 +2,306 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>위치 기록</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>이정표 경로 기록</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
-  html, body { height: 100%; margin: 0; font-family: sans-serif; }
-  #map { height: calc(100% - 96px); }
-  #bar { height: 96px; box-sizing: border-box; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
-  #buttons { display: flex; gap: 8px; }
-  button { flex: 1; padding: 10px; font-size: 15px; border: 1px solid #888; border-radius: 8px; background: #fff; }
-  #status { font-size: 13px; color: #444; }
+  :root {
+    --ink: #14233B;
+    --muted: #5A667A;
+    --line1: #0052A4;
+    --live: #00843A;
+    --stop: #D92D3A;
+    --paper: #F2F5F3;
+    --rule: #CBD3DD;
+    --white: #fff;
+    --sheet-h: 0px;
+    --font: "Pretendard Variable", Pretendard, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  }
+  [hidden] { display: none !important; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body { font-family: var(--font); color: var(--ink); background: var(--paper); -webkit-font-smoothing: antialiased; }
+  button { font: inherit; color: inherit; }
+  :focus-visible { outline: 3px solid rgba(0, 82, 164, .45); outline-offset: 2px; }
+
+  #map { position: fixed; inset: 0; background: #E6ECE9; }
+  .leaflet-bottom { bottom: var(--sheet-h); }
+  .leaflet-control-attribution { font-size: 10px; }
+
+  #top {
+    position: fixed; z-index: 1000; top: calc(12px + env(safe-area-inset-top)); left: 12px; right: 12px;
+    display: flex; justify-content: space-between; align-items: center; gap: 8px; pointer-events: none;
+  }
+  #top > * { pointer-events: auto; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px;
+    background: var(--white); border: 0; border-radius: 999px; font-size: 14px; font-weight: 700;
+    box-shadow: 0 2px 10px rgba(20, 35, 59, .18);
+  }
+  button.pill { cursor: pointer; }
+  .left { display: flex; gap: 8px; align-items: center; }
+  .brand svg { width: 18px; height: 18px; fill: var(--line1); }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--live); }
+
+  #sheet {
+    position: fixed; z-index: 1000; left: 0; right: 0; bottom: 0; max-height: 78vh; overflow-y: auto;
+    background: var(--white); border-radius: 20px 20px 0 0;
+    padding: 20px 18px calc(18px + env(safe-area-inset-bottom));
+    box-shadow: 0 -8px 30px rgba(20, 35, 59, .16);
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  @media (min-width: 760px) {
+    #sheet { left: 16px; right: auto; bottom: 16px; width: 372px; border-radius: 20px; padding-bottom: 20px; max-height: calc(100vh - 100px); }
+    .leaflet-bottom { bottom: 0; }
+  }
+  @media (pointer: coarse) { .leaflet-control-zoom { display: none; } }
+
+  h1 { margin: 0; font-size: 21px; line-height: 1.3; font-weight: 800; letter-spacing: -0.02em; }
+  .sub { margin: 0; font-size: 14px; line-height: 1.55; color: var(--muted); }
+  .stats { display: flex; gap: 12px; }
+  .stat { flex: 1; padding: 12px 14px; border-radius: 12px; background: var(--paper); display: flex; flex-direction: column; gap: 2px; }
+  .stat b { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .stat span { font-size: 13px; color: var(--muted); }
+
+  .btn { height: 48px; padding: 0 16px; border: 0; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .btn-live { background: var(--live); color: var(--white); }
+  .btn-stop { background: var(--stop); color: var(--white); }
+  .btn-ghost { background: var(--paper); color: var(--ink); }
+  .linkbtn { align-self: flex-start; padding: 6px 2px; background: none; border: 0; color: var(--muted); font-size: 14px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+  .linkbtn:disabled { opacity: .4; cursor: not-allowed; }
+  #note { margin: 0; padding: 10px 12px; border-radius: 12px; background: var(--paper); font-size: 13px; line-height: 1.5; }
+  #note.err { background: #FDECEE; color: #8E1620; }
+
+  #toast {
+    position: fixed; z-index: 1100; left: 50%; top: calc(64px + env(safe-area-inset-top)); transform: translateX(-50%);
+    max-width: calc(100% - 32px); padding: 10px 16px; border-radius: 999px; background: var(--ink); color: var(--white);
+    font-size: 14px; font-weight: 600; box-shadow: 0 4px 16px rgba(20, 35, 59, .3);
+  }
+
+  .pin-icon { background: none; border: 0; overflow: visible; }
+  .pin-box { position: absolute; left: 0; top: 0; width: 0; height: 0; --c: var(--line1); }
+  .pin {
+    position: absolute; left: 0; bottom: 8px; transform: translateX(-50%); display: flex; align-items: center; gap: 7px;
+    padding: 3px 12px 3px 3px; background: var(--white); border: 2px solid var(--c); border-radius: 999px;
+    box-shadow: 0 2px 8px rgba(20, 35, 59, .22); white-space: nowrap;
+  }
+  .pin::after {
+    content: ""; position: absolute; left: 50%; bottom: -8px; margin-left: -6px;
+    border: 6px solid transparent; border-top-color: var(--c); border-bottom-width: 0;
+  }
+  .av { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--c); color: var(--white); font-size: 14px; font-weight: 800; }
+  .ptxt { display: flex; flex-direction: column; line-height: 1.2; }
+  .ptxt b { font-size: 13px; font-weight: 700; }
+  .ptxt span { font-size: 12px; color: var(--muted); }
+  .pin-pt { position: absolute; left: -5px; top: -5px; width: 10px; height: 10px; border-radius: 50%; background: var(--c); border: 2px solid var(--white); }
+  .pin-pt::after { content: ""; position: absolute; inset: -9px; border-radius: 50%; border: 2px solid var(--c); animation: pulse 2.2s ease-out infinite; }
+  .pin-box.idle .pin-pt::after { animation: none; opacity: 0; }
+  @keyframes pulse { from { transform: scale(.4); opacity: .7; } to { transform: scale(1.5); opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .pin-pt::after { animation: none; opacity: 0; } }
 </style>
 </head>
 <body>
 <div id="map"></div>
-<div id="bar">
-  <div id="buttons">
-    <button id="start">기록 시작</button>
-    <button id="stop" disabled>기록 중지</button>
-    <button id="export" disabled>GPX 저장</button>
-    <button id="clear">초기화</button>
+
+<div id="top">
+  <div class="left">
+    <span class="pill brand">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 3h2v18h-2z"/><path d="M4 5h13l3 3-3 3H4z"/><path d="M20 13H7l-3 3 3 3h13z" opacity=".5"/></svg>
+      이정표
+    </span>
+    <span class="pill" id="recpill" hidden><i class="dot"></i>기록 중</span>
   </div>
-  <div id="status">대기 중</div>
+  <button class="pill" id="locate" type="button">내 위치</button>
 </div>
+
+<section id="sheet" aria-label="경로 기록">
+  <h1>내 이동 경로 기록</h1>
+  <p class="sub">경로는 이 기기에만 저장돼요. 서버로 보내지 않아요.</p>
+  <div class="stats">
+    <div class="stat"><b id="dist">0m</b><span>이동 거리</span></div>
+    <div class="stat"><b id="count">0</b><span>기록한 지점</span></div>
+  </div>
+  <button class="btn btn-live" id="rec" type="button">기록 시작</button>
+  <button class="btn btn-ghost" id="export" type="button" disabled>GPX로 저장</button>
+  <button class="linkbtn" id="clear" type="button" disabled>경로 지우기</button>
+  <p id="note" role="status" hidden></p>
+</section>
+
+<div id="toast" role="status" hidden></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const map = L.map('map').setView([37.5665, 126.9780], 14);
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  maxZoom: 19,
-  attribution: '&copy; OpenStreetMap contributors'
-}).addTo(map);
-
 const KEY = 'track-points';
-let points = JSON.parse(localStorage.getItem(KEY) || '[]');
-let watchId = null, marker = null, wakeLock = null;
-const line = L.polyline(points.map(p => [p.lat, p.lng]), { weight: 5 }).addTo(map);
-if (points.length) map.fitBounds(line.getBounds());
-if (points.length) $('export').disabled = false;
+const $ = id => document.getElementById(id);
+const mobileMQ = window.matchMedia('(max-width: 759px)');
 
-function $(id) { return document.getElementById(id); }
-const setStatus = t => $('status').textContent = t;
+const map = L.map('map', { zoomControl: false, attributionControl: false }).setView([37.5086, 126.8910], 14);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { subdomains: 'abcd', maxZoom: 20 }).addTo(map);
+L.control.attribution({ prefix: false }).addAttribution('&copy; OpenStreetMap, &copy; CARTO').addTo(map);
+L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+function sheetPad() {
+  if (mobileMQ.matches) return { paddingTopLeft: [32, 90], paddingBottomRight: [32, $('sheet').offsetHeight + 32] };
+  return { paddingTopLeft: [372 + 16 + 40, 90], paddingBottomRight: [48, 48] };
+}
+new ResizeObserver(() => {
+  document.documentElement.style.setProperty('--sheet-h', mobileMQ.matches ? $('sheet').offsetHeight + 'px' : '0px');
+}).observe($('sheet'));
+
+let toastTimer = null;
+function toast(msg) {
+  const el = $('toast');
+  el.textContent = msg; el.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.hidden = true; }, 3400);
+}
+function setNote(msg, isErr) {
+  const el = $('note');
+  el.hidden = !msg; el.textContent = msg || '';
+  el.className = isErr ? 'err' : '';
+}
+
+/* ---------- 데이터 ---------- */
+let points = [];
+try {
+  points = JSON.parse(localStorage.getItem(KEY) || '[]')
+    .filter(p => p && Number.isFinite(p.lat) && Number.isFinite(p.lng) && Number.isFinite(p.t));
+} catch (e) { points = []; }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(points)); } catch (e) { setNote('저장 공간이 부족해서 경로를 저장하지 못했어요. GPX로 저장한 뒤 경로를 지워 주세요.', true); } }
 
 function distanceM(a, b) {
   const R = 6371000, rad = x => x * Math.PI / 180;
   const dLat = rad(b.lat - a.lat), dLng = rad(b.lng - a.lng);
-  const h = Math.sin(dLat / 2) ** 2 +
-            Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLng / 2) ** 2;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLng / 2) ** 2;
   return 2 * R * Math.asin(Math.sqrt(h));
+}
+function totalM() { let s = 0; for (let i = 1; i < points.length; i++) s += distanceM(points[i - 1], points[i]); return s; }
+function fmtDist(m) { return m < 1000 ? Math.round(m) + 'm' : (m / 1000).toFixed(2) + 'km'; }
+
+/* ---------- 지도 표시 ---------- */
+const line = L.polyline(points.map(p => [p.lat, p.lng]), { color: '#0052A4', weight: 5, opacity: .85, lineJoin: 'round' }).addTo(map);
+
+function makePin() {
+  const box = document.createElement('div'); box.className = 'pin-box';
+  const pin = document.createElement('div'); pin.className = 'pin';
+  const av = document.createElement('span'); av.className = 'av'; av.textContent = '나';
+  const txt = document.createElement('span'); txt.className = 'ptxt';
+  const nm = document.createElement('b'); nm.textContent = '나';
+  const tm = document.createElement('span');
+  txt.append(nm, tm); pin.append(av, txt);
+  const pt = document.createElement('i'); pt.className = 'pin-pt';
+  box.append(pin, pt);
+  return { box, tm };
+}
+let pinParts = null, marker = null;
+function showMarker(p) {
+  if (!marker) {
+    pinParts = makePin();
+    marker = L.marker([p.lat, p.lng], {
+      icon: L.divIcon({ className: 'pin-icon', html: pinParts.box, iconSize: [0, 0] }), keyboard: false
+    }).addTo(map);
+  } else {
+    marker.setLatLng([p.lat, p.lng]);
+  }
+  pinParts.tm.textContent = recording ? '기록 중' : '마지막 위치';
+  pinParts.box.classList.toggle('idle', !recording);
+}
+function focusPoints(pts, opts) {
+  if (!pts.length) return;
+  map.fitBounds(L.latLngBounds(pts), Object.assign({ maxZoom: 17, animate: true }, sheetPad(), opts || {}));
+}
+
+/* ---------- 기록 ---------- */
+let watchId = null, wakeLock = null, recording = false, transientNote = false;
+
+function updateUi() {
+  $('dist').textContent = fmtDist(totalM());
+  $('count').textContent = points.length;
+  $('export').disabled = points.length === 0;
+  $('clear').disabled = points.length === 0 || recording;
+  $('recpill').hidden = !recording;
+  const b = $('rec');
+  b.textContent = recording ? '기록 중지' : (points.length ? '이어서 기록하기' : '기록 시작');
+  b.className = 'btn ' + (recording ? 'btn-stop' : 'btn-live');
 }
 
 function onPosition(pos) {
-  const p = {
-    lat: pos.coords.latitude,
-    lng: pos.coords.longitude,
-    acc: pos.coords.accuracy,
-    t: pos.timestamp
-  };
+  const p = { lat: pos.coords.latitude, lng: pos.coords.longitude, acc: pos.coords.accuracy, t: pos.timestamp };
   const last = points[points.length - 1];
-  // 정확도가 낮거나 5m 미만 이동은 기록하지 않아 지터를 줄입니다.
+  if (transientNote) { setNote(''); transientNote = false; }
+  showMarker(p); // 위치 표시는 항상 갱신하고, 경로에는 의미 있는 이동만 더합니다.
   if (p.acc > 50 || (last && distanceM(last, p) < 5)) return;
   points.push(p);
-  localStorage.setItem(KEY, JSON.stringify(points));
+  save();
   line.addLatLng([p.lat, p.lng]);
-  if (!marker) marker = L.marker([p.lat, p.lng]).addTo(map);
-  else marker.setLatLng([p.lat, p.lng]);
   map.panTo([p.lat, p.lng]);
-  setStatus(`기록 중 · 지점 ${points.length}개 · 오차 약 ${Math.round(p.acc)}m`);
-  $('export').disabled = false;
+  updateUi();
 }
-
 function onError(err) {
   const msg = {
-    1: '위치 권한이 거부되었습니다. 브라우저 설정에서 허용해 주세요.',
-    2: '위치를 확인할 수 없습니다.',
-    3: '위치 요청 시간이 초과되었습니다.'
-  }[err.code] || '알 수 없는 오류가 발생했습니다.';
-  setStatus(msg);
+    1: '위치 권한이 꺼져 있어요. 브라우저 설정에서 이 사이트의 위치 권한을 허용해 주세요.',
+    2: '위치를 확인할 수 없어요. 실내라면 창가나 야외에서 다시 시도해 주세요.',
+    3: '위치를 찾는 데 시간이 너무 오래 걸려요. 잠시 후 다시 시도해 주세요.'
+  }[err.code] || '위치를 가져오지 못했어요.';
+  if (err.code === 1) { setNote(msg, true); stopRecording(); return; }
+  // 터널이나 지하처럼 일시적으로 위치를 못 잡는 경우에는 기록을 끄지 않고 계속 기다립니다.
+  setNote(msg + ' 다시 잡히면 자동으로 이어서 기록해요.');
+  transientNote = true;
 }
+async function keepAwake() { try { wakeLock = await navigator.wakeLock.request('screen'); } catch (e) {} }
 
-async function keepAwake() {
-  try { wakeLock = await navigator.wakeLock.request('screen'); } catch (e) {}
-}
-
-$('start').onclick = () => {
-  if (!navigator.geolocation) return setStatus('이 브라우저는 위치 기능을 지원하지 않습니다.');
-  watchId = navigator.geolocation.watchPosition(onPosition, onError, {
-    enableHighAccuracy: true, maximumAge: 0, timeout: 20000
-  });
+function startRecording() {
+  if (!navigator.geolocation) return setNote('이 브라우저는 위치 기능을 지원하지 않아요.', true);
+  setNote('');
+  recording = true;
+  watchId = navigator.geolocation.watchPosition(onPosition, onError, { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 });
   keepAwake();
-  $('start').disabled = true; $('stop').disabled = false;
-  setStatus('위치 확인 중...');
-};
+  updateUi();
+}
+function stopRecording() {
+  if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+  if (wakeLock) { try { wakeLock.release(); } catch (e) {} wakeLock = null; }
+  recording = false;
+  if (points.length) showMarker(points[points.length - 1]);
+  updateUi();
+}
 
-$('stop').onclick = () => {
-  navigator.geolocation.clearWatch(watchId);
-  watchId = null;
-  if (wakeLock) wakeLock.release();
-  $('start').disabled = false; $('stop').disabled = true;
-  setStatus(`중지됨 · 지점 ${points.length}개`);
-};
+$('rec').onclick = () => { if (recording) { stopRecording(); toast('기록을 중지했어요.'); } else startRecording(); };
 
 $('export').onclick = () => {
-  const trkpts = points.map(p =>
-    `<trkpt lat="${p.lat}" lon="${p.lng}"><time>${new Date(p.t).toISOString()}</time></trkpt>`).join('');
-  const gpx = `<?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="track" xmlns="http://www.topografix.com/GPX/1/1"><trk><trkseg>${trkpts}</trkseg></trk></gpx>`;
+  const trkpts = points.map(p => `<trkpt lat="${p.lat}" lon="${p.lng}"><time>${new Date(p.t).toISOString()}</time></trkpt>`).join('');
+  const gpx = `<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="이정표" xmlns="http://www.topografix.com/GPX/1/1"><trk><trkseg>${trkpts}</trkseg></trk></gpx>`;
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([gpx], { type: 'application/gpx+xml' }));
   a.download = 'track.gpx';
   a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  toast('GPX 파일을 저장했어요.');
 };
 
 $('clear').onclick = () => {
-  if (!confirm('저장된 경로를 모두 삭제할까요?')) return;
+  if (!confirm('기록한 경로를 모두 지울까요? 지운 경로는 되돌릴 수 없어요.')) return;
   points = [];
-  localStorage.removeItem(KEY);
+  try { localStorage.removeItem(KEY); } catch (e) {}
   line.setLatLngs([]);
   if (marker) { map.removeLayer(marker); marker = null; }
-  $('export').disabled = true;
-  setStatus('초기화되었습니다.');
+  updateUi();
+  toast('경로를 지웠어요.');
 };
 
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && watchId !== null) keepAwake();
-});
+$('locate').onclick = () => {
+  const last = points[points.length - 1];
+  if (!last) return toast('아직 기록한 위치가 없어요. 기록을 시작해 보세요.');
+  focusPoints([[last.lat, last.lng]], { maxZoom: 16 });
+};
+
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && recording) keepAwake(); });
+
+if (points.length) { showMarker(points[points.length - 1]); focusPoints(points.map(p => [p.lat, p.lng])); }
+updateUi();
 </script>
 </body>
 </html>

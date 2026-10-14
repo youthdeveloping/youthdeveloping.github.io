@@ -282,7 +282,7 @@ const peers = new Map();       // 연결이 열린 친구
 let pending = null;            // 연결을 맺는 중인 친구
 let seq = 0;
 let view = 'home';
-let sharing = false, watchId = null, wakeLock = null;
+let sharing = false, watchId = null, wakeLock = null, transientNote = false;
 let lastPos = null, meSeen = 0, lastSend = 0;
 let fitted = false;
 const markers = {};
@@ -490,6 +490,7 @@ function startSharing() {
 }
 function onGeo(pos) {
   if (pos.coords.accuracy > 100) return;
+  if (transientNote) { setNote(''); transientNote = false; }
   lastPos = { lat: pos.coords.latitude, lng: pos.coords.longitude, acc: Math.round(pos.coords.accuracy) };
   meSeen = Date.now();
   if (meSeen - lastSend >= SEND_INTERVAL) { lastSend = meSeen; broadcast(posMsg()); }
@@ -501,8 +502,10 @@ function onGeoErr(err) {
     2: '위치를 확인할 수 없어요. 실내라면 창가나 야외에서 다시 시도해 주세요.',
     3: '위치를 찾는 데 시간이 너무 오래 걸려요. 잠시 후 다시 시도해 주세요.'
   }[err.code] || '위치를 가져오지 못했어요.';
-  setNote(msg, true);
-  stopSharing();
+  if (err.code === 1) { setNote(msg, true); stopSharing(); return; }
+  // 터널이나 지하처럼 일시적으로 위치를 못 잡는 경우에는 공유를 끄지 않고 계속 기다립니다.
+  setNote(msg + ' 다시 잡히면 자동으로 이어서 공유해요.');
+  transientNote = true;
 }
 function stopSharing() {
   if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
