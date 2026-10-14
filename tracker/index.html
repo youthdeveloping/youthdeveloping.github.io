@@ -4,7 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>이정표 경로 기록</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
   :root {
@@ -26,9 +25,7 @@
   button { font: inherit; color: inherit; }
   :focus-visible { outline: 3px solid rgba(0, 82, 164, .45); outline-offset: 2px; }
 
-  #map { position: fixed; inset: 0; background: #E6ECE9; }
-  .leaflet-bottom { bottom: var(--sheet-h); }
-  .leaflet-control-attribution { font-size: 10px; }
+  #map { position: fixed; top: 0; left: 0; right: 0; bottom: var(--sheet-h); background: #E6ECE9; }
 
   #top {
     position: fixed; z-index: 1000; top: calc(12px + env(safe-area-inset-top)); left: 12px; right: 12px;
@@ -53,10 +50,10 @@
     display: flex; flex-direction: column; gap: 14px;
   }
   @media (min-width: 760px) {
-    #sheet { left: 16px; right: auto; bottom: 16px; width: 372px; border-radius: 20px; padding-bottom: 20px; max-height: calc(100vh - 100px); }
-    .leaflet-bottom { bottom: 0; }
+    #sheet { top: 0; left: 0; right: auto; bottom: 0; width: 372px; max-height: none; border-radius: 0; padding: 24px 20px 20px; box-shadow: 4px 0 24px rgba(20, 35, 59, .12); }
+    #map { left: 372px; bottom: 0; }
+    #top { left: 384px; }
   }
-  @media (pointer: coarse) { .leaflet-control-zoom { display: none; } }
 
   h1 { margin: 0; font-size: 21px; line-height: 1.3; font-weight: 800; letter-spacing: -0.02em; }
   .sub { margin: 0; font-size: 14px; line-height: 1.55; color: var(--muted); }
@@ -132,23 +129,50 @@
 
 <div id="toast" role="status" hidden></div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+// developers.kakao.com > 내 애플리케이션 > 앱 키의 JavaScript 키를 넣고, 플랫폼(Web)에 https://youthdeveloping.github.io 를 등록하세요.
+const KAKAO_KEY = 'YOUR_KAKAO_JS_KEY';
 const KEY = 'track-points';
 const $ = id => document.getElementById(id);
 const mobileMQ = window.matchMedia('(max-width: 759px)');
 
-const map = L.map('map', { zoomControl: false, attributionControl: false }).setView([37.5086, 126.8910], 14);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { subdomains: 'abcd', maxZoom: 20 }).addTo(map);
-L.control.attribution({ prefix: false }).addAttribution('&copy; OpenStreetMap, &copy; CARTO').addTo(map);
-L.control.zoom({ position: 'bottomright' }).addTo(map);
-
-function sheetPad() {
-  if (mobileMQ.matches) return { paddingTopLeft: [32, 90], paddingBottomRight: [32, $('sheet').offsetHeight + 32] };
-  return { paddingTopLeft: [372 + 16 + 40, 90], paddingBottomRight: [48, 48] };
+let map = null, mapError = '';
+function startMap(onReady) {
+  if (!KAKAO_KEY || KAKAO_KEY.startsWith('YOUR_')) {
+    mapError = '카카오 지도 앱 키가 아직 입력되지 않았어요. 코드 상단의 KAKAO_KEY를 채워 주세요.';
+    setNote(mapError, true);
+    return;
+  }
+  const s = document.createElement('script');
+  s.src = 'https://dapi.kakao.com/v2/maps/sdk.js?appkey=' + encodeURIComponent(KAKAO_KEY) + '&autoload=false';
+  s.onload = () => kakao.maps.load(() => {
+    map = new kakao.maps.Map($('map'), { center: new kakao.maps.LatLng(37.5086, 126.8910), level: 5 });
+    if (!window.matchMedia('(pointer: coarse)').matches) {
+      map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.BOTTOMRIGHT);
+    }
+    map.relayout();
+    onReady();
+  });
+  s.onerror = () => {
+    mapError = '카카오 지도를 불러오지 못했어요. 앱 키와 등록한 사이트 주소(https://youthdeveloping.github.io)를 확인해 주세요.';
+    setNote(mapError, true);
+  };
+  document.head.appendChild(s);
+}
+function focusPoints(pts) {
+  if (!map || !pts.length) return;
+  if (pts.length === 1) {
+    if (map.getLevel() > 3) map.setLevel(3);
+    map.panTo(new kakao.maps.LatLng(pts[0][0], pts[0][1]));
+    return;
+  }
+  const b = new kakao.maps.LatLngBounds();
+  pts.forEach(p => b.extend(new kakao.maps.LatLng(p[0], p[1])));
+  map.setBounds(b, 90, 40, 40, 40);
 }
 new ResizeObserver(() => {
   document.documentElement.style.setProperty('--sheet-h', mobileMQ.matches ? $('sheet').offsetHeight + 'px' : '0px');
+  if (map) map.relayout();
 }).observe($('sheet'));
 
 let toastTimer = null;
@@ -182,7 +206,17 @@ function totalM() { let s = 0; for (let i = 1; i < points.length; i++) s += dist
 function fmtDist(m) { return m < 1000 ? Math.round(m) + 'm' : (m / 1000).toFixed(2) + 'km'; }
 
 /* ---------- 지도 표시 ---------- */
-const line = L.polyline(points.map(p => [p.lat, p.lng]), { color: '#0052A4', weight: 5, opacity: .85, lineJoin: 'round' }).addTo(map);
+let line = null;
+function drawLine() {
+  if (!map) return;
+  const path = points.map(p => new kakao.maps.LatLng(p.lat, p.lng));
+  if (!line) {
+    line = new kakao.maps.Polyline({ path, strokeWeight: 5, strokeColor: '#0052A4', strokeOpacity: 0.85, strokeStyle: 'solid' });
+    line.setMap(map);
+  } else {
+    line.setPath(path);
+  }
+}
 
 function makePin() {
   const box = document.createElement('div'); box.className = 'pin-box';
@@ -196,22 +230,19 @@ function makePin() {
   box.append(pin, pt);
   return { box, tm };
 }
-let pinParts = null, marker = null;
+let pinParts = null, overlay = null;
 function showMarker(p) {
-  if (!marker) {
+  if (!map) return;
+  const ll = new kakao.maps.LatLng(p.lat, p.lng);
+  if (!overlay) {
     pinParts = makePin();
-    marker = L.marker([p.lat, p.lng], {
-      icon: L.divIcon({ className: 'pin-icon', html: pinParts.box, iconSize: [0, 0] }), keyboard: false
-    }).addTo(map);
+    overlay = new kakao.maps.CustomOverlay({ position: ll, content: pinParts.box, xAnchor: 0, yAnchor: 0, zIndex: 10 });
+    overlay.setMap(map);
   } else {
-    marker.setLatLng([p.lat, p.lng]);
+    overlay.setPosition(ll);
   }
   pinParts.tm.textContent = recording ? '기록 중' : '마지막 위치';
   pinParts.box.classList.toggle('idle', !recording);
-}
-function focusPoints(pts, opts) {
-  if (!pts.length) return;
-  map.fitBounds(L.latLngBounds(pts), Object.assign({ maxZoom: 17, animate: true }, sheetPad(), opts || {}));
 }
 
 /* ---------- 기록 ---------- */
@@ -236,8 +267,8 @@ function onPosition(pos) {
   if (p.acc > 50 || (last && distanceM(last, p) < 5)) return;
   points.push(p);
   save();
-  line.addLatLng([p.lat, p.lng]);
-  map.panTo([p.lat, p.lng]);
+  drawLine();
+  if (map) map.panTo(new kakao.maps.LatLng(p.lat, p.lng));
   updateUi();
 }
 function onError(err) {
@@ -286,8 +317,8 @@ $('clear').onclick = () => {
   if (!confirm('기록한 경로를 모두 지울까요? 지운 경로는 되돌릴 수 없어요.')) return;
   points = [];
   try { localStorage.removeItem(KEY); } catch (e) {}
-  line.setLatLngs([]);
-  if (marker) { map.removeLayer(marker); marker = null; }
+  if (line) line.setPath([]);
+  if (overlay) { overlay.setMap(null); overlay = null; }
   updateUi();
   toast('경로를 지웠어요.');
 };
@@ -295,13 +326,16 @@ $('clear').onclick = () => {
 $('locate').onclick = () => {
   const last = points[points.length - 1];
   if (!last) return toast('아직 기록한 위치가 없어요. 기록을 시작해 보세요.');
-  focusPoints([[last.lat, last.lng]], { maxZoom: 16 });
+  focusPoints([[last.lat, last.lng]]);
 };
 
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && recording) keepAwake(); });
 
-if (points.length) { showMarker(points[points.length - 1]); focusPoints(points.map(p => [p.lat, p.lng])); }
 updateUi();
+startMap(() => {
+  drawLine();
+  if (points.length) { showMarker(points[points.length - 1]); focusPoints(points.map(p => [p.lat, p.lng])); }
+});
 </script>
 </body>
 </html>
