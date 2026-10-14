@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>실시간 위치 공유</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+  html, body { height: 100%; margin: 0; font-family: sans-serif; }
+  body { display: flex; flex-direction: column; }
+  #panel { padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid #ccc; }
+  .row { display: flex; gap: 8px; align-items: center; }
+  input[type=text] { flex: 1; min-width: 0; padding: 9px; font-size: 15px; border: 1px solid #888; border-radius: 8px; }
+  button { padding: 9px 12px; font-size: 14px; border: 1px solid #888; border-radius: 8px; background: #fff; }
+  button:disabled { opacity: .45; }
+  label { font-size: 13px; color: #333; display: flex; gap: 6px; align-items: flex-start; }
+  #map { flex: 1; }
+  #status { padding: 8px 12px; font-size: 13px; color: #444; border-top: 1px solid #ccc; }
+</style>
+</head>
+<body>
+<div id="panel">
+  <div class="row">
+    <input id="name" type="text" maxlength="20" placeholder="표시 이름 (최대 20자)">
+  </div>
+  <div class="row">
+    <input id="room" type="text" maxlength="24" placeholder="방 코드">
+    <button id="gen">새 방</button>
+    <button id="join" disabled>입장</button>
+    <button id="leave" disabled>나가기</button>
+  </div>
+  <label>
+    <input id="consent" type="checkbox">
+    <span>내 위치가 같은 방에 입장한 사람에게 실시간으로 공유되는 것에 동의합니다. 공유는 아래 버튼을 눌러야 시작되며, 언제든 중지할 수 있고 중지하거나 접속이 끊기면 내 위치 정보는 즉시 삭제됩니다.</span>
+  </label>
+  <div class="row">
+    <button id="share" disabled>내 위치 공유 시작</button>
+    <button id="stop" disabled>공유 중지</button>
+    <button id="copy" disabled>초대 링크 복사</button>
+  </div>
+</div>
+<div id="map"></div>
+<div id="status">설정 확인 중...</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+// Firebase 콘솔 > 프로젝트 설정 > 내 앱(웹)에서 확인한 값으로 교체하세요.
+// 이 값은 비밀 키가 아니며, 접근 제어는 데이터베이스 보안 규칙이 담당합니다.
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "YOUR_PROJECT",
+  appId: "YOUR_APP_ID"
+};
+
+const STALE_MS = 120000;     // 2분 이상 갱신이 없으면 지도에서 숨김
+const WRITE_INTERVAL = 3000; // 위치 전송 최소 간격
+
+const $ = id => document.getElementById(id);
+const setStatus = t => { $('status').textContent = t; };
+
+const map = L.map('map').setView([37.5665, 126.9780], 14);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+  attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+let db = null, uid = null;
+let room = null, membersRef = null, myRef = null;
+let watchId = null, wakeLock = null, lastWrite = 0, fitted = false;
+let lastData = {};
+const markers = {};
+
+try { $('name').value = localStorage.getItem('live-name') || ''; } catch (e) {}
+
+function randomRoom() {
+  const chars = 'abcdefghjkmnpqrstuvwxyz23456789';
+  const buf = new Uint32Array(10);
+  crypto.getRandomValues(buf);
+  return Array.from(buf, n => chars[n % chars.length]).join('');
+}
+
+function cleanRoom(v) { return v.trim().toLowerCase().replace(/[^a-z0-9_-]/g, ''); }
+
+function ago(t) {
+  const s = Math.max(0, Math.round((Date.now() - t) / 1000));
+  return s < 60 ? `${s}초 전` : `${Math.round(s / 60)}분 전`;
+}
+
+function tooltipNode(name, t, me) {
+  const el = document.createElement('span');
+  el.textContent = `${me ? '나 · ' : ''}${name} (${ago(t)})`;
+  return el;
+}
+
+function render() {
+  const now = Date.now();
+  const alive = {};
+  Object.entries(lastData || {}).forEach(([id, m]) => {
+    if (!m || typeof m.lat !== 'number' || typeof m.lng !== 'number') return;
+    if (now - m.t > STALE_MS) return;
+    alive[id] = m;
+  });
+  Object.keys(markers).forEach(id => {
+    if (!alive[id]) { map.removeLayer(markers[id]); delete markers[id]; }
+  });
+  Object.entries(alive).forEach(([id, m]) => {
+    const me = id === uid;
+    const ll = [m.lat, m.lng];
+    if (!markers[id]) {
+      markers[id] = L.circleMarker(ll, {
+        radius: 9, weight: 3,
+        color: me ? '#0b57d0' : '#c5221f',
+        fillColor: me ? '#0b57d0' : '#c5221f',
+        fillOpacity: 0.5
+      }).addTo(map);
+    } else {
+      markers[id].setLatLng(ll);
+    }
+    markers[id].unbindTooltip();
+    markers[id].bindTooltip(tooltipNode(String(m.name || '이름 없음').slice(0, 20), m.t, me), {
+      permanent: true, direction: 'top', offset: [0, -8]
+    });
+  });
+  const ids = Object.keys(alive);
+  if (ids.length && !fitted) {
+    fitted = true;
+    map.fitBounds(L.latLngBounds(ids.map(id => [alive[id].lat, alive[id].lng])), { maxZoom: 17, padding: [40, 40] });
+  }
+  if (room) setStatus(`방 ${room} · 지금 공유 중인 사람 ${ids.length}명${watchId !== null ? ' · 내 위치 공유 중' : ''}`);
+}
+
+function updateButtons() {
+  const joined = !!room;
+  const sharing = watchId !== null;
+  $('join').disabled = !uid || joined;
+  $('leave').disabled = !joined;
+  $('gen').disabled = joined;
+  $('room').disabled = joined;
+  $('share').disabled = !joined || sharing || !$('consent').checked;
+  $('stop').disabled = !sharing;
+  $('copy').disabled = !joined;
+  $('consent').disabled = sharing;
+}
+
+function joinRoom() {
+  const code = cleanRoom($('room').value);
+  if (code.length < 6) return setStatus('방 코드는 6자 이상이어야 합니다. 새 방 버튼으로 생성해 주세요.');
+  room = code;
+  $('room').value = code;
+  fitted = false;
+  membersRef = db.ref(`rooms/${room}/members`);
+  membersRef.on('value', snap => { lastData = snap.val() || {}; render(); },
+    err => setStatus('데이터를 읽을 수 없습니다: ' + err.message));
+  history.replaceState(null, '', '#' + room);
+  updateButtons();
+  setStatus(`방 ${room}에 입장했습니다.`);
+}
+
+function leaveRoom() {
+  stopSharing();
+  if (membersRef) membersRef.off();
+  membersRef = null; room = null; lastData = {};
+  render();
+  history.replaceState(null, '', location.pathname);
+  updateButtons();
+  setStatus('방에서 나왔습니다.');
+}
+
+async function keepAwake() {
+  try { wakeLock = await navigator.wakeLock.request('screen'); } catch (e) {}
+}
+
+function startSharing() {
+  if (!$('consent').checked) return setStatus('위치 공유 동의에 체크해 주세요.');
+  if (!navigator.geolocation) return setStatus('이 브라우저는 위치 기능을 지원하지 않습니다.');
+  const name = $('name').value.trim().slice(0, 20) || '이름 없음';
+  try { localStorage.setItem('live-name', name); } catch (e) {}
+  myRef = db.ref(`rooms/${room}/members/${uid}`);
+  myRef.onDisconnect().remove();
+  lastWrite = 0;
+  watchId = navigator.geolocation.watchPosition(pos => {
+    const now = Date.now();
+    if (now - lastWrite < WRITE_INTERVAL) return;
+    if (pos.coords.accuracy > 100) return;
+    lastWrite = now;
+    myRef.set({
+      name,
+      lat: pos.coords.latitude,
+      lng: pos.coords.longitude,
+      acc: Math.round(pos.coords.accuracy),
+      t: now
+    }).catch(err => setStatus('전송 실패: ' + err.message));
+  }, err => {
+    const msg = { 1: '위치 권한이 거부되었습니다. 브라우저 설정에서 허용해 주세요.',
+                  2: '위치를 확인할 수 없습니다.',
+                  3: '위치 요청 시간이 초과되었습니다.' }[err.code] || '알 수 없는 오류가 발생했습니다.';
+    setStatus(msg);
+    stopSharing();
+  }, { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 });
+  keepAwake();
+  updateButtons();
+  setStatus('위치 확인 중...');
+}
+
+function stopSharing() {
+  if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+  if (wakeLock) { try { wakeLock.release(); } catch (e) {} wakeLock = null; }
+  if (myRef) {
+    myRef.onDisconnect().cancel();
+    myRef.remove();
+    myRef = null;
+  }
+  updateButtons();
+  if (room) render();
+}
+
+$('gen').onclick = () => { $('room').value = randomRoom(); };
+$('join').onclick = joinRoom;
+$('leave').onclick = leaveRoom;
+$('share').onclick = startSharing;
+$('stop').onclick = () => { stopSharing(); setStatus('공유를 중지했고 내 위치 정보를 삭제했습니다.'); };
+$('consent').onchange = updateButtons;
+$('copy').onclick = async () => {
+  const link = location.origin + location.pathname + '#' + room;
+  try { await navigator.clipboard.writeText(link); setStatus('초대 링크를 복사했습니다.'); }
+  catch (e) { setStatus('복사에 실패했습니다. 주소창의 링크를 직접 공유해 주세요.'); }
+};
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && watchId !== null) keepAwake();
+});
+window.addEventListener('pagehide', () => { if (myRef) myRef.remove(); });
+setInterval(render, 15000);
+
+(function init() {
+  if (firebaseConfig.apiKey.startsWith('YOUR_')) {
+    setStatus('Firebase 설정이 아직 입력되지 않았습니다. 코드 상단의 firebaseConfig를 채워 주세요.');
+    return;
+  }
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.database();
+  firebase.auth().onAuthStateChanged(user => {
+    if (!user) return;
+    uid = user.uid;
+    setStatus('연결되었습니다. 방 코드를 입력하거나 새 방을 만들어 주세요.');
+    updateButtons();
+    const fromHash = cleanRoom(location.hash.slice(1));
+    if (fromHash.length >= 6 && !room) { $('room').value = fromHash; joinRoom(); }
+  });
+  firebase.auth().signInAnonymously().catch(err => setStatus('인증 실패: ' + err.message));
+})();
+</script>
+</body>
+</html>
