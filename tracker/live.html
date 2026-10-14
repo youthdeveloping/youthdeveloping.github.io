@@ -2,258 +2,653 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>실시간 위치 공유</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>이정표 위치 공유</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
-  html, body { height: 100%; margin: 0; font-family: sans-serif; }
-  body { display: flex; flex-direction: column; }
-  #panel { padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid #ccc; }
-  .row { display: flex; gap: 8px; align-items: center; }
-  input[type=text] { flex: 1; min-width: 0; padding: 9px; font-size: 15px; border: 1px solid #888; border-radius: 8px; }
-  button { padding: 9px 12px; font-size: 14px; border: 1px solid #888; border-radius: 8px; background: #fff; }
-  button:disabled { opacity: .45; }
-  label { font-size: 13px; color: #333; display: flex; gap: 6px; align-items: flex-start; }
-  #map { flex: 1; }
-  #status { padding: 8px 12px; font-size: 13px; color: #444; border-top: 1px solid #ccc; }
+  :root {
+    --ink: #14233B;
+    --muted: #5A667A;
+    --line1: #0052A4;      /* 1호선 파랑: 나, 기본 동작 */
+    --live: #00843A;       /* 2호선 초록: 공유 중 */
+    --stop: #D92D3A;
+    --paper: #F2F5F3;
+    --rule: #CBD3DD;
+    --white: #fff;
+    --sheet-h: 0px;
+    --font: "Pretendard Variable", Pretendard, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  }
+  [hidden] { display: none !important; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body { font-family: var(--font); color: var(--ink); background: var(--paper); -webkit-font-smoothing: antialiased; }
+  button, input, textarea { font: inherit; color: inherit; }
+  :focus-visible { outline: 3px solid rgba(0, 82, 164, .45); outline-offset: 2px; }
+
+  #map { position: fixed; inset: 0; background: #E6ECE9; }
+  .leaflet-bottom { bottom: var(--sheet-h); }
+  .leaflet-control-attribution { font-size: 10px; }
+
+  /* 상단 바 */
+  #top {
+    position: fixed; z-index: 1000; top: calc(12px + env(safe-area-inset-top)); left: 12px; right: 12px;
+    display: flex; justify-content: space-between; align-items: center; gap: 8px; pointer-events: none;
+  }
+  #top > * { pointer-events: auto; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px;
+    background: var(--white); border: 0; border-radius: 999px; font-size: 14px; font-weight: 700;
+    box-shadow: 0 2px 10px rgba(20, 35, 59, .18);
+  }
+  button.pill { cursor: pointer; }
+  .left { display: flex; gap: 8px; align-items: center; min-width: 0; }
+  .brand svg { width: 18px; height: 18px; fill: var(--line1); }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--live); }
+
+  /* 하단 시트 */
+  #sheet {
+    position: fixed; z-index: 1000; left: 0; right: 0; bottom: 0; max-height: 78vh; overflow-y: auto;
+    background: var(--white); border-radius: 20px 20px 0 0;
+    padding: 20px 18px calc(18px + env(safe-area-inset-bottom));
+    box-shadow: 0 -8px 30px rgba(20, 35, 59, .16);
+  }
+  @media (min-width: 760px) {
+    #sheet { left: 16px; right: auto; bottom: 16px; width: 372px; border-radius: 20px; padding-bottom: 20px; max-height: calc(100vh - 100px); }
+    .leaflet-bottom { bottom: 0; }
+  }
+  @media (pointer: coarse) { .leaflet-control-zoom { display: none; } }
+
+  .view { display: flex; flex-direction: column; gap: 14px; }
+  h1 { margin: 0; font-size: 21px; line-height: 1.3; font-weight: 800; letter-spacing: -0.02em; }
+  h2 { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+  .sub { margin: 0; font-size: 14px; line-height: 1.55; color: var(--muted); }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label, .lbl { font-size: 13px; font-weight: 600; }
+  input[type=text] {
+    height: 48px; padding: 0 14px; border: 1.5px solid var(--rule); border-radius: 12px; background: var(--white); font-size: 16px;
+  }
+  input[type=text]:read-only { background: var(--paper); }
+  textarea.code {
+    width: 100%; min-height: 68px; resize: none; padding: 10px 12px; border: 1.5px solid var(--rule); border-radius: 12px;
+    background: var(--paper); font: 12px/1.45 ui-monospace, Menlo, Consolas, monospace; word-break: break-all;
+  }
+  textarea.code:not([readonly]) { background: var(--white); }
+
+  .btn {
+    height: 48px; padding: 0 16px; border: 0; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer;
+  }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .btn-primary { background: var(--line1); color: var(--white); }
+  .btn-live { background: var(--live); color: var(--white); }
+  .btn-stop { background: var(--stop); color: var(--white); }
+  .btn-ghost { background: var(--paper); color: var(--ink); }
+  .btn-sm { height: 40px; font-size: 14px; padding: 0 14px; }
+  .linkbtn { align-self: flex-start; padding: 6px 2px; background: none; border: 0; color: var(--muted); font-size: 14px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  /* 순서가 있는 안내 */
+  .steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 16px; counter-reset: s; }
+  .steps > li { display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; }
+  .steps > li::before {
+    counter-increment: s; content: counter(s); width: 28px; height: 28px; border-radius: 50%;
+    display: grid; place-items: center; background: var(--line1); color: var(--white); font-size: 14px; font-weight: 800;
+  }
+  .stepbody { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .stepbody p { margin: 0; font-size: 14px; font-weight: 600; line-height: 1.5; }
+
+  /* 사람 목록 */
+  #people { list-style: none; margin: 0 -2px; padding: 2px 2px 6px; display: flex; gap: 8px; overflow-x: auto; }
+  .person {
+    flex: none; display: flex; align-items: center; gap: 8px; padding: 5px 14px 5px 5px;
+    border: 1.5px solid var(--c); border-radius: 999px; background: var(--white); cursor: pointer; text-align: left;
+  }
+  .person:disabled { cursor: default; border-style: dashed; }
+  .av { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--c); color: var(--white); font-size: 14px; font-weight: 800; }
+  .ptxt { display: flex; flex-direction: column; line-height: 1.2; }
+  .ptxt b { font-size: 14px; font-weight: 700; }
+  .ptxt span { font-size: 12px; color: var(--muted); }
+
+  .check { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; line-height: 1.5; color: var(--muted); cursor: pointer; }
+  .check input { flex: none; width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--line1); }
+  #note { margin: 14px 0 0; padding: 10px 12px; border-radius: 12px; background: var(--paper); font-size: 13px; line-height: 1.5; }
+  #note.err { background: #FDECEE; color: #8E1620; }
+
+  #toast {
+    position: fixed; z-index: 1100; left: 50%; top: calc(64px + env(safe-area-inset-top)); transform: translateX(-50%);
+    max-width: calc(100% - 32px); padding: 10px 16px; border-radius: 999px; background: var(--ink); color: var(--white);
+    font-size: 14px; font-weight: 600; box-shadow: 0 4px 16px rgba(20, 35, 59, .3);
+  }
+
+  /* 지도 위 표지판 마커 */
+  .pin-icon { background: none; border: 0; overflow: visible; }
+  .pin-box { position: absolute; left: 0; top: 0; width: 0; height: 0; }
+  .pin {
+    position: absolute; left: 0; bottom: 8px; transform: translateX(-50%); display: flex; align-items: center; gap: 7px;
+    padding: 3px 12px 3px 3px; background: var(--white); border: 2px solid var(--c); border-radius: 999px;
+    box-shadow: 0 2px 8px rgba(20, 35, 59, .22); white-space: nowrap;
+  }
+  .pin::after {
+    content: ""; position: absolute; left: 50%; bottom: -8px; margin-left: -6px;
+    border: 6px solid transparent; border-top-color: var(--c); border-bottom-width: 0;
+  }
+  .pin .ptxt b { font-size: 13px; }
+  .pin-pt { position: absolute; left: -5px; top: -5px; width: 10px; height: 10px; border-radius: 50%; background: var(--c); border: 2px solid var(--white); }
+  .pin-pt::after {
+    content: ""; position: absolute; inset: -9px; border-radius: 50%; border: 2px solid var(--c);
+    animation: pulse 2.2s ease-out infinite;
+  }
+  .pin-box.idle { opacity: .6; }
+  .pin-box.idle .pin-pt::after { animation: none; opacity: 0; }
+  @keyframes pulse { from { transform: scale(.4); opacity: .7; } to { transform: scale(1.5); opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .pin-pt::after { animation: none; opacity: 0; } }
 </style>
 </head>
 <body>
-<div id="panel">
-  <div class="row">
-    <input id="name" type="text" maxlength="20" placeholder="표시 이름 (최대 20자)">
-  </div>
-  <div class="row">
-    <input id="room" type="text" maxlength="24" placeholder="방 코드">
-    <button id="gen">새 방</button>
-    <button id="join" disabled>입장</button>
-    <button id="leave" disabled>나가기</button>
-  </div>
-  <label>
-    <input id="consent" type="checkbox">
-    <span>내 위치가 같은 방에 입장한 사람에게 실시간으로 공유되는 것에 동의합니다. 공유는 아래 버튼을 눌러야 시작되며, 언제든 중지할 수 있고 중지하거나 접속이 끊기면 내 위치 정보는 즉시 삭제됩니다.</span>
-  </label>
-  <div class="row">
-    <button id="share" disabled>내 위치 공유 시작</button>
-    <button id="stop" disabled>공유 중지</button>
-    <button id="copy" disabled>초대 링크 복사</button>
-  </div>
-</div>
 <div id="map"></div>
-<div id="status">설정 확인 중...</div>
+
+<div id="top">
+  <div class="left">
+    <span class="pill brand">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 3h2v18h-2z"/><path d="M4 5h13l3 3-3 3H4z"/><path d="M20 13H7l-3 3 3 3h13z" opacity=".5"/></svg>
+      이정표
+    </span>
+    <span class="pill" id="livepill" hidden><i class="dot"></i><span id="livecount">0</span></span>
+  </div>
+  <button class="pill" id="fit" type="button">모두 보기</button>
+</div>
+
+<section id="sheet" aria-label="위치 공유">
+
+  <div class="view" id="v-home">
+    <h1>친구와 위치를 같이 봐요</h1>
+    <p class="sub">서버를 거치지 않고 친구 기기와 바로 연결돼요. 초대 코드를 메신저로 주고받으면 연결됩니다.</p>
+    <button class="btn btn-primary" id="start-invite" type="button">친구 초대하기</button>
+    <button class="btn btn-ghost" id="start-join" type="button">초대 코드 받았어요</button>
+    <button class="linkbtn" id="back-live" type="button" hidden>지도로 돌아가기</button>
+  </div>
+
+  <div class="view" id="v-invite" hidden>
+    <h1>친구 초대하기</h1>
+    <ol class="steps">
+      <li><div class="stepbody">
+        <p>초대 코드를 복사해서 친구에게 보내세요.</p>
+        <textarea class="code" id="invite-code" readonly aria-label="초대 코드"></textarea>
+        <div class="row"><button class="btn btn-ghost btn-sm" id="copy-invite" type="button">코드 복사</button></div>
+      </div></li>
+      <li><div class="stepbody">
+        <p>친구가 돌려준 응답 코드를 붙여넣으세요.</p>
+        <textarea class="code" id="answer-in" aria-label="응답 코드" placeholder="응답 코드를 여기에 붙여넣기"></textarea>
+        <div class="row"><button class="btn btn-primary btn-sm" id="accept-answer" type="button">연결하기</button></div>
+      </div></li>
+    </ol>
+    <button class="linkbtn" id="back-invite" type="button">뒤로</button>
+  </div>
+
+  <div class="view" id="v-join" hidden>
+    <h1>초대 코드로 연결하기</h1>
+    <ol class="steps">
+      <li><div class="stepbody">
+        <p>친구가 보낸 초대 코드를 붙여넣으세요.</p>
+        <textarea class="code" id="offer-in" aria-label="초대 코드" placeholder="초대 코드를 여기에 붙여넣기"></textarea>
+        <div class="row"><button class="btn btn-primary btn-sm" id="make-answer" type="button">응답 코드 만들기</button></div>
+      </div></li>
+      <li id="join-step2" hidden><div class="stepbody">
+        <p>응답 코드를 복사해서 친구에게 보내세요. 친구가 입력하면 자동으로 연결돼요.</p>
+        <textarea class="code" id="answer-code" readonly aria-label="응답 코드"></textarea>
+        <div class="row"><button class="btn btn-ghost btn-sm" id="copy-answer" type="button">코드 복사</button></div>
+      </div></li>
+    </ol>
+    <button class="linkbtn" id="back-join" type="button">뒤로</button>
+  </div>
+
+  <div class="view" id="v-live" hidden>
+    <h2 id="people-title">지금 보이는 사람 0명</h2>
+    <ul id="people"></ul>
+    <p class="sub" id="empty">친구가 공유를 시작하면 이곳과 지도에 나타나요.</p>
+    <div class="field">
+      <label for="name">내 이름</label>
+      <input id="name" type="text" maxlength="20" autocomplete="off" placeholder="친구들에게 보일 이름">
+    </div>
+    <label class="check" id="consent-row">
+      <input id="consent" type="checkbox">
+      <span>연결된 친구들에게 내 위치가 실시간으로 보이는 것에 동의해요. 공유를 중지하거나 연결이 끊기면 친구 화면에서 내 위치가 바로 사라져요.</span>
+    </label>
+    <p class="sub" id="sharing-note" hidden>공유 중이에요. 중지하면 친구 화면에서 내 위치가 바로 사라져요.</p>
+    <button class="btn btn-live" id="share" type="button" disabled>내 위치 공유 시작</button>
+    <div class="row">
+      <button class="linkbtn" id="more" type="button">친구 더 연결하기</button>
+      <button class="linkbtn" id="disconnect" type="button">연결 모두 끊기</button>
+    </div>
+  </div>
+
+  <p id="note" role="status" hidden></p>
+</section>
+
+<div id="toast" role="status" hidden></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script>
-// Firebase 콘솔 > 프로젝트 설정 > 내 앱(웹)에서 확인한 값으로 교체하세요.
-// 이 값은 비밀 키가 아니며, 접근 제어는 데이터베이스 보안 규칙이 담당합니다.
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  databaseURL: "https://YOUR_PROJECT-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "YOUR_PROJECT",
-  appId: "YOUR_APP_ID"
-};
-
-const STALE_MS = 120000;     // 2분 이상 갱신이 없으면 지도에서 숨김
-const WRITE_INTERVAL = 3000; // 위치 전송 최소 간격
+const ICE_SERVERS = [{ urls: 'stun:stun.l.google.com:19302' }]; // 서로의 공인 주소를 찾는 용도로만 쓰며 위치 정보는 지나가지 않습니다.
+const STALE_MS = 120000;      // 2분 넘게 소식이 없으면 지도에서 숨김
+const IDLE_MS = 60000;        // 1분 넘게 소식이 없으면 흐리게 표시
+const SEND_INTERVAL = 3000;   // 위치 전송 최소 간격
+const HEARTBEAT_MS = 10000;   // 멈춰 있어도 이 간격으로 위치를 다시 보냄
+const ME_COLOR = '#0052A4';
+const PALETTE = ['#D96A0B', '#7E57A6', '#D81B60', '#6B7A00', '#A8601F'];
 
 const $ = id => document.getElementById(id);
-const setStatus = t => { $('status').textContent = t; };
+const mobileMQ = window.matchMedia('(max-width: 759px)');
 
-const map = L.map('map').setView([37.5665, 126.9780], 14);
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  maxZoom: 19,
-  attribution: '&copy; OpenStreetMap contributors'
+/* ---------- 지도 ---------- */
+const map = L.map('map', { zoomControl: false, attributionControl: false }).setView([37.5086, 126.8910], 14);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+  subdomains: 'abcd', maxZoom: 20
 }).addTo(map);
+L.control.attribution({ prefix: false }).addAttribution('&copy; OpenStreetMap, &copy; CARTO').addTo(map);
+L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-let db = null, uid = null;
-let room = null, membersRef = null, myRef = null;
-let watchId = null, wakeLock = null, lastWrite = 0, fitted = false;
-let lastData = {};
+function sheetPad() {
+  if (mobileMQ.matches) {
+    return { paddingTopLeft: [32, 90], paddingBottomRight: [32, $('sheet').offsetHeight + 32] };
+  }
+  return { paddingTopLeft: [372 + 16 + 40, 90], paddingBottomRight: [48, 48] };
+}
+function focusPoints(pts, minZoom) {
+  if (!pts.length) return;
+  map.fitBounds(L.latLngBounds(pts), Object.assign({ maxZoom: 17, animate: true }, sheetPad()));
+  if (minZoom && pts.length === 1 && map.getZoom() < minZoom) map.setZoom(minZoom);
+}
+new ResizeObserver(() => {
+  document.documentElement.style.setProperty('--sheet-h', mobileMQ.matches ? $('sheet').offsetHeight + 'px' : '0px');
+}).observe($('sheet'));
+
+/* ---------- 알림 ---------- */
+let toastTimer = null;
+function toast(msg) {
+  const el = $('toast');
+  el.textContent = msg; el.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.hidden = true; }, 3400);
+}
+function setNote(msg, isErr) {
+  const el = $('note');
+  el.hidden = !msg; el.textContent = msg || '';
+  el.className = isErr ? 'err' : '';
+}
+
+/* ---------- 상태 ---------- */
+const peers = new Map();       // 연결이 열린 친구
+let pending = null;            // 연결을 맺는 중인 친구
+let seq = 0;
+let view = 'home';
+let sharing = false, watchId = null, wakeLock = null;
+let lastPos = null, meSeen = 0, lastSend = 0;
+let fitted = false;
 const markers = {};
+const chips = {};
+let visibleNow = [];
 
 try { $('name').value = localStorage.getItem('live-name') || ''; } catch (e) {}
+function myName() { return $('name').value.trim().slice(0, 20) || '이름 없음'; }
 
-function randomRoom() {
-  const chars = 'abcdefghjkmnpqrstuvwxyz23456789';
-  const buf = new Uint32Array(10);
-  crypto.getRandomValues(buf);
-  return Array.from(buf, n => chars[n % chars.length]).join('');
+/* ---------- 코드 만들기와 읽기 ---------- */
+function toB64u(bytes) {
+  let s = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
-
-function cleanRoom(v) { return v.trim().toLowerCase().replace(/[^a-z0-9_-]/g, ''); }
-
-function ago(t) {
-  const s = Math.max(0, Math.round((Date.now() - t) / 1000));
-  return s < 60 ? `${s}초 전` : `${Math.round(s / 60)}분 전`;
+function fromB64u(str) {
+  const b = atob(str.replace(/-/g, '+').replace(/_/g, '/'));
+  const out = new Uint8Array(b.length);
+  for (let i = 0; i < b.length; i++) out[i] = b.charCodeAt(i);
+  return out;
 }
-
-function tooltipNode(name, t, me) {
-  const el = document.createElement('span');
-  el.textContent = `${me ? '나 · ' : ''}${name} (${ago(t)})`;
-  return el;
+async function pipeBytes(bytes, stream) {
+  return new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(stream)).arrayBuffer());
 }
-
-function render() {
-  const now = Date.now();
-  const alive = {};
-  Object.entries(lastData || {}).forEach(([id, m]) => {
-    if (!m || typeof m.lat !== 'number' || typeof m.lng !== 'number') return;
-    if (now - m.t > STALE_MS) return;
-    alive[id] = m;
-  });
-  Object.keys(markers).forEach(id => {
-    if (!alive[id]) { map.removeLayer(markers[id]); delete markers[id]; }
-  });
-  Object.entries(alive).forEach(([id, m]) => {
-    const me = id === uid;
-    const ll = [m.lat, m.lng];
-    if (!markers[id]) {
-      markers[id] = L.circleMarker(ll, {
-        radius: 9, weight: 3,
-        color: me ? '#0b57d0' : '#c5221f',
-        fillColor: me ? '#0b57d0' : '#c5221f',
-        fillOpacity: 0.5
-      }).addTo(map);
-    } else {
-      markers[id].setLatLng(ll);
-    }
-    markers[id].unbindTooltip();
-    markers[id].bindTooltip(tooltipNode(String(m.name || '이름 없음').slice(0, 20), m.t, me), {
-      permanent: true, direction: 'top', offset: [0, -8]
-    });
-  });
-  const ids = Object.keys(alive);
-  if (ids.length && !fitted) {
-    fitted = true;
-    map.fitBounds(L.latLngBounds(ids.map(id => [alive[id].lat, alive[id].lng])), { maxZoom: 17, padding: [40, 40] });
+async function encodeDesc(desc) {
+  let bytes = new TextEncoder().encode(JSON.stringify({ t: desc.type, s: desc.sdp }));
+  let prefix = 'p.';
+  if ('CompressionStream' in window) {
+    bytes = await pipeBytes(bytes, new CompressionStream('deflate-raw'));
+    prefix = 'z.';
   }
-  if (room) setStatus(`방 ${room} · 지금 공유 중인 사람 ${ids.length}명${watchId !== null ? ' · 내 위치 공유 중' : ''}`);
+  return prefix + toB64u(bytes);
+}
+async function decodeDesc(code) {
+  const c = code.replace(/\s+/g, '');
+  let bytes = fromB64u(c.slice(2));
+  if (c.startsWith('z.')) {
+    if (!('DecompressionStream' in window)) throw new Error('이 브라우저는 압축된 코드를 읽을 수 없어요. 최신 브라우저를 사용해 주세요.');
+    bytes = await pipeBytes(bytes, new DecompressionStream('deflate-raw'));
+  } else if (!c.startsWith('p.')) {
+    throw new Error('코드 형식이 맞지 않아요. 전체를 빠짐없이 복사했는지 확인해 주세요.');
+  }
+  const o = JSON.parse(new TextDecoder().decode(bytes));
+  if (typeof o.s !== 'string' || (o.t !== 'offer' && o.t !== 'answer')) throw new Error('코드 내용이 올바르지 않아요.');
+  return { type: o.t, sdp: o.s };
+}
+function waitIce(pc) {
+  return new Promise(resolve => {
+    if (pc.iceGatheringState === 'complete') return resolve();
+    const done = () => { pc.removeEventListener('icegatheringstatechange', check); resolve(); };
+    const check = () => { if (pc.iceGatheringState === 'complete') done(); };
+    pc.addEventListener('icegatheringstatechange', check);
+    setTimeout(done, 5000);
+  });
+}
+async function copyText(text, okMsg) {
+  try { await navigator.clipboard.writeText(text); toast(okMsg); }
+  catch (e) { toast('복사하지 못했어요. 코드를 길게 눌러 직접 복사해 주세요.'); }
 }
 
-function updateButtons() {
-  const joined = !!room;
-  const sharing = watchId !== null;
-  $('join').disabled = !uid || joined;
-  $('leave').disabled = !joined;
-  $('gen').disabled = joined;
-  $('room').disabled = joined;
-  $('share').disabled = !joined || sharing || !$('consent').checked;
-  $('stop').disabled = !sharing;
-  $('copy').disabled = !joined;
-  $('consent').disabled = sharing;
+/* ---------- 연결 ---------- */
+function makePeer() {
+  seq += 1;
+  const peer = {
+    id: 'p' + seq, pc: new RTCPeerConnection({ iceServers: ICE_SERVERS }), dc: null,
+    color: PALETTE[(seq - 1) % PALETTE.length], name: '친구 ' + seq, pos: null, seen: 0, dead: false
+  };
+  peer.pc.onconnectionstatechange = () => {
+    const s = peer.pc.connectionState;
+    if (s === 'failed' || s === 'closed') dropPeer(peer);
+    else if (s === 'disconnected') setTimeout(() => { if (peer.pc.connectionState === 'disconnected') dropPeer(peer); }, 8000);
+  };
+  return peer;
 }
-
-function joinRoom() {
-  const code = cleanRoom($('room').value);
-  if (code.length < 6) return setStatus('방 코드는 6자 이상이어야 합니다. 새 방 버튼으로 생성해 주세요.');
-  room = code;
-  $('room').value = code;
-  fitted = false;
-  membersRef = db.ref(`rooms/${room}/members`);
-  membersRef.on('value', snap => { lastData = snap.val() || {}; render(); },
-    err => setStatus('데이터를 읽을 수 없습니다: ' + err.message));
-  history.replaceState(null, '', '#' + room);
-  updateButtons();
-  setStatus(`방 ${room}에 입장했습니다.`);
+function sendTo(peer, msg) {
+  if (peer.dc && peer.dc.readyState === 'open') { try { peer.dc.send(JSON.stringify(msg)); } catch (e) {} }
 }
+function broadcast(msg) { peers.forEach(p => sendTo(p, msg)); }
+function posMsg() { return { t: 'pos', name: myName(), lat: lastPos.lat, lng: lastPos.lng, acc: lastPos.acc }; }
 
-function leaveRoom() {
-  stopSharing();
-  if (membersRef) membersRef.off();
-  membersRef = null; room = null; lastData = {};
+function wireChannel(peer, dc) {
+  peer.dc = dc;
+  dc.onopen = () => {
+    peers.set(peer.id, peer);
+    if (pending === peer) pending = null;
+    sendTo(peer, { t: 'hello', name: $('name').value.trim().slice(0, 20) });
+    if (sharing && lastPos) sendTo(peer, posMsg());
+    toast('친구와 연결됐어요.');
+    show('live');
+  };
+  dc.onmessage = e => onMessage(peer, e.data);
+  dc.onclose = () => dropPeer(peer);
+}
+function onMessage(peer, raw) {
+  if (typeof raw !== 'string' || raw.length > 1000) return;
+  let m;
+  try { m = JSON.parse(raw); } catch (e) { return; }
+  if (!m || typeof m !== 'object') return;
+  if (typeof m.name === 'string') {
+    const n = m.name.trim().slice(0, 20);
+    if (n) peer.name = n;
+  }
+  if (m.t === 'pos') {
+    if (Number.isFinite(m.lat) && Number.isFinite(m.lng) && Math.abs(m.lat) <= 90 && Math.abs(m.lng) <= 180) {
+      peer.pos = { lat: m.lat, lng: m.lng };
+      peer.seen = Date.now();
+    }
+  } else if (m.t === 'stop') {
+    peer.pos = null;
+  }
   render();
-  history.replaceState(null, '', location.pathname);
-  updateButtons();
-  setStatus('방에서 나왔습니다.');
+}
+function dropPeer(peer) {
+  if (peer.dead) return;
+  peer.dead = true;
+  const wasOpen = peers.delete(peer.id);
+  if (pending === peer) pending = null;
+  try { peer.pc.close(); } catch (e) {}
+  if (wasOpen) {
+    toast(peer.name + '님과 연결이 끊어졌어요.');
+    if (peers.size === 0) { stopSharing(); show('home'); }
+  } else if (view === 'invite' || view === 'join') {
+    setNote('연결하지 못했어요. 두 기기가 서로 다른 네트워크에 있으면 막힐 수 있어요. 같은 와이파이에서 처음부터 다시 시도해 주세요.', true);
+  }
+  render();
+}
+function cancelPending() {
+  if (!pending) return;
+  const p = pending; pending = null; p.dead = true;
+  try { p.pc.close(); } catch (e) {}
 }
 
-async function keepAwake() {
-  try { wakeLock = await navigator.wakeLock.request('screen'); } catch (e) {}
+async function startInvite() {
+  if (!window.RTCPeerConnection) return setNote('이 브라우저는 직접 연결을 지원하지 않아요. 최신 Chrome이나 Safari를 사용해 주세요.', true);
+  cancelPending();
+  show('invite');
+  $('invite-code').value = '코드를 만드는 중이에요...';
+  $('answer-in').value = '';
+  try {
+    const peer = makePeer();
+    pending = peer;
+    wireChannel(peer, peer.pc.createDataChannel('loc'));
+    await peer.pc.setLocalDescription(await peer.pc.createOffer());
+    await waitIce(peer.pc);
+    $('invite-code').value = await encodeDesc(peer.pc.localDescription);
+  } catch (e) {
+    $('invite-code').value = '';
+    setNote('초대 코드를 만들지 못했어요. 페이지를 새로고침한 뒤 다시 시도해 주세요.', true);
+  }
 }
+async function acceptAnswer() {
+  if (!pending) return setNote('먼저 초대 코드를 만들어 주세요.', true);
+  try {
+    const desc = await decodeDesc($('answer-in').value);
+    if (desc.type !== 'answer') throw new Error('이 코드는 응답 코드가 아니에요. 친구가 보낸 응답 코드를 붙여넣어 주세요.');
+    await pending.pc.setRemoteDescription(desc);
+    setNote('연결하는 중이에요. 잠시만 기다려 주세요.');
+  } catch (e) {
+    setNote(e.message || '코드를 읽지 못했어요.', true);
+  }
+}
+async function makeAnswer() {
+  if (!window.RTCPeerConnection) return setNote('이 브라우저는 직접 연결을 지원하지 않아요. 최신 Chrome이나 Safari를 사용해 주세요.', true);
+  cancelPending();
+  setNote('');
+  try {
+    const desc = await decodeDesc($('offer-in').value);
+    if (desc.type !== 'offer') throw new Error('이 코드는 초대 코드가 아니에요. 친구가 보낸 초대 코드를 붙여넣어 주세요.');
+    const peer = makePeer();
+    pending = peer;
+    peer.pc.ondatachannel = e => wireChannel(peer, e.channel);
+    await peer.pc.setRemoteDescription(desc);
+    await peer.pc.setLocalDescription(await peer.pc.createAnswer());
+    await waitIce(peer.pc);
+    $('answer-code').value = await encodeDesc(peer.pc.localDescription);
+    $('join-step2').hidden = false;
+  } catch (e) {
+    setNote(e.message || '코드를 읽지 못했어요.', true);
+  }
+}
+function disconnectAll() {
+  stopSharing();
+  cancelPending();
+  Array.from(peers.values()).forEach(p => { p.dead = true; try { p.pc.close(); } catch (e) {} });
+  peers.clear();
+  show('home');
+  render();
+  toast('연결을 모두 끊었어요.');
+}
+
+/* ---------- 내 위치 공유 ---------- */
+async function keepAwake() { try { wakeLock = await navigator.wakeLock.request('screen'); } catch (e) {} }
 
 function startSharing() {
-  if (!$('consent').checked) return setStatus('위치 공유 동의에 체크해 주세요.');
-  if (!navigator.geolocation) return setStatus('이 브라우저는 위치 기능을 지원하지 않습니다.');
-  const name = $('name').value.trim().slice(0, 20) || '이름 없음';
+  if (!$('consent').checked) return toast('위치 공유 동의에 체크해 주세요.');
+  const name = $('name').value.trim().slice(0, 20);
+  if (!name) { toast('친구들에게 보일 이름을 입력해 주세요.'); $('name').focus(); return; }
   try { localStorage.setItem('live-name', name); } catch (e) {}
-  myRef = db.ref(`rooms/${room}/members/${uid}`);
-  myRef.onDisconnect().remove();
-  lastWrite = 0;
-  watchId = navigator.geolocation.watchPosition(pos => {
-    const now = Date.now();
-    if (now - lastWrite < WRITE_INTERVAL) return;
-    if (pos.coords.accuracy > 100) return;
-    lastWrite = now;
-    myRef.set({
-      name,
-      lat: pos.coords.latitude,
-      lng: pos.coords.longitude,
-      acc: Math.round(pos.coords.accuracy),
-      t: now
-    }).catch(err => setStatus('전송 실패: ' + err.message));
-  }, err => {
-    const msg = { 1: '위치 권한이 거부되었습니다. 브라우저 설정에서 허용해 주세요.',
-                  2: '위치를 확인할 수 없습니다.',
-                  3: '위치 요청 시간이 초과되었습니다.' }[err.code] || '알 수 없는 오류가 발생했습니다.';
-    setStatus(msg);
-    stopSharing();
-  }, { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 });
+  if (!navigator.geolocation) return setNote('이 브라우저는 위치 기능을 지원하지 않아요.', true);
+  setNote('');
+  sharing = true; lastSend = 0;
+  watchId = navigator.geolocation.watchPosition(onGeo, onGeoErr, { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 });
   keepAwake();
-  updateButtons();
-  setStatus('위치 확인 중...');
+  updateShare(); render();
 }
-
+function onGeo(pos) {
+  if (pos.coords.accuracy > 100) return;
+  lastPos = { lat: pos.coords.latitude, lng: pos.coords.longitude, acc: Math.round(pos.coords.accuracy) };
+  meSeen = Date.now();
+  if (meSeen - lastSend >= SEND_INTERVAL) { lastSend = meSeen; broadcast(posMsg()); }
+  render();
+}
+function onGeoErr(err) {
+  const msg = {
+    1: '위치 권한이 꺼져 있어요. 브라우저 설정에서 이 사이트의 위치 권한을 허용해 주세요.',
+    2: '위치를 확인할 수 없어요. 실내라면 창가나 야외에서 다시 시도해 주세요.',
+    3: '위치를 찾는 데 시간이 너무 오래 걸려요. 잠시 후 다시 시도해 주세요.'
+  }[err.code] || '위치를 가져오지 못했어요.';
+  setNote(msg, true);
+  stopSharing();
+}
 function stopSharing() {
   if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
   if (wakeLock) { try { wakeLock.release(); } catch (e) {} wakeLock = null; }
-  if (myRef) {
-    myRef.onDisconnect().cancel();
-    myRef.remove();
-    myRef = null;
-  }
-  updateButtons();
-  if (room) render();
+  if (sharing) broadcast({ t: 'stop' });
+  sharing = false; lastPos = null;
+  updateShare(); render();
+}
+function updateShare() {
+  const b = $('share');
+  b.textContent = sharing ? '공유 중지' : '내 위치 공유 시작';
+  b.className = 'btn ' + (sharing ? 'btn-stop' : 'btn-live');
+  b.disabled = !sharing && !$('consent').checked;
+  $('consent-row').hidden = sharing;
+  $('sharing-note').hidden = !sharing;
+  $('name').readOnly = sharing;
+}
+setInterval(() => { if (sharing && lastPos) { meSeen = Date.now(); broadcast(posMsg()); render(); } }, HEARTBEAT_MS);
+
+/* ---------- 화면 그리기 ---------- */
+function ago(t) {
+  const s = Math.max(0, Math.round((Date.now() - t) / 1000));
+  if (s < 5) return '방금';
+  return s < 60 ? s + '초 전' : Math.round(s / 60) + '분 전';
+}
+function makeEl(tag, cls, text) {
+  const el = document.createElement(tag);
+  if (cls) el.className = cls;
+  if (text != null) el.textContent = text;
+  return el;
+}
+function makePin(color) {
+  const box = makeEl('div', 'pin-box');
+  box.style.setProperty('--c', color);
+  const pin = makeEl('div', 'pin');
+  const av = makeEl('span', 'av');
+  const txt = makeEl('span', 'ptxt');
+  const nm = makeEl('b'); const tm = makeEl('span');
+  txt.append(nm, tm); pin.append(av, txt);
+  box.append(pin, makeEl('i', 'pin-pt'));
+  return { box, av, nm, tm };
+}
+function initial(name) { return Array.from(name)[0] || '?'; }
+
+function render() {
+  const now = Date.now();
+  const all = [];
+  if (sharing) all.push({ id: 'me', name: myName(), color: ME_COLOR, me: true, pos: lastPos, seen: meSeen });
+  peers.forEach(p => all.push({ id: p.id, name: p.name, color: p.color, me: false, pos: p.pos, seen: p.seen }));
+  const visible = all.filter(e => e.pos && now - e.seen <= STALE_MS);
+  visibleNow = visible;
+  const label = e => e.name + (e.me ? ' (나)' : '');
+
+  // 지도 마커
+  const vis = {};
+  visible.forEach(e => { vis[e.id] = e; });
+  Object.keys(markers).forEach(id => { if (!vis[id]) { map.removeLayer(markers[id].marker); delete markers[id]; } });
+  visible.forEach(e => {
+    let m = markers[e.id];
+    if (!m) {
+      const pin = makePin(e.color);
+      const marker = L.marker([e.pos.lat, e.pos.lng], {
+        icon: L.divIcon({ className: 'pin-icon', html: pin.box, iconSize: [0, 0] }),
+        zIndexOffset: e.me ? 1000 : 0, keyboard: false
+      }).addTo(map);
+      m = markers[e.id] = Object.assign({ marker }, pin);
+    }
+    m.marker.setLatLng([e.pos.lat, e.pos.lng]);
+    m.av.textContent = initial(e.name);
+    m.nm.textContent = label(e);
+    m.tm.textContent = e.me ? '내 위치' : ago(e.seen);
+    m.box.classList.toggle('idle', !e.me && now - e.seen > IDLE_MS);
+  });
+
+  // 사람 목록
+  const ul = $('people');
+  const ids = {};
+  all.forEach(e => { ids[e.id] = true; });
+  Object.keys(chips).forEach(id => { if (!ids[id]) { chips[id].el.remove(); delete chips[id]; } });
+  const order = [];
+  all.forEach(e => {
+    let c = chips[e.id];
+    if (!c) {
+      const el = makeEl('button', 'person'); el.type = 'button';
+      const av = makeEl('span', 'av');
+      const txt = makeEl('span', 'ptxt');
+      const nm = makeEl('b'); const tm = makeEl('span');
+      txt.append(nm, tm); el.append(av, txt);
+      el.style.setProperty('--c', e.color);
+      el.addEventListener('click', () => {
+        const cur = visibleNow.find(v => v.id === e.id);
+        if (cur) focusPoints([[cur.pos.lat, cur.pos.lng]], 16);
+      });
+      c = chips[e.id] = { el, av, nm, tm };
+    }
+    const shown = e.pos && now - e.seen <= STALE_MS;
+    c.av.textContent = initial(e.name);
+    c.nm.textContent = label(e);
+    c.tm.textContent = shown ? (e.me ? '내 위치' : ago(e.seen)) : (e.me ? '위치 확인 중' : '위치 공유 전');
+    c.el.disabled = !shown;
+    c.el.setAttribute('aria-label', shown ? label(e) + ' 위치로 이동' : label(e));
+    order.push(c.el);
+  });
+  if (order.some((el, i) => ul.children[i] !== el)) order.forEach(el => ul.append(el));
+
+  $('people-title').textContent = '지금 보이는 사람 ' + visible.length + '명';
+  $('empty').hidden = visible.length > 0 || sharing;
+  $('livepill').hidden = peers.size === 0;
+  $('livecount').textContent = '친구 ' + peers.size + '명 연결됨';
+
+  if (!fitted && visible.length) { fitted = true; focusPoints(visible.map(e => [e.pos.lat, e.pos.lng]), 16); }
+}
+setInterval(render, 5000);
+
+function show(v) {
+  view = v;
+  ['home', 'invite', 'join', 'live'].forEach(id => { $('v-' + id).hidden = id !== v; });
+  $('back-live').hidden = !(v === 'home' && peers.size > 0);
+  if (v === 'join') { $('offer-in').value = ''; $('answer-code').value = ''; $('join-step2').hidden = true; }
+  setNote('');
+  render();
 }
 
-$('gen').onclick = () => { $('room').value = randomRoom(); };
-$('join').onclick = joinRoom;
-$('leave').onclick = leaveRoom;
-$('share').onclick = startSharing;
-$('stop').onclick = () => { stopSharing(); setStatus('공유를 중지했고 내 위치 정보를 삭제했습니다.'); };
-$('consent').onchange = updateButtons;
-$('copy').onclick = async () => {
-  const link = location.origin + location.pathname + '#' + room;
-  try { await navigator.clipboard.writeText(link); setStatus('초대 링크를 복사했습니다.'); }
-  catch (e) { setStatus('복사에 실패했습니다. 주소창의 링크를 직접 공유해 주세요.'); }
+/* ---------- 이벤트 ---------- */
+$('start-invite').onclick = startInvite;
+$('start-join').onclick = () => { cancelPending(); show('join'); };
+$('back-invite').onclick = () => { cancelPending(); show('home'); };
+$('back-join').onclick = () => { cancelPending(); show('home'); };
+$('back-live').onclick = () => show('live');
+$('more').onclick = () => show('home');
+$('disconnect').onclick = () => { if (confirm('연결된 친구와 모두 끊을까요?')) disconnectAll(); };
+$('copy-invite').onclick = () => copyText($('invite-code').value, '초대 코드를 복사했어요.');
+$('copy-answer').onclick = () => copyText($('answer-code').value, '응답 코드를 복사했어요.');
+$('accept-answer').onclick = acceptAnswer;
+$('make-answer').onclick = makeAnswer;
+$('consent').onchange = updateShare;
+$('share').onclick = () => { if (sharing) { stopSharing(); toast('공유를 중지했어요. 친구 화면에서 내 위치가 사라졌어요.'); } else startSharing(); };
+$('fit').onclick = () => {
+  if (!visibleNow.length) return toast('지금 위치를 공유 중인 사람이 없어요.');
+  focusPoints(visibleNow.map(e => [e.pos.lat, e.pos.lng]));
 };
+['invite-code', 'answer-code', 'answer-in', 'offer-in'].forEach(id => $(id).addEventListener('focus', e => e.target.select()));
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && sharing) keepAwake(); });
+window.addEventListener('pagehide', () => { if (sharing) broadcast({ t: 'stop' }); });
 
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && watchId !== null) keepAwake();
-});
-window.addEventListener('pagehide', () => { if (myRef) myRef.remove(); });
-setInterval(render, 15000);
-
-(function init() {
-  if (firebaseConfig.apiKey.startsWith('YOUR_')) {
-    setStatus('Firebase 설정이 아직 입력되지 않았습니다. 코드 상단의 firebaseConfig를 채워 주세요.');
-    return;
-  }
-  firebase.initializeApp(firebaseConfig);
-  db = firebase.database();
-  firebase.auth().onAuthStateChanged(user => {
-    if (!user) return;
-    uid = user.uid;
-    setStatus('연결되었습니다. 방 코드를 입력하거나 새 방을 만들어 주세요.');
-    updateButtons();
-    const fromHash = cleanRoom(location.hash.slice(1));
-    if (fromHash.length >= 6 && !room) { $('room').value = fromHash; joinRoom(); }
-  });
-  firebase.auth().signInAnonymously().catch(err => setStatus('인증 실패: ' + err.message));
-})();
+show('home');
 </script>
 </body>
 </html>
