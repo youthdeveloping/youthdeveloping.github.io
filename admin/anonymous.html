@@ -7,12 +7,14 @@ async function api(path,opts={}){const r=await fetch(API+path,{...opts,headers:{
 async function load(){
  result.textContent="메시지와 신고 목록을 불러오는 중…";
  try{
-  const [m,r]=await Promise.all([fetch(API).then(async x=>{if(!x.ok)throw Error("메시지 목록을 불러오지 못했습니다.");return x.json()}),api("/admin/reports")]);
-  const messages=m.messages||[],reports=r.reports||[];
+  const m=await fetch(API).then(async x=>{if(!x.ok)throw Error("메시지 목록을 불러오지 못했습니다.");return x.json()});
+  let reports=[],reportError="";
+  try{const r=await api("/admin/reports");reports=r.reports||[]}catch(e){reportError=e.message||"신고 목록을 불러오지 못했습니다."}
+  const messages=m.messages||[];
   result.innerHTML='<h2>전체 공개 메시지 ('+messages.length+')</h2>'+
    (messages.length?messages.map(x=>'<article class="card"><b>메시지 #'+x.id+'</b><p>'+esc(x.body)+'</p><div class="meta">'+esc(x.created_at||"")+'</div><button class="danger" data-delete="'+x.id+'">메시지 삭제</button></article>').join(""):'<p>공개된 메시지가 없습니다.</p>')+
    '<h2 style="margin-top:30px">미처리 신고 ('+reports.length+')</h2>'+
-   (reports.length?reports.map(x=>'<article class="card"><b>신고 · 메시지 #'+x.message_id+'</b><p>'+esc(x.body||"(메시지 없음)")+'</p><div class="meta">사유: '+esc(x.reason)+' · '+esc(x.created_at||"")+'</div><button class="danger" data-delete="'+x.message_id+'">메시지 삭제 및 신고 처리</button></article>').join(""):'<p>미처리 신고가 없습니다.</p>');
+   (reportError?'<p>신고 목록: '+esc(reportError)+'</p>':reports.length?reports.map(x=>'<article class="card"><b>신고 · 메시지 #'+x.message_id+'</b><p>'+esc(x.body||"(메시지 없음)")+'</p><div class="meta">사유: '+esc(x.reason)+' · '+esc(x.created_at||"")+'</div><button class="danger" data-delete="'+x.message_id+'">메시지 삭제 및 신고 처리</button></article>').join(""):'<p>미처리 신고가 없습니다.</p>');
  }catch(e){result.textContent=e.message||"오류가 발생했습니다."}
 }
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
