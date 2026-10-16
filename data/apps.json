@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-09T00:00:00.000Z",
+  "updated": "2026-10-16T08:27:19.636Z",
   "apps": [
     {
       "id": "timer",
@@ -356,7 +356,7 @@
       "icon": "📝",
       "name": "익명 한마디",
       "desc": "이름 없이 메시지 남기기",
-      "url": "",
+      "url": "/services/anonymous.html",
       "status": "on",
       "group": "server",
       "featured": false
