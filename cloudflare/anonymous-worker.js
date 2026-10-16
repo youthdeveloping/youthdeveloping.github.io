@@ -26,6 +26,11 @@ export default {
     await env.DB.prepare("INSERT INTO reports (message_id,reason) VALUES (?,?)").bind(report[1],reason||"부적절한 메시지").run();
     return json({ok:true},201);
    }
+   if(request.method==="GET"&&url.pathname==="/api/anonymous/admin/messages"){
+    if(!admin)return json({error:"관리자 인증이 필요합니다."},401);
+    const rows=await env.DB.prepare("SELECT id,body,created_at FROM messages WHERE deleted_at IS NULL ORDER BY id DESC LIMIT 500").all();
+    return json({messages:rows.results||[]});
+   }
    if(url.pathname==="/api/anonymous/admin/reports"&&request.method==="GET"){
     if(!admin)return json({error:"관리자 인증이 필요합니다."},401);
     const rows=await env.DB.prepare("SELECT r.id,r.message_id,r.reason,r.created_at,m.body FROM reports r LEFT JOIN messages m ON m.id=r.message_id WHERE r.status='open' ORDER BY r.id DESC LIMIT 200").all();
