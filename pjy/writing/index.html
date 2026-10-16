@@ -1,164 +1,36 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f7f8fc">
-  <title>Writing Discussion — What to Build in an Empty Place</title>
-  <style>
-    :root{color-scheme:light;--ink:#182230;--muted:#657084;--line:#e2e7ef;--paper:#fff;--bg:#f5f7fb;--blue:#3659d9}
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.55}
-    .wrap{width:min(100% - 32px,980px);margin:0 auto;padding:42px 0 64px}
-    .top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:24px}
-    .eyebrow{font-size:.78rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--blue)}
-    h1{font-size:clamp(2rem,5vw,3.2rem);line-height:1.12;letter-spacing:-.045em;margin:10px 0 14px}
-    .intro{color:var(--muted);max-width:680px;margin:0 0 28px}
-    .options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:26px 0 34px}
-    .option,.writing-card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 5px 20px #1b2b4a08}
-    .letter{display:inline-grid;place-items:center;width:36px;height:36px;border-radius:11px;background:#edf1ff;color:var(--blue);font-weight:850;margin-bottom:12px}
-    .option h2{font-size:1.05rem;line-height:1.35;margin:0 0 8px}
-    .person{font-size:.9rem;color:var(--muted);margin:0}
-    .section-heading{display:flex;justify-content:space-between;align-items:end;gap:12px;margin:0 0 16px}
-    .section-heading h2{font-size:1.45rem;letter-spacing:-.025em;margin:0}
-    .section-heading p{font-size:.86rem;color:var(--muted);margin:0}
-    .writing-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-    .writing-card h3{font-size:1rem;margin:0 0 5px}
-    .writing-card .subtitle{font-size:.84rem;color:var(--muted);margin:0 0 13px}
-    textarea{display:block;width:100%;min-height:132px;resize:vertical;border:1px solid #d8deea;border-radius:12px;padding:12px 13px;font:inherit;font-size:.95rem;color:var(--ink);background:#fcfdff;outline:none}
-    textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px #3659d91c}
-    .bottom{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-top:20px}
-    #saveStatus{font-size:.86rem;color:var(--muted)}
-    button{border:0;border-radius:11px;background:var(--blue);color:white;font:inherit;font-weight:700;padding:11px 16px;cursor:pointer}
-    button.secondary{background:#e9edf5;color:#283448}
-    .note{margin-top:22px;color:var(--muted);font-size:.82rem}
-    @media(max-width:680px){.wrap{padding-top:28px}.options{grid-template-columns:1fr}.writing-grid{grid-template-columns:1fr}.section-heading{align-items:start;flex-direction:column}}
-  </style>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f7f8fc">
+<title>Writing Discussion — What to Build in an Empty Place</title>
+<style>
+:root{color-scheme:light;--ink:#182230;--muted:#657084;--line:#e2e7ef;--paper:#fff;--bg:#f5f7fb;--blue:#2457db}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.55}.wrap{width:min(100% - 32px,980px);margin:auto;padding:36px 0 64px}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:24px}.eyebrow{font-size:.78rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--blue)}h1{font-size:clamp(2rem,5vw,3.2rem);line-height:1.12;letter-spacing:-.045em;margin:10px 0 14px}.intro{color:var(--muted);max-width:680px;margin:0 0 22px}.options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:26px 0 34px}.option,.writing-card,.panel{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 5px 20px #1b2b4a08}.letter{display:inline-grid;place-items:center;width:36px;height:36px;border-radius:11px;background:#edf1ff;color:var(--blue);font-weight:850;margin-bottom:12px}.option h2{font-size:1.05rem;line-height:1.35;margin:0 0 8px}.person{font-size:.9rem;color:var(--muted);margin:0}.look{display:inline-flex;align-items:center;gap:5px;margin-top:15px;padding:8px 12px;border:1px solid #cbd8ff;border-radius:10px;background:#eef3ff;color:#1749c7;font:inherit;font-weight:750;cursor:pointer}.look:hover{background:#e2eaff}.problem{margin:0 0 24px}.problem summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;color:#1749c7;font-size:1.05rem;font-weight:800;background:#edf3ff;border:1px solid #d4e0ff;border-radius:14px;padding:15px 18px}.problem summary::-webkit-details-marker{display:none}.problem summary:after{content:"＋";font-size:1.25rem}.problem[open] summary:after{content:"−"}.panel{margin-top:12px}.panel h3{margin:0 0 8px}.panel p{margin:8px 0}.issue-tag{display:inline-block;background:#fff0db;color:#8b4c00;padding:4px 9px;border-radius:8px;font-size:.78rem;font-weight:800;margin-bottom:8px}.section-heading{display:flex;justify-content:space-between;align-items:end;gap:12px;margin:0 0 16px}.section-heading h2{font-size:1.45rem;letter-spacing:-.025em;margin:0}.section-heading p{font-size:.86rem;color:var(--muted);margin:0}.writing-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.writing-card h3{font-size:1rem;margin:0 0 5px}.writing-card .subtitle{font-size:.84rem;color:var(--muted);margin:0 0 13px}textarea{display:block;width:100%;min-height:132px;resize:vertical;border:1px solid #d8deea;border-radius:12px;padding:12px 13px;font:inherit;font-size:.95rem;color:var(--ink);background:#fcfdff;outline:none}textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px #3659d91c}.bottom{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-top:20px}#saveStatus{font-size:.86rem;color:var(--muted)}button.action{border:0;border-radius:11px;background:var(--blue);color:white;font:inherit;font-weight:700;padding:11px 16px;cursor:pointer}button.secondary{background:#e9edf5;color:#283448}.note{margin-top:22px;color:var(--muted);font-size:.82rem}.detail-list{padding-left:22px;margin:8px 0}.detail-list li{margin:8px 0}.option details{margin-top:6px}
+@media(max-width:680px){.wrap{padding-top:28px}.options{grid-template-columns:1fr}.writing-grid{grid-template-columns:1fr}.section-heading{align-items:start;flex-direction:column}}
+</style>
 </head>
-<body>
-  <main class="wrap">
-    <div class="top">
-      <span class="eyebrow">Writing Discussion</span>
-      <button class="secondary" id="clearButton" type="button">Clear my answers</button>
-    </div>
-    <h1>What to Build in an Empty Place</h1>
-    <p class="intro">Review the three proposals, then write down the advantages and disadvantages of each one. Your answers are saved automatically in this browser.</p>
-
-    <section class="options" aria-label="Discussion options">
-      <article class="option">
-        <span class="letter">A</span>
-        <h2>Build a Park</h2>
-        <p class="person">Proposed by Michael Jayce</p>
-      </article>
-      <article class="option">
-        <span class="letter">B</span>
-        <h2>Build a Luxury Shopping Mall</h2>
-        <p class="person">Proposed by Stella Ryan</p>
-      </article>
-      <article class="option">
-        <span class="letter">C</span>
-        <h2>Build Low-Cost Housing</h2>
-        <p class="person">Proposed by Zio</p>
-      </article>
-    </section>
-
-    <div class="section-heading">
-      <h2>Share your thoughts</h2>
-      <p>There are no right or wrong answers.</p>
-    </div>
-
-    <section class="writing-grid" aria-label="Advantages and disadvantages">
-      <article class="writing-card">
-        <h3>Option A — Advantage</h3>
-        <p class="subtitle">What are the benefits of building a park?</p>
-        <textarea id="a-advantage" data-answer="a-advantage" aria-label="Option A advantage" placeholder="Write your ideas here..."></textarea>
-      </article>
-      <article class="writing-card">
-        <h3>Option A — Disadvantage</h3>
-        <p class="subtitle">What problems might a park have?</p>
-        <textarea id="a-disadvantage" data-answer="a-disadvantage" aria-label="Option A disadvantage" placeholder="Write your ideas here..."></textarea>
-      </article>
-      <article class="writing-card">
-        <h3>Option B — Advantage</h3>
-        <p class="subtitle">What are the benefits of a luxury shopping mall?</p>
-        <textarea id="b-advantage" data-answer="b-advantage" aria-label="Option B advantage" placeholder="Write your ideas here..."></textarea>
-      </article>
-      <article class="writing-card">
-        <h3>Option B — Disadvantage</h3>
-        <p class="subtitle">What problems might a luxury shopping mall have?</p>
-        <textarea id="b-disadvantage" data-answer="b-disadvantage" aria-label="Option B disadvantage" placeholder="Write your ideas here..."></textarea>
-      </article>
-      <article class="writing-card">
-        <h3>Option C — Advantage</h3>
-        <p class="subtitle">What are the benefits of low-cost housing?</p>
-        <textarea id="c-advantage" data-answer="c-advantage" aria-label="Option C advantage" placeholder="Write your ideas here..."></textarea>
-      </article>
-      <article class="writing-card">
-        <h3>Option C — Disadvantage</h3>
-        <p class="subtitle">What problems might low-cost housing have?</p>
-        <textarea id="c-disadvantage" data-answer="c-disadvantage" aria-label="Option C disadvantage" placeholder="Write your ideas here..."></textarea>
-      </article>
-    </section>
-
-    <div class="bottom">
-      <span id="saveStatus" role="status" aria-live="polite">Loading saved answers…</span>
-      <button id="saveButton" type="button">Save answers</button>
-    </div>
-    <p class="note">Your writing is stored in this browser using localStorage. It is not shared with other visitors and may not appear on another device or browser.</p>
-  </main>
-  <script>
-    (() => {
-      const storageKey = "youthdeveloping-pjy-writing-discussion-v1";
-      const fields = [...document.querySelectorAll("[data-answer]")];
-      const status = document.getElementById("saveStatus");
-      let saveTimer;
-
-      function loadAnswers() {
-        try {
-          const saved = JSON.parse(localStorage.getItem(storageKey) || "{}");
-          fields.forEach((field) => { field.value = typeof saved[field.dataset.answer] === "string" ? saved[field.dataset.answer] : ""; });
-          status.textContent = "Your saved answers are ready.";
-        } catch (error) {
-          status.textContent = "Could not load saved answers in this browser.";
-        }
-      }
-
-      function saveAnswers() {
-        try {
-          const answers = {};
-          fields.forEach((field) => { answers[field.dataset.answer] = field.value; });
-          localStorage.setItem(storageKey, JSON.stringify(answers));
-          status.textContent = "Saved on this device.";
-        } catch (error) {
-          status.textContent = "Unable to save. Please check your browser storage settings.";
-        }
-      }
-
-      fields.forEach((field) => field.addEventListener("input", () => {
-        status.textContent = "Saving…";
-        clearTimeout(saveTimer);
-        saveTimer = setTimeout(saveAnswers, 250);
-      }));
-
-      document.getElementById("saveButton").addEventListener("click", () => {
-        clearTimeout(saveTimer);
-        saveAnswers();
-      });
-
-      document.getElementById("clearButton").addEventListener("click", () => {
-        if (!window.confirm("Clear all six answers saved in this browser?")) return;
-        clearTimeout(saveTimer);
-        fields.forEach((field) => { field.value = ""; });
-        try {
-          localStorage.removeItem(storageKey);
-          status.textContent = "All answers cleared.";
-        } catch (error) {
-          status.textContent = "Answers cleared from the form, but browser storage could not be updated.";
-        }
-      });
-
-      loadAnswers();
-    })();
-  </script>
-</body>
-</html>
+<body><main class="wrap">
+<div class="top"><span class="eyebrow">Writing Discussion</span><button class="action secondary" id="clearButton" type="button">Clear my answers</button></div>
+<h1>What to Build in an Empty Place</h1>
+<p class="intro">Review the traffic problem and each possible solution. Open the blue links to read more, then write down the advantages and disadvantages.</p>
+<details class="problem"><summary>Look Problems 💧</summary><div class="panel"><span class="issue-tag">CASE 1 · THE TRAFFIC CRISIS</span><h3>The Traffic Crisis</h3><p>Traffic in the downtown area is terrible. Citizens are angry because it takes two hours to drive to work each day, causing stress, lateness, and frustration. Businesses are complaining, and pollution is increasing.</p><p>The city only has enough budget to choose one solution, so its decision could change the city's future.</p></div></details>
+<section class="options" aria-label="Discussion options">
+<article class="option"><span class="letter">A</span><h2>Widen the Roads</h2><p class="person">Build bigger roads so more cars can travel through the city.</p><details><summary class="look">Look More 💧</summary><div class="panel"><span class="issue-tag">OPTION A</span><h3>Widen the Roads</h3><p><strong>Negative consequences:</strong></p><ul class="detail-list"><li>A popular local park would need to be destroyed to make space for the new roads.</li><li>Families would lose a place to relax, children would have nowhere nearby to play, and sports teams and community groups would lose an important meeting area.</li><li>Hundreds of trees and plants would be removed, reducing green space and harming local wildlife.</li><li>The city may become noisier and more polluted because more people would be encouraged to drive through the area.</li></ul></div></details></article>
+<article class="option"><span class="letter">B</span><h2>Build a Subway System</h2><p class="person">Build a new subway system so people can travel without using cars.</p><details><summary class="look">Look More 💧</summary><div class="panel"><span class="issue-tag">OPTION B</span><h3>Build a Subway System</h3><p><strong>Negative consequences:</strong></p><ul class="detail-list"><li>The subway would use all of the city's money, leaving no budget for schools this year.</li><li>Schools might have to cancel field trips, sports programs, and extracurricular activities. They may also be unable to buy new books, computers, or classroom supplies.</li><li>Some schools could have to postpone repairs, resulting in outdated equipment and overcrowded classrooms.</li><li>Teachers, students, and parents may become frustrated because education would suffer while the city focuses all of its money on the subway project.</li></ul></div></details></article>
+<article class="option"><span class="letter">C</span><h2>Ban Cars Completely</h2><p class="person">Ban cars from downtown so people must walk, cycle, or use public transport.</p><details><summary class="look">Look More 💧</summary><div class="panel"><span class="issue-tag">OPTION C</span><h3>Ban Cars Completely</h3><p><strong>Negative consequences:</strong></p><ul class="detail-list"><li>Many businesses could lose customers because people may avoid shopping or eating downtown if they cannot drive there easily.</li><li>Some shops and restaurants might earn less money, reduce staff hours, or even close.</li><li>Elderly people, families with young children, and people with disabilities may find it difficult to walk or cycle long distances.</li><li>Many citizens would be angry because they would feel their freedom and convenience had been taken away, leading to complaints and protests against the new policy.</li></ul></div></details></article>
+</section>
+<div class="section-heading"><h2>Share your thoughts</h2><p>There are no right or wrong answers.</p></div>
+<section class="writing-grid" aria-label="Advantages and disadvantages">
+<article class="writing-card"><h3>Option A — Advantage</h3><p class="subtitle">What are the benefits of widening roads?</p><textarea data-answer="a-advantage" aria-label="Option A advantage" placeholder="Write your ideas here..."></textarea></article>
+<article class="writing-card"><h3>Option A — Disadvantage</h3><p class="subtitle">What problems might widening roads cause?</p><textarea data-answer="a-disadvantage" aria-label="Option A disadvantage" placeholder="Write your ideas here..."></textarea></article>
+<article class="writing-card"><h3>Option B — Advantage</h3><p class="subtitle">What are the benefits of a subway system?</p><textarea data-answer="b-advantage" aria-label="Option B advantage" placeholder="Write your ideas here..."></textarea></article>
+<article class="writing-card"><h3>Option B — Disadvantage</h3><p class="subtitle">What problems might a subway system cause?</p><textarea data-answer="b-disadvantage" aria-label="Option B disadvantage" placeholder="Write your ideas here..."></textarea></article>
+<article class="writing-card"><h3>Option C — Advantage</h3><p class="subtitle">What are the benefits of banning cars downtown?</p><textarea data-answer="c-advantage" aria-label="Option C advantage" placeholder="Write your ideas here..."></textarea></article>
+<article class="writing-card"><h3>Option C — Disadvantage</h3><p class="subtitle">What problems might banning cars cause?</p><textarea data-answer="c-disadvantage" aria-label="Option C disadvantage" placeholder="Write your ideas here..."></textarea></article>
+</section>
+<div class="bottom"><span id="saveStatus" role="status" aria-live="polite">Loading saved answers…</span><button class="action" id="saveButton" type="button">Save answers</button></div>
+<p class="note">Your writing is stored in this browser using localStorage. It is not shared with other visitors and may not appear on another device or browser.</p>
+</main>
+<script>
+(()=>{const storageKey="youthdeveloping-pjy-writing-discussion-v1";const fields=[...document.querySelectorAll("[data-answer]")];const status=document.getElementById("saveStatus");let saveTimer;function loadAnswers(){try{const saved=JSON.parse(localStorage.getItem(storageKey)||"{}");fields.forEach(field=>{field.value=typeof saved[field.dataset.answer]==="string"?saved[field.dataset.answer]:""});status.textContent="Your saved answers are ready."}catch(error){status.textContent="Could not load saved answers in this browser."}}function saveAnswers(){try{const answers={};fields.forEach(field=>{answers[field.dataset.answer]=field.value});localStorage.setItem(storageKey,JSON.stringify(answers));status.textContent="Saved on this device."}catch(error){status.textContent="Unable to save. Please check your browser storage settings."}}fields.forEach(field=>field.addEventListener("input",()=>{status.textContent="Saving…";clearTimeout(saveTimer);saveTimer=setTimeout(saveAnswers,250)}));document.getElementById("saveButton").addEventListener("click",()=>{clearTimeout(saveTimer);saveAnswers()});document.getElementById("clearButton").addEventListener("click",()=>{if(!window.confirm("Clear all six answers saved in this browser?"))return;clearTimeout(saveTimer);fields.forEach(field=>{field.value=""});try{localStorage.removeItem(storageKey);status.textContent="All answers cleared."}catch(error){status.textContent="Answers cleared from the form, but browser storage could not be updated."}});loadAnswers()})();
+</script></body></html>
