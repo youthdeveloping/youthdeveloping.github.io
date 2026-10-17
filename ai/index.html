@@ -221,8 +221,8 @@
     async function discoverSiteContent() {
       const origin = window.location.origin;
       const candidates = new Set([new URL('/', origin).href]);
-      const ignored = /\\.(?:png|jpe?g|gif|webp|svg|pdf|zip|css|js|json|xml|ico|woff2?)$/i;
-      const excludedPath = /\\/(?:ai|admin|assets|images|img|fonts|api)(?:\/|$)/i;
+      const ignored = /\.(?:png|jpe?g|gif|webp|svg|pdf|zip|css|js|json|xml|ico|woff2?)$/i;
+      const excludedPath = /\/(?:ai|admin|assets|images|img|fonts|api)(?:\/|$)/i;
 
       function addUrl(raw, base) {
         try {
@@ -253,15 +253,15 @@
         visited.add(url);
         try {
           const response = await fetch(url, { cache: 'no-store' });
-          if (!response.ok || !/text\\/html/i.test(response.headers.get('content-type') || 'text/html')) continue;
+          if (!response.ok || !/text\/html/i.test(response.headers.get('content-type') || 'text/html')) continue;
           const html = await response.text();
           const page = new DOMParser().parseFromString(html, 'text/html');
           page.querySelectorAll('script,style,noscript,svg,canvas,nav,header,footer,form,button,iframe').forEach(node => node.remove());
           const title = (page.querySelector('title')?.textContent || page.querySelector('h1')?.textContent || url)
-            .replace(/\\s+/g, ' ').trim().slice(0, 120);
+            .replace(/\s+/g, ' ').trim().slice(0, 120);
           const main = page.querySelector('main,article,[role="main"]') || page.body;
           const text = (main?.innerText || main?.textContent || '')
-            .replace(/\\s+/g, ' ').trim().slice(0, 1600);
+            .replace(/\s+/g, ' ').trim().slice(0, 1600);
           if (text.length >= 80 && !url.includes('/ai/')) {
             discovered.push({
               id: 'site-' + discovered.length,
@@ -295,12 +295,12 @@
         visited.add(url);
         try {
           const response = await fetch(url, { cache: 'no-store' });
-          if (!response.ok || !/text\\/html/i.test(response.headers.get('content-type') || 'text/html')) continue;
+          if (!response.ok || !/text\/html/i.test(response.headers.get('content-type') || 'text/html')) continue;
           const page = new DOMParser().parseFromString(await response.text(), 'text/html');
           page.querySelectorAll('script,style,noscript,svg,canvas,nav,header,footer,form,button,iframe').forEach(node => node.remove());
-          const title = (page.querySelector('title')?.textContent || page.querySelector('h1')?.textContent || url).replace(/\\s+/g, ' ').trim().slice(0, 120);
+          const title = (page.querySelector('title')?.textContent || page.querySelector('h1')?.textContent || url).replace(/\s+/g, ' ').trim().slice(0, 120);
           const main = page.querySelector('main,article,[role="main"]') || page.body;
-          const text = (main?.innerText || main?.textContent || '').replace(/\\s+/g, ' ').trim().slice(0, 1600);
+          const text = (main?.innerText || main?.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 1600);
           if (text.length >= 80 && !url.includes('/ai/')) {
             discovered.push({ id: 'site-' + discovered.length, topics: [title, '사이트 내용', '웹페이지', '페이지 정보'], questions: [title + ' 내용이 뭐야?', title + ' 알려줘'], answer: '사이트 페이지 「' + title + '」의 내용: ' + text.slice(0, 900), sourceUrl: url });
           }
