@@ -66,6 +66,7 @@
     const suggestionBox = document.getElementById('suggestions');
     let knowledgeBase = null;
     let searchIndex = null;
+    const KNOWLEDGE_API = 'https://youthdeveloper-anonymous.youthdeveloper-github.workers.dev/api/knowledge';
 
     function addMessage(text, role) {
       const row = document.createElement('div');
@@ -315,6 +316,23 @@
         if (!response.ok) throw new Error('HTTP ' + response.status);
         const data = await response.json();
         if (!Array.isArray(data.knowledge)) throw new Error('Invalid knowledge data');
+        try {
+          const storedResponse = await fetch(KNOWLEDGE_API, { cache: 'no-store' });
+          if (storedResponse.ok) {
+            const storedData = await storedResponse.json();
+            for (const item of (storedData.knowledge || [])) {
+              data.knowledge.push({
+                id: 'custom-' + item.id,
+                topics: ['추가 정보', 'NEWKN', item.content],
+                questions: [item.content, item.content + ' 알려줘', item.content + ' 맞아?'],
+                answer: item.content,
+                sourceUrl: ''
+              });
+            }
+          }
+        } catch (error) {
+          console.warn('저장된 추가 지식 자료를 불러오지 못했습니다.', error);
+        }
         const siteEntries = await discoverSiteContent();
         data.knowledge.push(...siteEntries);
         knowledgeBase = data;
@@ -340,13 +358,55 @@
       }
     }
 
-    form.addEventListener('submit', event => {
+    form.addEventListener('submit', async event => {
       event.preventDefault();
       const question = input.value.trim();
       if (!question) return;
       addMessage(question, 'user');
       input.value = '';
       send.disabled = true;
+
+      const command = question.match(/^NEWKN:\\s*([\\s\\S]*?)\\s*;admin$/i);
+      if (command) {
+        const content = command[1].trim();
+        if (!content) {
+          addMessage('추가할 정보를 입력해 주세요. 예: NEWKN:우리는 놀고 소속이야;admin', 'assistant');
+          send.disabled = false;
+          input.focus();
+          return;
+        }
+        const adminToken = window.prompt('관리자 인증 토큰을 입력해 주세요. 토큰은 저장되지 않습니다.');
+        if (!adminToken) {
+          addMessage('관리자 인증이 취소되어 정보가 저장되지 않았습니다.', 'assistant');
+          send.disabled = false;
+          input.focus();
+          return;
+        }
+        try {
+          const response = await fetch(KNOWLEDGE_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminToken },
+            body: JSON.stringify({ content })
+          });
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || '저장에 실패했습니다.');
+          const entry = {
+            id: 'custom-' + result.id,
+            topics: ['추가 정보', 'NEWKN', content],
+            questions: [content, content + ' 알려줘', content + ' 맞아?'],
+            answer: content
+          };
+          knowledgeBase.knowledge.push(entry);
+          searchIndex = buildSearchIndex(knowledgeBase);
+          addMessage('정보를 서버에 영구 저장했습니다. 다른 방문자도 새로고침 후 이 정보를 검색할 수 있습니다.', 'assistant');
+        } catch (error) {
+          addMessage('정보를 저장하지 못했습니다: ' + error.message, 'assistant');
+        }
+        send.disabled = false;
+        input.focus();
+        return;
+      }
+
       window.setTimeout(() => {
         addMessage(findAnswer(question), 'assistant');
         send.disabled = false;
