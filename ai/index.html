@@ -90,12 +90,11 @@
 
     function normalize(text) {
       return String(text || '').toLocaleLowerCase('ko-KR')
-        .replace(/https?:\\/\\/\\S+/g, ' URL ')
-        .replace(/[?!.,，。？！:;'"“”‘’()\\[\\]{}<>/\\\\|_+=~\`@#$%^&*\\-]/g, ' ')
-        .replace(/[^\\p{L}\\p{N}\\s]/gu, ' ')
-        .replace(/\\s+/g, ' ').trim();
+        .replace(/https?:\/\/\S+/g, ' URL ')
+        .replace(/[?!.,，。？！:;'"“”‘’()\[\]{}<>/\\|_+=~`@#$%^&*\-]/g, ' ')
+        .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+        .replace(/\s+/g, ' ').trim();
     }
-
     function tokenize(text) {
       const cleaned = normalize(text);
       const tokens = new Set();
@@ -224,17 +223,20 @@
         if (!Array.isArray(data.knowledge)) throw new Error('Invalid knowledge data');
         knowledgeBase = data;
         statusText.textContent = '지식 자료 연결됨 · ' + data.knowledge.length + '개 항목 · 검색 v2';
-        const questions = data.knowledge.flatMap(item => item.questions || []).slice(0, 6);
-        if (questions.length) {
-          suggestionBox.replaceChildren();
-          questions.slice(0, 4).forEach(question => {
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.dataset.question = question;
-            button.textContent = question;
-            suggestionBox.appendChild(button);
-          });
-        }
+        const questions = [
+          '청소년개발자는 어떤 팀이야?',
+          '너희 사이트 주소가 뭐야?',
+          '어떤 프로젝트를 해?',
+          '놀고(Nol Go)가 뭐야?'
+        ];
+        suggestionBox.replaceChildren();
+        questions.forEach(question => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.dataset.question = question;
+          button.textContent = question;
+          suggestionBox.appendChild(button);
+        });
       } catch (error) {
         statusText.textContent = '자료 연결 실패';
         addMessage('response.json을 불러오지 못했습니다. GitHub Pages 배포가 완료되었는지 확인한 뒤 새로고침해 주세요.', 'assistant');
