@@ -1,25 +1,22 @@
-Copyright (c) 2026 YouthDeveloper. All rights reserved.
+저작권 (c) 2026 YouthDeveloper. 모든 권리 보유.
 
-This repository and the website published from it (youthdeveloping.github.io),
-including its source code, design, text, images and data, are proprietary.
+이 저장소와 이 저장소로 게시되는 웹사이트(youthdeveloping.github.io)의
+소스 코드, 디자인, 글, 이미지, 데이터는 모두 저작권자의 소유입니다.
 
-Permission is granted to view and use the published website through a web
-browser for personal, non-commercial purposes.
+웹 브라우저를 통해 게시된 웹사이트를 보고 개인적·비영리 목적으로 이용하는
+것은 허용됩니다.
 
-Except as expressly stated above, no part of this repository or website may be
-copied, modified, merged, published, distributed, sublicensed, sold, or used to
-create derivative works without prior written permission from the copyright
-holder.
+위에서 명시적으로 허용한 경우를 제외하고, 저작권자의 사전 서면 허락 없이는
+이 저장소 또는 웹사이트의 어떤 부분도 복사, 수정, 병합, 게시, 배포,
+재라이선스, 판매할 수 없으며 이를 바탕으로 2차 저작물을 만들 수 없습니다.
 
-Third-party libraries, fonts, models and services used by this site (for
-example Pretendard, Leaflet and Google Teachable Machine) remain under their
-own licenses and terms, and nothing in this file changes those terms.
+이 사이트에서 사용하는 외부 라이브러리, 글꼴, 모델, 서비스(예: Pretendard,
+Leaflet, Google Teachable Machine)는 각자의 라이선스와 약관을 따르며, 이
+문서는 그 조건을 바꾸지 않습니다.
 
-THE SOFTWARE AND CONTENT ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO
-EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR CONTENT OR
-THE USE OF IT.
+소프트웨어와 콘텐츠는 상품성, 특정 목적에의 적합성, 권리 비침해를 포함하여
+명시적이든 묵시적이든 어떠한 종류의 보증도 없이 "있는 그대로" 제공됩니다.
+저작권자는 소프트웨어나 콘텐츠 또는 그 이용과 관련하여 발생하는 어떠한
+청구, 손해 또는 기타 책임에 대해서도 책임을 지지 않습니다.
 
-Contact for permission requests: youthdeveloper.github@gmail.com
+허락 문의: youthdeveloper.github@gmail.com
