@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#05070a">
+  <meta name="description" content="청소년개발자 팀과 프로젝트에 관해 질문할 수 있는 YouthDeveloper AI 챗봇입니다.">
+  <title>YouthDeveloper AI</title>
+  <style>
+    :root{color-scheme:dark;--bg:#05070a;--panel:#0c1118;--line:rgba(255,255,255,.1);--text:#edf2f7;--muted:#8a97a5;--green:#61ff9a;--cyan:#62e8ff;--purple:#9d7bff}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 15% 0%,rgba(97,255,154,.08),transparent 32rem),radial-gradient(ellipse at 90% 30%,rgba(98,232,255,.08),transparent 30rem),var(--bg);color:var(--text);font-family:Inter,Pretendard,"Noto Sans KR",system-ui,sans-serif}
+    a{color:inherit;text-decoration:none}.shell{width:min(920px,calc(100% - 32px));margin:auto}
+    header{height:72px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;font-family:ui-monospace,Consolas,monospace}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.04em}.mark{display:grid;place-items:center;width:32px;height:32px;border:1px solid rgba(97,255,154,.55);color:var(--green);font-size:12px}.back{color:var(--muted);font-size:12px}.back:hover{color:var(--cyan)}
+    main{padding:42px 0 60px}.eyebrow{font:700 11px ui-monospace,Consolas,monospace;letter-spacing:.18em;color:var(--green);text-transform:uppercase}
+    h1{font-size:clamp(34px,6vw,58px);letter-spacing:-.065em;line-height:1.05;margin:14px 0}.intro{color:var(--muted);line-height:1.8;margin:0 0 28px;max-width:640px}
+    .chat{border:1px solid var(--line);background:rgba(10,14,19,.9);box-shadow:0 24px 80px #0005;overflow:hidden}
+    .chat-head{padding:15px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);background:#0d131a;font:11px ui-monospace,Consolas,monospace;color:var(--muted)}
+    .online{display:flex;align-items:center;gap:8px}.dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 12px #61ff9a}
+    #messages{height:min(48vh,460px);min-height:300px;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px;scroll-behavior:smooth}
+    .message{display:flex;gap:10px;max-width:88%;align-items:flex-start}.message.user{align-self:flex-end;flex-direction:row-reverse}.avatar{flex:0 0 30px;height:30px;border:1px solid var(--line);display:grid;place-items:center;font:700 10px ui-monospace,Consolas,monospace;color:var(--green);background:#101820}.user .avatar{color:var(--cyan)}
+    .bubble{padding:12px 14px;border:1px solid var(--line);background:#111820;border-radius:3px;line-height:1.75;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere}.user .bubble{background:#102028;border-color:rgba(98,232,255,.2)}
+    .suggestions{padding:0 20px 18px;display:flex;gap:8px;flex-wrap:wrap}.suggestions button{border:1px solid var(--line);background:#0d131a;color:#b8c3cd;padding:8px 11px;font:12px inherit;cursor:pointer;border-radius:2px}.suggestions button:hover{border-color:var(--cyan);color:var(--cyan)}
+    form{border-top:1px solid var(--line);padding:14px;display:flex;gap:10px;background:#090d12}input{min-width:0;flex:1;border:1px solid var(--line);background:#05080c;color:var(--text);padding:14px;font:14px inherit;outline:none;border-radius:2px}input:focus{border-color:rgba(97,255,154,.55)}input::placeholder{color:#65717d}
+    form button{border:1px solid rgba(97,255,154,.5);background:rgba(97,255,154,.1);color:var(--green);font-weight:700;padding:0 18px;cursor:pointer;border-radius:2px}form button:hover{background:rgba(97,255,154,.18)}form button:disabled{opacity:.5;cursor:wait}
+    .note{font-size:11px;color:#65717d;line-height:1.7;margin:13px 2px 0}footer{padding:22px 0 30px;border-top:1px solid var(--line);color:#65717d;font:11px ui-monospace,Consolas,monospace;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    @media(max-width:560px){header{height:62px}.back{font-size:11px}main{padding-top:32px}#messages{padding:14px;min-height:300px}.message{max-width:100%}.suggestions{padding:0 14px 14px}form{padding:10px}input{padding:12px}form button{padding:0 13px}}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <a class="brand" href="../" aria-label="청소년개발자 홈페이지"><span class="mark">YD</span><span>YouthDeveloper <span style="color:var(--green)">AI</span></span></a>
+      <a class="back" href="../">← 메인 사이트</a>
+    </header>
+    <main>
+      <div class="eyebrow">KNOWLEDGE CHATBOT / v1.0</div>
+      <h1>청소년개발자에게<br>무엇이든 물어보세요.</h1>
+      <p class="intro">팀 소개, 프로젝트, 놀고(Nol Go) 활동에 관한 질문에 답변합니다. 등록된 자료를 바탕으로 답하며, 확인되지 않은 내용은 지어내지 않습니다.</p>
+      <section class="chat" aria-label="AI 채팅">
+        <div class="chat-head"><span>YD_AI / CHAT</span><span class="online"><i class="dot"></i><span id="status">지식 자료 불러오는 중</span></span></div>
+        <div id="messages" role="log" aria-live="polite" aria-relevant="additions">
+          <div class="message"><div class="avatar">AI</div><div class="bubble">안녕하세요. 저는 청소년개발자 팀을 소개하는 안내 챗봇입니다. 팀이나 프로젝트에 대해 궁금한 점을 질문해 주세요.</div></div>
+        </div>
+        <div class="suggestions" id="suggestions" aria-label="추천 질문">
+          <button type="button" data-question="청소년개발자는 어떤 팀이야?">팀 소개</button>
+          <button type="button" data-question="너희 사이트 주소가 뭐야?">홈페이지</button>
+          <button type="button" data-question="어떤 프로젝트를 해?">프로젝트</button>
+          <button type="button" data-question="놀고가 뭐야?">놀고(Nol Go)</button>
+        </div>
+        <form id="chatForm">
+          <input id="question" name="question" autocomplete="off" maxlength="500" placeholder="질문을 입력하세요..." aria-label="질문 입력" required>
+          <button id="send" type="submit">보내기 ↗</button>
+        </form>
+      </section>
+      <p class="note">이 버전은 response.json에 등록된 지식을 검색하는 기본형 챗봇이며, 외부 AI API를 호출하지 않습니다. 답변이 부족하면 지식 자료를 추가해 개선할 수 있습니다.</p>
+    </main>
+    <footer><span>© YouthDeveloper</span><span>BUILT WITH response.json</span></footer>
+  </div>
+  <script>
+    const messages = document.getElementById('messages');
+    const form = document.getElementById('chatForm');
+    const input = document.getElementById('question');
+    const send = document.getElementById('send');
+    const statusText = document.getElementById('status');
+    const suggestionBox = document.getElementById('suggestions');
+    let knowledgeBase = null;
+
+    function addMessage(text, role) {
+      const row = document.createElement('div');
+      row.className = 'message ' + (role === 'user' ? 'user' : 'assistant');
+      const avatar = document.createElement('div');
+      avatar.className = 'avatar';
+      avatar.textContent = role === 'user' ? 'YOU' : 'AI';
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.textContent = text;
+      row.append(avatar, bubble);
+      messages.appendChild(row);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function normalize(text) {
+      return String(text || '').toLocaleLowerCase('ko-KR')
+        .replace(/[?!.,，。？！:;'"“”‘’()\[\]{}<>/\\|_+=~`@#$%^&*\-]/g, ' ')
+        .replace(/\s+/g, ' ').trim();
+    }
+
+    function terms(text) {
+      const cleaned = normalize(text);
+      const words = cleaned.split(' ').filter(word => word.length > 1);
+      const chunks = [];
+      for (const word of words) {
+        chunks.push(word);
+        if (word.length >= 3) {
+          for (let i = 0; i <= word.length - 2; i++) chunks.push(word.slice(i, i + 2));
+        }
+      }
+      return [...new Set(chunks)];
+    }
+
+    function findAnswer(question) {
+      if (!knowledgeBase || !Array.isArray(knowledgeBase.knowledge)) return '지식 자료를 아직 불러오지 못했습니다. 잠시 후 페이지를 새로고침해 주세요.';
+      const q = normalize(question);
+      if (!q) return knowledgeBase.instructions?.fallback || '질문을 입력해 주세요.';
+      let best = null;
+      let bestScore = 0;
+      const qTerms = terms(q);
+      for (const entry of knowledgeBase.knowledge) {
+        let score = 0;
+        for (const example of (entry.questions || [])) {
+          const e = normalize(example);
+          if (q === e) score += 12;
+          else if (e && (q.includes(e) || e.includes(q))) score += 7;
+        }
+        for (const topic of (entry.topics || [])) {
+          const t = normalize(topic);
+          if (!t) continue;
+          if (q.includes(t)) score += Math.max(3, t.length * 0.8);
+        }
+        const entryText = normalize([...(entry.topics || []), ...(entry.questions || [])].join(' '));
+        for (const term of qTerms) if (entryText.includes(term)) score += term.length > 2 ? 1.5 : 0.5;
+        if (score > bestScore) { bestScore = score; best = entry; }
+      }
+      if (best && bestScore >= 3) return best.answer;
+      return knowledgeBase.instructions?.fallback || '죄송해요. 해당 질문에 대한 정보가 아직 등록되어 있지 않아요.';
+    }
+
+    async function loadKnowledge() {
+      try {
+        const response = await fetch('./response.json', { cache: 'no-store' });
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const data = await response.json();
+        if (!Array.isArray(data.knowledge)) throw new Error('Invalid knowledge data');
+        knowledgeBase = data;
+        statusText.textContent = '지식 자료 연결됨 · ' + data.knowledge.length + '개 항목';
+        const questions = data.knowledge.flatMap(item => item.questions || []).slice(0, 6);
+        if (questions.length) {
+          suggestionBox.replaceChildren();
+          questions.slice(0, 4).forEach(question => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.dataset.question = question;
+            button.textContent = question;
+            suggestionBox.appendChild(button);
+          });
+        }
+      } catch (error) {
+        statusText.textContent = '자료 연결 실패';
+        addMessage('response.json을 불러오지 못했습니다. GitHub Pages 배포가 완료되었는지 확인한 뒤 새로고침해 주세요.', 'assistant');
+      }
+    }
+
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      const question = input.value.trim();
+      if (!question) return;
+      addMessage(question, 'user');
+      input.value = '';
+      send.disabled = true;
+      window.setTimeout(() => {
+        addMessage(findAnswer(question), 'assistant');
+        send.disabled = false;
+        input.focus();
+      }, 180);
+    });
+
+    suggestionBox.addEventListener('click', event => {
+      const button = event.target.closest('button[data-question]');
+      if (!button) return;
+      input.value = button.dataset.question;
+      form.requestSubmit();
+    });
+
+    loadKnowledge();
+  </script>
+</body>
+</html>
