@@ -366,7 +366,7 @@
       input.value = '';
       send.disabled = true;
 
-      const command = question.match(/^NEWKN:\\s*([\\s\\S]*?)\\s*;admin$/i);
+      const command = question.match(/^NEWKN:\s*([\s\S]*?)\s*;admin$/i);
       if (command) {
         const content = command[1].trim();
         if (!content) {
