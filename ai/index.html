@@ -65,6 +65,7 @@
     const statusText = document.getElementById('status');
     const suggestionBox = document.getElementById('suggestions');
     let knowledgeBase = null;
+    let searchIndex = null;
 
     function addMessage(text, role) {
       const row = document.createElement('div');
@@ -118,7 +119,7 @@
       const entries = data.knowledge.map((entry, index) => {
         const questions = (entry.questions || []).map(normalize).filter(Boolean);
         const topics = (entry.topics || []).map(normalize).filter(Boolean);
-        const searchableText = [...topics, ...questions].join(' ');
+        const searchableText = [...topics, ...questions, normalize(entry.answer || '')].join(' ');
         return {
           entry, index, questions, topics, searchableText,
           tokens: new Set(tokenize(searchableText))
@@ -208,12 +209,105 @@
         (best.score >= 4.2 && best.coverage >= 0.22 && (margin >= 0.45 || best.score >= 8)) ||
         (best.score >= 7 && best.matchedCount >= 2 && best.coverage >= 0.3)
       );
-      if (confident) return best.doc.entry.answer;
+      if (confident) {
+        const entry = best.doc.entry;
+        if (entry.sourceUrl) return entry.answer + '\\n\\n사이트에서 확인: ' + entry.sourceUrl;
+        return entry.answer;
+      }
       return knowledgeBase.instructions?.fallback ||
         '죄송해요. 해당 질문에 대한 정보가 아직 등록되어 있지 않아요.';
     }
 
-    let searchIndex = null;
+    async function discoverSiteContent() {
+      const origin = window.location.origin;
+      const candidates = new Set([new URL('/', origin).href]);
+      const ignored = /\\.(?:png|jpe?g|gif|webp|svg|pdf|zip|css|js|json|xml|ico|woff2?)$/i;
+      const excludedPath = /\\/(?:ai|admin|assets|images|img|fonts|api)(?:\/|$)/i;
+
+      function addUrl(raw, base) {
+        try {
+          const url = new URL(raw, base);
+          if (url.origin !== origin || ignored.test(url.pathname) || excludedPath.test(url.pathname)) return;
+          if (!/^https?:$/.test(url.protocol)) return;
+          url.hash = '';
+          url.search = '';
+          if (url.pathname.endsWith('/')) url.pathname += 'index.html';
+          candidates.add(url.href);
+        } catch (_) {}
+      }
+
+      try {
+        const sitemap = await fetch('/sitemap.xml', { cache: 'no-store' });
+        if (sitemap.ok) {
+          const xml = new DOMParser().parseFromString(await sitemap.text(), 'application/xml');
+          xml.querySelectorAll('loc').forEach(node => addUrl(node.textContent.trim(), origin));
+        }
+      } catch (_) {}
+
+      const queue = [new URL('/', origin).href];
+      const visited = new Set();
+      const discovered = [];
+      while (queue.length && visited.size < 30) {
+        const url = queue.shift();
+        if (visited.has(url)) continue;
+        visited.add(url);
+        try {
+          const response = await fetch(url, { cache: 'no-store' });
+          if (!response.ok || !/text\\/html/i.test(response.headers.get('content-type') || 'text/html')) continue;
+          const html = await response.text();
+          const page = new DOMParser().parseFromString(html, 'text/html');
+          page.querySelectorAll('script,style,noscript,svg,canvas,nav,header,footer,form,button,iframe').forEach(node => node.remove());
+          const title = (page.querySelector('title')?.textContent || page.querySelector('h1')?.textContent || url)
+            .replace(/\\s+/g, ' ').trim().slice(0, 120);
+          const main = page.querySelector('main,article,[role="main"]') || page.body;
+          const text = (main?.innerText || main?.textContent || '')
+            .replace(/\\s+/g, ' ').trim().slice(0, 1600);
+          if (text.length >= 80 && !url.includes('/ai/')) {
+            discovered.push({
+              id: 'site-' + discovered.length,
+              topics: [title, '사이트 내용', '웹페이지', '페이지 정보'],
+              questions: [title + ' 내용이 뭐야?', title + ' 알려줘'],
+              answer: '사이트 페이지 「' + title + '」의 내용: ' + text.slice(0, 900),
+              sourceUrl: url
+            });
+          }
+          page.querySelectorAll('a[href]').forEach(link => {
+            if (visited.size + queue.length < 30) {
+              const before = candidates.size;
+              addUrl(link.getAttribute('href'), url);
+              if (candidates.size > before) {
+                const added = [...candidates].find(item => !visited.has(item) && !queue.includes(item));
+                if (added) queue.push(added);
+              }
+            }
+          });
+        } catch (_) {}
+      }
+
+      // Sitemap URLs are useful even when the home page does not link to every page.
+      for (const url of candidates) {
+        if (visited.size >= 30) break;
+        if (!visited.has(url)) queue.push(url);
+      }
+      while (queue.length && visited.size < 30) {
+        const url = queue.shift();
+        if (visited.has(url)) continue;
+        visited.add(url);
+        try {
+          const response = await fetch(url, { cache: 'no-store' });
+          if (!response.ok || !/text\\/html/i.test(response.headers.get('content-type') || 'text/html')) continue;
+          const page = new DOMParser().parseFromString(await response.text(), 'text/html');
+          page.querySelectorAll('script,style,noscript,svg,canvas,nav,header,footer,form,button,iframe').forEach(node => node.remove());
+          const title = (page.querySelector('title')?.textContent || page.querySelector('h1')?.textContent || url).replace(/\\s+/g, ' ').trim().slice(0, 120);
+          const main = page.querySelector('main,article,[role="main"]') || page.body;
+          const text = (main?.innerText || main?.textContent || '').replace(/\\s+/g, ' ').trim().slice(0, 1600);
+          if (text.length >= 80 && !url.includes('/ai/')) {
+            discovered.push({ id: 'site-' + discovered.length, topics: [title, '사이트 내용', '웹페이지', '페이지 정보'], questions: [title + ' 내용이 뭐야?', title + ' 알려줘'], answer: '사이트 페이지 「' + title + '」의 내용: ' + text.slice(0, 900), sourceUrl: url });
+          }
+        } catch (_) {}
+      }
+      return discovered;
+    }
 
     async function loadKnowledge() {
       try {
@@ -221,8 +315,11 @@
         if (!response.ok) throw new Error('HTTP ' + response.status);
         const data = await response.json();
         if (!Array.isArray(data.knowledge)) throw new Error('Invalid knowledge data');
+        const siteEntries = await discoverSiteContent();
+        data.knowledge.push(...siteEntries);
         knowledgeBase = data;
-        statusText.textContent = '지식 자료 연결됨 · ' + data.knowledge.length + '개 항목 · 검색 v2';
+        searchIndex = buildSearchIndex(data);
+        statusText.textContent = '지식 자료 연결됨 · ' + data.knowledge.length + '개 항목 · 사이트 실시간 조회';
         const questions = [
           '청소년개발자는 어떤 팀이야?',
           '너희 사이트 주소가 뭐야?',
