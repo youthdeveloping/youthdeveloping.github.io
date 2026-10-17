@@ -34,7 +34,7 @@
       <a class="back" href="../">← 메인 사이트</a>
     </header>
     <main>
-      <div class="eyebrow">KNOWLEDGE CHATBOT / v1.0</div>
+      <div class="eyebrow">KNOWLEDGE CHATBOT / v2.0</div>
       <h1>청소년개발자에게<br>무엇이든 물어보세요.</h1>
       <p class="intro">팀 소개, 프로젝트, 놀고(Nol Go) 활동에 관한 질문에 답변합니다. 등록된 자료를 바탕으로 답하며, 확인되지 않은 내용은 지어내지 않습니다.</p>
       <section class="chat" aria-label="AI 채팅">
@@ -80,51 +80,141 @@
       messages.scrollTop = messages.scrollHeight;
     }
 
+    // 검색 알고리즘 v2: 정규화 + 한국어 부분 문자열 + IDF 가중치 + 질문 유사도 + 신뢰도 판정
+    const STOP_WORDS = new Set([
+      '그냥','정말','진짜','혹시','조금','좀','알려','주세요','해줘','해요','인가요','뭐야',
+      '무엇','어떻게','어떤','있어','있나요','하는','해주는','대한','대해','그리고','또는',
+      '저기','여기','저희','너희','우리','저는','나는','제가','내가','그게','이거','저거',
+      'the','and','what','how','your','you','are','is','please','tell','about'
+    ]);
+
     function normalize(text) {
       return String(text || '').toLocaleLowerCase('ko-KR')
-        .replace(/[?!.,，。？！:;'"“”‘’()\[\]{}<>/\\|_+=~`@#$%^&*\-]/g, ' ')
-        .replace(/\s+/g, ' ').trim();
+        .replace(/https?:\\/\\/\\S+/g, ' URL ')
+        .replace(/[?!.,，。？！:;'"“”‘’()\\[\\]{}<>/\\\\|_+=~\`@#$%^&*\\-]/g, ' ')
+        .replace(/[^\\p{L}\\p{N}\\s]/gu, ' ')
+        .replace(/\\s+/g, ' ').trim();
     }
 
-    function terms(text) {
+    function tokenize(text) {
       const cleaned = normalize(text);
-      const words = cleaned.split(' ').filter(word => word.length > 1);
-      const chunks = [];
-      for (const word of words) {
-        chunks.push(word);
-        if (word.length >= 3) {
-          for (let i = 0; i <= word.length - 2; i++) chunks.push(word.slice(i, i + 2));
+      const tokens = new Set();
+      for (const word of cleaned.split(' ')) {
+        if (!word || STOP_WORDS.has(word)) continue;
+        if (word.length >= 2) tokens.add(word);
+        // Korean spacing/ending variations: overlapping character bigrams
+        if (/[가-힣]/.test(word) && word.length >= 2) {
+          for (let i = 0; i < word.length - 1; i++) {
+            const gram = word.slice(i, i + 2);
+            if (!STOP_WORDS.has(gram)) tokens.add(gram);
+          }
+        }
+        // Short English terms are useful as exact tokens
+        if (/^[a-z0-9]+$/i.test(word)) tokens.add(word);
+      }
+      return [...tokens];
+    }
+
+    function buildSearchIndex(data) {
+      const entries = data.knowledge.map((entry, index) => {
+        const questions = (entry.questions || []).map(normalize).filter(Boolean);
+        const topics = (entry.topics || []).map(normalize).filter(Boolean);
+        const searchableText = [...topics, ...questions].join(' ');
+        return {
+          entry, index, questions, topics, searchableText,
+          tokens: new Set(tokenize(searchableText))
+        };
+      });
+      const documentFrequency = new Map();
+      for (const doc of entries) {
+        for (const token of doc.tokens) {
+          documentFrequency.set(token, (documentFrequency.get(token) || 0) + 1);
         }
       }
-      return [...new Set(chunks)];
+      const total = Math.max(entries.length, 1);
+      for (const doc of entries) {
+        doc.weights = new Map();
+        for (const token of doc.tokens) {
+          const df = documentFrequency.get(token) || 0;
+          // Rare and specific terms carry more weight than common terms.
+          doc.weights.set(token, Math.log(1 + (total - df + 0.5) / (df + 0.5)));
+        }
+      }
+      return { entries, documentFrequency, total };
+    }
+
+    function scoreEntry(question, queryTokens, doc, index) {
+      const q = normalize(question);
+      let score = 0;
+      let matchedWeight = 0;
+      let totalQueryWeight = 0;
+      const matched = new Set();
+
+      for (const token of queryTokens) {
+        const df = index.documentFrequency.get(token) || 0;
+        const weight = Math.log(1 + (index.total - df + 0.5) / (df + 0.5));
+        totalQueryWeight += weight;
+        if (doc.tokens.has(token)) {
+          matched.add(token);
+          matchedWeight += weight;
+          score += weight * (token.length >= 4 ? 1.25 : 0.7);
+        }
+      }
+
+      let exactQuestion = false;
+      let phraseMatch = false;
+      for (const example of doc.questions) {
+        if (q === example) {
+          exactQuestion = true;
+          break;
+        }
+        if (example.length >= 4 && (q.includes(example) || example.includes(q))) {
+          phraseMatch = true;
+        }
+      }
+      if (exactQuestion) score += 12;
+      else if (phraseMatch) score += 5;
+
+      for (const topic of doc.topics) {
+        if (topic.length >= 2 && q.includes(topic)) score += 3 + Math.min(topic.length, 12) * 0.35;
+      }
+
+      const coverage = totalQueryWeight ? matchedWeight / totalQueryWeight : 0;
+      const queryLengthPenalty = queryTokens.length > 7 ? 0.88 : 1;
+      score *= (0.55 + coverage * 0.9) * queryLengthPenalty;
+      return { score, coverage, matchedCount: matched.size, exactQuestion, phraseMatch };
     }
 
     function findAnswer(question) {
-      if (!knowledgeBase || !Array.isArray(knowledgeBase.knowledge)) return '지식 자료를 아직 불러오지 못했습니다. 잠시 후 페이지를 새로고침해 주세요.';
+      if (!knowledgeBase || !Array.isArray(knowledgeBase.knowledge)) {
+        return '지식 자료를 아직 불러오지 못했습니다. 잠시 후 페이지를 새로고침해 주세요.';
+      }
       const q = normalize(question);
       if (!q) return knowledgeBase.instructions?.fallback || '질문을 입력해 주세요.';
-      let best = null;
-      let bestScore = 0;
-      const qTerms = terms(q);
-      for (const entry of knowledgeBase.knowledge) {
-        let score = 0;
-        for (const example of (entry.questions || [])) {
-          const e = normalize(example);
-          if (q === e) score += 12;
-          else if (e && (q.includes(e) || e.includes(q))) score += 7;
-        }
-        for (const topic of (entry.topics || [])) {
-          const t = normalize(topic);
-          if (!t) continue;
-          if (q.includes(t)) score += Math.max(3, t.length * 0.8);
-        }
-        const entryText = normalize([...(entry.topics || []), ...(entry.questions || [])].join(' '));
-        for (const term of qTerms) if (entryText.includes(term)) score += term.length > 2 ? 1.5 : 0.5;
-        if (score > bestScore) { bestScore = score; best = entry; }
-      }
-      if (best && bestScore >= 3) return best.answer;
-      return knowledgeBase.instructions?.fallback || '죄송해요. 해당 질문에 대한 정보가 아직 등록되어 있지 않아요.';
+      const index = searchIndex || buildSearchIndex(knowledgeBase);
+      const queryTokens = tokenize(q);
+      if (!queryTokens.length) return knowledgeBase.instructions?.fallback || '질문을 조금 더 구체적으로 입력해 주세요.';
+
+      const ranked = index.entries.map(doc => ({
+        doc,
+        ...scoreEntry(q, queryTokens, doc, index)
+      })).sort((a, b) => b.score - a.score);
+
+      const best = ranked[0];
+      const second = ranked[1];
+      const margin = best ? best.score - (second?.score || 0) : 0;
+      // Avoid confidently returning a random entry for unrelated questions.
+      const confident = best && (
+        best.exactQuestion ||
+        (best.score >= 4.2 && best.coverage >= 0.22 && (margin >= 0.45 || best.score >= 8)) ||
+        (best.score >= 7 && best.matchedCount >= 2 && best.coverage >= 0.3)
+      );
+      if (confident) return best.doc.entry.answer;
+      return knowledgeBase.instructions?.fallback ||
+        '죄송해요. 해당 질문에 대한 정보가 아직 등록되어 있지 않아요.';
     }
+
+    let searchIndex = null;
 
     async function loadKnowledge() {
       try {
@@ -133,7 +223,7 @@
         const data = await response.json();
         if (!Array.isArray(data.knowledge)) throw new Error('Invalid knowledge data');
         knowledgeBase = data;
-        statusText.textContent = '지식 자료 연결됨 · ' + data.knowledge.length + '개 항목';
+        statusText.textContent = '지식 자료 연결됨 · ' + data.knowledge.length + '개 항목 · 검색 v2';
         const questions = data.knowledge.flatMap(item => item.questions || []).slice(0, 6);
         if (questions.length) {
           suggestionBox.replaceChildren();
