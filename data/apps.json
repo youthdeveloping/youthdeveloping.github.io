@@ -1,6 +1,16 @@
 {
-  "updated": "2026-10-17T02:07:36.000Z",
+  "updated": "2026-10-17T02:40:42.000Z",
   "apps": [
+    {
+      "id": "ai",
+      "icon": "🤖",
+      "name": "이정표 AI",
+      "desc": "우리가 직접 학습시킨 AI 모음",
+      "url": "/ai/",
+      "status": "on",
+      "group": "tool",
+      "featured": true
+    },
     {
       "id": "shapes",
       "icon": "🔺",
