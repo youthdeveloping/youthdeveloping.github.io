@@ -88,14 +88,21 @@ function switchPanel(panel){
  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.panel===panel));
  $("previewPanel").classList.toggle("hidden",panel!=="preview");$("consolePanel").classList.toggle("hidden",panel!=="console");
 }
+function escapeClosingTag(text,tag){
+ const slash=String.fromCharCode(92);
+ const closing="<"+"/"+tag;
+ const escaped="<"+slash+"/"+tag;
+ return text.split(closing).join(escaped).split(closing.toUpperCase()).join(escaped);
+}
 function runBrowser(){
  const code=activeCode(); const frame=$("preview");
  if(currentLanguage==="html"){frame.srcdoc=code;showConsole("HTML 미리보기를 갱신했습니다.",false);switchPanel("preview");return}
  if(currentLanguage==="css"){
- frame.srcdoc='<!doctype html><html><head><meta charset="utf-8"><style>'+code.replace(/<\\/style/gi,"<\\\\/style")+'</style></head><body><h1>CSS 미리보기</h1><p>현재 CSS가 이 페이지에 적용됩니다.</p><button>샘플 버튼</button></body></html>';switchPanel("preview");$("runInfo").textContent="CSS 미리보기 완료";return;
+ const safeCss=escapeClosingTag(code,"style");
+ frame.srcdoc='<!doctype html><html><head><meta charset="utf-8"><style>'+safeCss+'</style></head><body><h1>CSS 미리보기</h1><p>현재 CSS가 이 페이지에 적용됩니다.</p><button>샘플 버튼</button></body></html>';switchPanel("preview");$("runInfo").textContent="CSS 미리보기 완료";return;
  }
- const escaped=code.replace(/<\\/script/gi,"<\\\\/script");
- frame.srcdoc='<!doctype html><html><head><meta charset="utf-8"></head><body><div id="app"></div><script>const send=(...a)=>parent.postMessage({type:"yd-editor-console",args:a.map(x=>{try{return typeof x==="string"?x:JSON.stringify(x)}catch(e){return String(x)}})},"*");console.log=(...a)=>send(...a);console.error=(...a)=>send("ERROR:",...a);window.onerror=(m,s,l,c,e)=>send("ERROR:",m+" ("+l+":"+c+")");try{'+escaped+'}catch(e){console.error(e.stack||e.message)}<\\/script></body></html>';
+ const escaped=escapeClosingTag(code,"script");
+ frame.srcdoc='<!doctype html><html><head><meta charset="utf-8"></head><body><div id="app"></div><script>const send=(...a)=>parent.postMessage({type:"yd-editor-console",args:a.map(x=>{try{return typeof x==="string"?x:JSON.stringify(x)}catch(e){return String(x)}})},"*");console.log=(...a)=>send(...a);console.error=(...a)=>send("ERROR:",...a);window.onerror=(m,s,l,c,e)=>send("ERROR:",m+" ("+l+":"+c+")");try{'+escaped+'}catch(e){console.error(e.stack||e.message)}<'+"/script></body></html>";
  switchPanel("preview");$("runInfo").textContent="JavaScript 실행 완료";
 }
 window.addEventListener("message",e=>{if(e.data&&e.data.type==="yd-editor-console"){const line=(e.data.args||[]).join(" ");$("console").style.display="block";$("consoleEmpty").style.display="none";$("console").textContent+=($("console").textContent?"\n":"")+line;switchPanel("console")}});
