@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101116">
+<meta name="description" content="YouthCraft Studio — 청소년개발자가 만드는 웹 기반 이미지 편집 작업실">
+<title>YouthCraft Studio — YouthDeveloper</title>
+<style>
+:root{color-scheme:dark;--bg:#101116;--panel:#181a22;--panel2:#20232d;--line:#303440;--text:#f4f5f8;--muted:#9ba2b3;--accent:#9caeff;--accent2:#6de0bd;--danger:#ff8795}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select{font:inherit}button{cursor:pointer;border:1px solid var(--line);border-radius:9px;background:var(--panel2);color:var(--text);padding:9px 12px;transition:.15s}button:hover{border-color:var(--accent);background:#292d3a}button:disabled{opacity:.4;cursor:not-allowed}.primary{background:var(--accent);border-color:var(--accent);color:#101116;font-weight:700}.primary:hover{background:#b8c4ff;color:#101116}.quiet{background:transparent}.danger{color:var(--danger)}header{height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;border-bottom:1px solid var(--line);background:#14151b;gap:14px}.brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:inherit;font-weight:800;letter-spacing:-.03em}.logo{width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:var(--accent);color:#101116;font-size:19px}.brand small{display:block;color:var(--muted);font-weight:500;letter-spacing:0;font-size:11px}.head-actions{display:flex;gap:8px;align-items:center}.layout{display:grid;grid-template-columns:240px minmax(0,1fr) 260px;min-height:calc(100vh - 64px)}aside{padding:18px 14px;background:#14151b;min-width:0}aside.left{border-right:1px solid var(--line)}aside.right{border-left:1px solid var(--line)}.group{margin-bottom:24px}.group-title{font-size:11px;color:var(--muted);letter-spacing:.12em;font-weight:700;margin:0 0 10px 5px}.tools{display:grid;grid-template-columns:1fr 1fr;gap:7px}.tool{min-height:62px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:5px;text-align:left}.tool span{font-size:18px}.tool.active{border-color:var(--accent);background:#252839}.field{display:grid;gap:7px;margin:14px 0}.field label{font-size:12px;color:var(--muted)}input[type="text"],input[type="number"],select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:#111219;color:var(--text);min-width:0}input[type="color"]{width:100%;height:36px;padding:3px;background:#111219;border:1px solid var(--line);border-radius:8px}input[type="range"]{width:100%;accent-color:var(--accent)}.workspace{min-width:0;display:flex;flex-direction:column}.workspace-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}.workspace-top .left-actions,.workspace-top .right-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap}.status{color:var(--muted);font-size:12px}.stage{flex:1;min-height:480px;padding:30px;display:grid;place-items:center;overflow:auto;background-color:#111219;background-image:linear-gradient(45deg,#1b1d25 25%,transparent 25%),linear-gradient(-45deg,#1b1d25 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#1b1d25 75%),linear-gradient(-45deg,transparent 75%,#1b1d25 75%);background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0}.canvas-wrap{position:relative;max-width:100%;box-shadow:0 16px 50px #0008;background:white}.canvas-wrap canvas{display:block;max-width:100%;height:auto;touch-action:none}.empty{max-width:390px;text-align:center;padding:30px}.empty .big{font-size:48px;margin-bottom:12px}.empty h2{margin:0 0 8px;font-size:22px}.empty p{color:var(--muted);line-height:1.7}.empty-actions{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:18px}.layers{display:grid;gap:7px;margin-top:10px}.layer{display:flex;gap:9px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:9px;background:#111219;min-width:0}.layer.selected{border-color:var(--accent);background:#252839}.layer .thumb{width:34px;height:34px;display:grid;place-items:center;border-radius:6px;background:#2a2d39;flex:none}.layer .layer-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;font-size:12px}.layer button{padding:4px 7px}.bottom-note{padding:12px 18px;border-top:1px solid var(--line);color:var(--muted);font-size:11px}.mobile-section{display:none}.hidden{display:none!important}
+@media(max-width:1050px){.layout{grid-template-columns:205px minmax(0,1fr)}aside.right{grid-column:1/-1;border-left:0;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:20px}.stage{min-height:400px}}
+@media(max-width:650px){header{padding:0 12px;height:58px}.brand{font-size:13px}.brand small{display:none}.head-actions button{padding:7px 9px;font-size:12px}.layout{display:flex;flex-direction:column}.left{border-right:0!important;border-bottom:1px solid var(--line)}aside.left{padding:12px}.group{margin-bottom:12px}.tools{grid-template-columns:repeat(4,1fr)}.tool{min-height:53px;padding:6px;font-size:11px;align-items:center;text-align:center}.tool span{font-size:17px}.workspace-top{padding:10px}.stage{min-height:340px;padding:12px}.workspace-top button{padding:7px 9px;font-size:12px}aside.right{display:block;padding:14px}.bottom-note{line-height:1.7}}
+</style>
+</head>
+<body>
+<header>
+  <a class="brand" href="/youthcraft/" aria-label="YouthCraft Studio 홈"><span class="logo">✳</span><span>YouthCraft Studio<small>by YouthDeveloper · Image Editor</small></span></a>
+  <div class="head-actions"><button id="openBtn" class="quiet">이미지 열기</button><button id="saveBtn" class="primary">PNG 내보내기</button></div>
+</header>
+<div class="layout">
+<aside class="left">
+  <section class="group"><h2 class="group-title">TOOLS / 도구</h2>
+    <div class="tools">
+      <button class="tool active" data-tool="select"><span>↖</span>선택</button>
+      <button class="tool" data-tool="text"><span>T</span>텍스트</button>
+      <button class="tool" data-tool="rect"><span>▱</span>사각형</button>
+      <button class="tool" data-tool="circle"><span>◯</span>원</button>
+    </div>
+  </section>
+  <section class="group"><h2 class="group-title">ADD / 추가</h2>
+    <div class="field"><label for="textValue">텍스트 내용</label><input id="textValue" type="text" maxlength="160" value="새로운 아이디어"></div>
+    <div class="field"><label for="fontSize">글자 크기</label><input id="fontSize" type="number" min="8" max="240" value="48"></div>
+    <div class="field"><label for="fillColor">색상</label><input id="fillColor" type="color" value="#9caeff"></div>
+    <button id="addText" class="primary" style="width:100%">텍스트 추가</button>
+    <button id="addRect" style="width:100%;margin-top:7px">사각형 추가</button>
+    <button id="addCircle" style="width:100%;margin-top:7px">원 추가</button>
+  </section>
+  <section class="group"><h2 class="group-title">IMAGE / 이미지</h2>
+    <div class="field"><label for="brightness">밝기</label><input id="brightness" type="range" min="40" max="160" value="100"><span class="status" id="brightnessVal">100%</span></div>
+    <div class="field"><label for="contrast">대비</label><input id="contrast" type="range" min="40" max="160" value="100"><span class="status" id="contrastVal">100%</span></div>
+    <div class="field"><label for="saturation">채도</label><input id="saturation" type="range" min="0" max="200" value="100"><span class="status" id="saturationVal">100%</span></div>
+    <button id="resetFilters" class="quiet" style="width:100%">필터 초기화</button>
+  </section>
+</aside>
+<main class="workspace">
+  <div class="workspace-top"><div class="left-actions"><button id="undoBtn" disabled>↶ 실행 취소</button><button id="redoBtn" disabled>↷ 다시 실행</button><button id="deleteBtn" class="danger" disabled>삭제</button></div><div class="right-actions"><span id="canvasInfo" class="status">캔버스 준비됨</span><button id="newBtn">새 캔버스</button></div></div>
+  <div class="stage" id="stage">
+    <div class="empty" id="emptyState"><div class="big">✳</div><h2>무엇을 만들어 볼까요?</h2><p>이미지를 불러오거나 새 캔버스를 시작해 보세요. 텍스트와 도형을 추가하고 색상과 이미지 필터를 조정할 수 있습니다.</p><div class="empty-actions"><button id="emptyOpen" class="primary">이미지 열기</button><button id="emptyNew">새 캔버스</button></div></div>
+    <div class="canvas-wrap hidden" id="canvasWrap"><canvas id="canvas" width="1200" height="800" aria-label="이미지 편집 캔버스"></canvas></div>
+  </div>
+  <div class="bottom-note">프로젝트는 현재 브라우저 안에서 처리됩니다. AI 생성 기능은 아직 포함되어 있지 않습니다.</div>
+</main>
+<aside class="right">
+  <section class="group"><h2 class="group-title">PROPERTIES / 속성</h2>
+    <div id="noSelection" class="status">선택된 요소가 없습니다. 캔버스에서 텍스트나 도형을 선택해 주세요.</div>
+    <div id="properties" class="hidden">
+      <div class="field"><label for="propX">X 위치</label><input id="propX" type="number"></div>
+      <div class="field"><label for="propY">Y 위치</label><input id="propY" type="number"></div>
+      <div class="field"><label for="propW">너비</label><input id="propW" type="number" min="1"></div>
+      <div class="field"><label for="propH">높이</label><input id="propH" type="number" min="1"></div>
+      <div class="field"><label for="propColor">요소 색상</label><input id="propColor" type="color"></div>
+      <div class="field" id="propTextField"><label for="propText">텍스트 수정</label><input id="propText" type="text" maxlength="160"></div>
+      <button id="applyProps" class="primary" style="width:100%">속성 적용</button>
+    </div>
+  </section>
+  <section class="group"><div style="display:flex;justify-content:space-between;align-items:center"><h2 class="group-title" style="margin-bottom:0">LAYERS / 레이어</h2><button id="clearLayers" style="padding:5px 8px;font-size:11px">전체 삭제</button></div><div id="layers" class="layers"><div class="status" style="margin-top:10px">아직 레이어가 없습니다.</div></div></section>
+</aside>
+</div>
+<input id="fileInput" type="file" accept="image/*" class="hidden">
+<script>
+(() => {
+const $=id=>document.getElementById(id), canvas=$('canvas'), ctx=canvas.getContext('2d'), wrap=$('canvasWrap');
+let image=null, elements=[], selected=null, tool='select', drag=null, history=[], historyIndex=-1, filters={brightness:100,contrast:100,saturation:100};
+const clone=v=>JSON.parse(JSON.stringify(v));
+function snapshot(){return {width:canvas.width,height:canvas.height,elements:clone(elements),filters:clone(filters),imageSrc:image?image.src:null};}
+function commit(){const s=snapshot();history=history.slice(0,historyIndex+1);history.push(s);if(history.length>40)history.shift();historyIndex=history.length-1;updateHistoryButtons();}
+function updateHistoryButtons(){$('undoBtn').disabled=historyIndex<=0;$('redoBtn').disabled=historyIndex<0||historyIndex>=history.length-1;}
+function restore(s){canvas.width=s.width;canvas.height=s.height;elements=clone(s.elements);filters=clone(s.filters);image=null;if(s.imageSrc){const im=new Image();im.onload=()=>{image=im;render();};im.src=s.imageSrc;}updateFilterUI();selected=null;render();updateLayers();updateProperties();updateHistoryButtons();}
+function setStatus(t){$('canvasInfo').textContent=t;}
+function ensureCanvas(){ $('emptyState').classList.add('hidden');wrap.classList.remove('hidden');}
+function render(){if(!ctx)return;ctx.clearRect(0,0,canvas.width,canvas.height);ctx.save();ctx.filter='brightness('+filters.brightness+'%) contrast('+filters.contrast+'%) saturate('+filters.saturation+'%)';if(image)ctx.drawImage(image,0,0,canvas.width,canvas.height);ctx.restore();for(const e of elements){ctx.save();ctx.fillStyle=e.color||'#9caeff';if(e.type==='text'){ctx.font=(e.fontSize||48)+'px Inter,system-ui,sans-serif';ctx.textBaseline='top';ctx.fillText(e.text||'',e.x,e.y);if(selected===e.id){const m=ctx.measureText(e.text||'');ctx.strokeStyle='#4f72ff';ctx.setLineDash([5,4]);ctx.strokeRect(e.x-3,e.y-3,Math.max(m.width,20)+6,(e.fontSize||48)*1.25+6);}}else if(e.type==='rect'){ctx.fillRect(e.x,e.y,e.w,e.h);if(selected===e.id){ctx.strokeStyle='#4f72ff';ctx.setLineDash([5,4]);ctx.strokeRect(e.x-3,e.y-3,e.w+6,e.h+6);}}else if(e.type==='circle'){ctx.beginPath();ctx.ellipse(e.x+e.w/2,e.y+e.h/2,Math.abs(e.w/2),Math.abs(e.h/2),0,0,Math.PI*2);ctx.fill();if(selected===e.id){ctx.strokeStyle='#4f72ff';ctx.setLineDash([5,4]);ctx.strokeRect(e.x-3,e.y-3,e.w+6,e.h+6);}}ctx.restore();}updateProperties();}
+function uid(){return 'el-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7);}
+function addElement(type){ensureCanvas();const color=$('fillColor').value,e={id:uid(),type,x:Math.round(canvas.width*.12),y:Math.round(canvas.height*.14),w:260,h:150,color};if(type==='text'){e.text=$('textValue').value||'텍스트';e.fontSize=Math.max(8,Math.min(240,Number($('fontSize').value)||48));}elements.push(e);selected=e.id;commit();render();updateLayers();setStatus('요소 추가됨');}
+function updateLayers(){const root=$('layers');root.replaceChildren();if(!elements.length){const n=document.createElement('div');n.className='status';n.style.marginTop='10px';n.textContent='아직 레이어가 없습니다.';root.append(n);return;}[...elements].reverse().forEach(e=>{const row=document.createElement('div');row.className='layer'+(selected===e.id?' selected':'');const thumb=document.createElement('span');thumb.className='thumb';thumb.textContent=e.type==='text'?'T':e.type==='rect'?'▱':'◯';const name=document.createElement('span');name.className='layer-name';name.textContent=e.type==='text'?e.text:e.type==='rect'?'사각형':'원';const btn=document.createElement('button');btn.textContent='×';btn.title='레이어 삭제';btn.addEventListener('click',ev=>{ev.stopPropagation();elements=elements.filter(x=>x.id!==e.id);if(selected===e.id)selected=null;commit();render();updateLayers();});row.append(thumb,name,btn);row.addEventListener('click',()=>{selected=e.id;render();updateLayers();});root.append(row);});}
+function updateProperties(){const e=elements.find(x=>x.id===selected);$('noSelection').classList.toggle('hidden',!!e);$('properties').classList.toggle('hidden',!e);$('deleteBtn').disabled=!e;if(!e)return;$('propX').value=Math.round(e.x);$('propY').value=Math.round(e.y);$('propW').value=Math.round(e.w||0);$('propH').value=Math.round(e.h||0);$('propColor').value=e.color||'#9caeff';$('propTextField').classList.toggle('hidden',e.type!=='text');$('propText').value=e.text||'';}
+function updateFilterUI(){for(const k of Object.keys(filters)){$(k).value=filters[k];$(k+'Val').textContent=filters[k]+'%';}}
+function loadImage(file){if(!file||!file.type.startsWith('image/'))return;const url=URL.createObjectURL(file),im=new Image();im.onload=()=>{image=im;canvas.width=Math.min(im.naturalWidth,2400);canvas.height=Math.min(im.naturalHeight,2400);ensureCanvas();elements=[];selected=null;filters={brightness:100,contrast:100,saturation:100};updateFilterUI();commit();render();updateLayers();setStatus(canvas.width+' × '+canvas.height);URL.revokeObjectURL(url);};im.onerror=()=>{URL.revokeObjectURL(url);alert('이미지를 열 수 없습니다. 다른 파일을 선택해 주세요.');};im.src=url;}
+function newCanvas(){const w=Number(prompt('캔버스 너비(px)', '1200')),h=Number(prompt('캔버스 높이(px)','800'));if(!Number.isFinite(w)||!Number.isFinite(h)||w<1||h<1||w>5000||h>5000)return;image=null;elements=[];canvas.width=w;canvas.height=h;filters={brightness:100,contrast:100,saturation:100};selected=null;updateFilterUI();ensureCanvas();commit();render();updateLayers();setStatus(w+' × '+h);}
+function hit(x,y){for(let i=elements.length-1;i>=0;i--){const e=elements[i];let w=e.w||0,h=e.h||0;if(e.type==='text'){ctx.font=(e.fontSize||48)+'px Inter,system-ui,sans-serif';w=ctx.measureText(e.text||'').width;h=(e.fontSize||48)*1.3;}if(x>=e.x-5&&x<=e.x+w+5&&y>=e.y-5&&y<=e.y+h+5)return e;}return null;}
+function point(ev){const r=canvas.getBoundingClientRect();return {x:(ev.clientX-r.left)*canvas.width/r.width,y:(ev.clientY-r.top)*canvas.height/r.height};}
+canvas.addEventListener('pointerdown',ev=>{const p=point(ev);if(tool==='text'){addElement('text');return;}if(tool==='rect'||tool==='circle'){const e={id:uid(),type:tool==='rect'?'rect':'circle',x:p.x,y:p.y,w:1,h:1,color:$('fillColor').value};elements.push(e);selected=e.id;drag={start:p,last:p,id:e.id,create:true};canvas.setPointerCapture(ev.pointerId);render();updateLayers();return;}const e=hit(p.x,p.y);selected=e?e.id:null;if(e){drag={start:p,last:p,id:e.id,ox:e.x,oy:e.y};canvas.setPointerCapture(ev.pointerId);}render();updateLayers();});
+canvas.addEventListener('pointermove',ev=>{if(!drag)return;const p=point(ev),e=elements.find(x=>x.id===drag.id);if(!e)return;if(drag.create){e.x=Math.min(drag.start.x,p.x);e.y=Math.min(drag.start.y,p.y);e.w=Math.max(1,Math.abs(p.x-drag.start.x));e.h=Math.max(1,Math.abs(p.y-drag.start.y));}else{e.x=drag.ox+(p.x-drag.start.x);e.y=drag.oy+(p.y-drag.start.y);}drag.last=p;render();});
+canvas.addEventListener('pointerup',()=>{if(drag){drag=null;commit();updateLayers();}});
+function download(){if(!image&&!elements.length){alert('먼저 이미지를 열거나 요소를 추가해 주세요.');return;}const a=document.createElement('a');a.download='youthcraft-design.png';a.href=canvas.toDataURL('image/png');a.click();}
+$('openBtn').onclick=$('emptyOpen').onclick=()=>$('fileInput').click();$('fileInput').addEventListener('change',e=>{loadImage(e.target.files[0]);e.target.value='';});
+$('saveBtn').onclick=download;$('newBtn').onclick=$('emptyNew').onclick=newCanvas;
+$('addText').onclick=()=>addElement('text');$('addRect').onclick=()=>addElement('rect');$('addCircle').onclick=()=>addElement('circle');
+document.querySelectorAll('[data-tool]').forEach(b=>b.addEventListener('click',()=>{tool=b.dataset.tool;document.querySelectorAll('[data-tool]').forEach(x=>x.classList.toggle('active',x===b));setStatus('도구: '+b.textContent.trim());}));
+$('deleteBtn').onclick=()=>{elements=elements.filter(e=>e.id!==selected);selected=null;commit();render();updateLayers();};
+$('clearLayers').onclick=()=>{if(!elements.length)return;if(confirm('모든 텍스트와 도형 레이어를 삭제할까요?')){elements=[];selected=null;commit();render();updateLayers();}};
+$('applyProps').onclick=()=>{const e=elements.find(x=>x.id===selected);if(!e)return;e.x=Number($('propX').value)||0;e.y=Number($('propY').value)||0;e.w=Math.max(1,Number($('propW').value)||1);e.h=Math.max(1,Number($('propH').value)||1);e.color=$('propColor').value;if(e.type==='text')e.text=$('propText').value;commit();render();updateLayers();};
+for(const k of Object.keys(filters))$(k).addEventListener('input',()=>{filters[k]=Number($(k).value);$(k+'Val').textContent=filters[k]+'%';render();});for(const k of Object.keys(filters))$(k).addEventListener('change',commit);
+$('resetFilters').onclick=()=>{filters={brightness:100,contrast:100,saturation:100};updateFilterUI();render();commit();};
+$('undoBtn').onclick=()=>{if(historyIndex>0)restore(history[--historyIndex]);};$('redoBtn').onclick=()=>{if(historyIndex<history.length-1)restore(history[++historyIndex]);};
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();$('undoBtn').click();}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){e.preventDefault();$('redoBtn').click();}if((e.key==='Delete'||e.key==='Backspace')&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)&&selected)$('deleteBtn').click();if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();download();}});
+commit();updateHistoryButtons();
+})();
+</script>
+</body>
+</html>
