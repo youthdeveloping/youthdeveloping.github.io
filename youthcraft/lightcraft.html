@@ -37,4 +37,5 @@ if(type==='vector'||type==='cad'){
  const title=field('문서 제목','title','YouthCraft 문서');const text=area('본문','body','PDF로 저장할 내용을 입력하세요.');stage.innerHTML='<div class="output" id="paper" style="white-space:pre-wrap"></div>';function draw(){$('paper').innerHTML='<h1>'+title.value.replace(/[<>&]/g,'')+'</h1><p>'+text.value.replace(/[<>&]/g,'').replace(/\n/g,'<br>')+'</p>'}title.oninput=text.oninput=draw;btn('PDF로 인쇄 / 저장',()=>window.print(),true);btn('텍스트 저장',()=>saveBlob(new Blob([title.value+'\n\n'+text.value],{type:'text/plain;charset=utf-8'}),'document.txt'));draw();$('hint').textContent='“PDF로 인쇄 / 저장”을 누른 뒤 인쇄 대화상자에서 PDF로 저장을 선택하세요.';
 }
 })();
-</script></body></html>
+</script><script src="/youthcraft/studio.js" defer></script>
+</body></html>
