@@ -134,7 +134,7 @@ function runWebProject(){
  }
  // 미리보기 문서에 CSP를 넣어 네트워크 요청과 외부 리소스를 기본 차단합니다.
  const csp='<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'unsafe-inline\'; style-src \'unsafe-inline\'; img-src data: blob:; font-src data:; media-src data: blob:; connect-src \'none\'; form-action \'none\'; object-src \'none\'; base-uri \'none\'">';
- if(/<head(?:\\s[^>]*)?>/i.test(html)) html=html.replace(/<head(?:\\s[^>]*)?>/i,match=>match+'\\n'+csp);
+ if(/<head/i.test(html)) html=html.replace(/<head[^>]*>/i,match=>match+String.fromCharCode(10)+csp);
  else html=csp+html;
  $("preview").srcdoc=html;switchPanel("preview");$("runInfo").textContent="웹 프로젝트 실행 완료 · Sandbox + CSP 적용";setStatus("실행 완료");
 }
