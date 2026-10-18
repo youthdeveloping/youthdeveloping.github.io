@@ -78,7 +78,12 @@ function selectFile(path){
   editor.setModel(models[path]);
   monaco.editor.setModelLanguage(models[path],modelLanguage(path));
  }
- $("projectName").textContent=path;renderFiles();$("languageInfo").textContent=modelLanguage(path).toUpperCase();
+ $("projectName").textContent=path;renderFiles();
+ const fileLang=modelLanguage(path);
+ if(["python","csharp","java","c","cpp","php","go","rust","sql","shell","typescript"].includes(fileLang))$("language").value=fileLang;
+ else if(fileLang==="javascript"&&!Object.keys(files).some(p=>p.split("/").pop().toLowerCase()==="index.html"))$("language").value="javascript";
+ else if(["html","css","javascript"].includes(fileLang))$("language").value="html";
+ $("languageInfo").textContent=$("language").value.toUpperCase();
 }
 function addFile(){
  const raw=prompt("새 파일 이름을 입력하세요. 예: app.js 또는 src/main.py");if(!raw)return;
