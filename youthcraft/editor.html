@@ -105,6 +105,10 @@ $('resetFilters').onclick=()=>{filters={brightness:100,contrast:100,saturation:1
 $('undoBtn').onclick=()=>{if(historyIndex>0)restore(history[--historyIndex]);};$('redoBtn').onclick=()=>{if(historyIndex<history.length-1)restore(history[++historyIndex]);};
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();$('undoBtn').click();}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){e.preventDefault();$('redoBtn').click();}if((e.key==='Delete'||e.key==='Backspace')&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)&&selected)$('deleteBtn').click();if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();download();}});
 commit();updateHistoryButtons();
+window.youthCraftProjectAdapter={
+ export(){let imageData=null;if(image){const tmp=document.createElement('canvas');tmp.width=image.naturalWidth||image.width;tmp.height=image.naturalHeight||image.height;tmp.getContext('2d').drawImage(image,0,0);imageData=tmp.toDataURL('image/png');}return {width:canvas.width,height:canvas.height,elements:clone(elements),filters:clone(filters),imageData};},
+ async import(data){if(!data||!Number.isFinite(data.width)||!Number.isFinite(data.height)||!Array.isArray(data.elements))throw Error('Invalid PhotoCraft project');if(data.width<1||data.height<1||data.width>5000||data.height>5000)throw Error('Canvas size out of range');let nextImage=null;if(data.imageData){nextImage=await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=data.imageData;});}canvas.width=data.width;canvas.height=data.height;image=nextImage;elements=data.elements.map(e=>({...e}));filters={brightness:100,contrast:100,saturation:100,...data.filters};selected=null;ensureCanvas();updateFilterUI();render();updateLayers();commit();setStatus(canvas.width+' × '+canvas.height+' · 프로젝트 불러옴');}
+};
 })();
 </script>
 <script src="/youthcraft/studio.js" defer></script>
