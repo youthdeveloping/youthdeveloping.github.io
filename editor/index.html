@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="YouthDeveloper Editor — HTML, CSS, JavaScript, Python, C#, Java, C++ 등 다양한 언어를 작성하고 실행하는 온라인 코드 편집기입니다.">
+<meta name="theme-color" content="#080b12">
+<title>Online Code Editor · YouthDeveloper</title>
+<style>
+:root{color-scheme:dark;--bg:#080b12;--panel:#101622;--panel2:#151e2d;--line:#273246;--text:#edf3fb;--muted:#9aa9bd;--accent:#73a7ff;--good:#66e3ae;--danger:#ff7f88;--bar:46px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;height:100vh;overflow:hidden}button,select,input{font:inherit}button,select{color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:8px 11px;cursor:pointer}button:hover{border-color:#526987}button:disabled{opacity:.55;cursor:wait}a{color:var(--accent);text-decoration:none}.top{height:56px;display:flex;align-items:center;gap:12px;padding:0 16px;border-bottom:1px solid var(--line);background:#0c111b}.brand{font-weight:750;white-space:nowrap}.brand span{color:var(--accent)}.crumb{color:var(--muted);font-size:12px}.spacer{flex:1}.status{color:var(--muted);font-size:12px}.primary{background:#3979e8;border-color:#3979e8;color:white;font-weight:700}.danger{color:var(--danger)}.toolbar{height:52px;display:flex;align-items:center;gap:8px;padding:0 12px;border-bottom:1px solid var(--line);background:var(--panel)}.toolbar label{color:var(--muted);font-size:12px}.toolbar select{max-width:175px}.workspace{height:calc(100vh - 108px);display:grid;grid-template-columns:minmax(360px,1.1fr) minmax(320px,.9fr);min-height:0}.left,.right{min-width:0;min-height:0;display:flex;flex-direction:column}.left{border-right:1px solid var(--line)}.filebar,.panelhead{height:var(--bar);min-height:var(--bar);display:flex;align-items:center;gap:8px;padding:0 12px;background:#0c111b;border-bottom:1px solid var(--line)}.filedot{width:8px;height:8px;border-radius:50%;background:var(--accent)}.filename{font-size:12px;color:#d8e3f2}.filebar .spacer{flex:1}.small{font-size:12px;padding:5px 8px}.editorwrap{flex:1;min-height:0;position:relative}#editor{position:absolute;inset:0}.right{background:#0a0e16}.tabs{display:flex;gap:4px;align-items:center}.tab{background:transparent;border-color:transparent;color:var(--muted);padding:6px 10px}.tab.active{background:var(--panel2);border-color:var(--line);color:var(--text)}.output{flex:1;min-height:0;position:relative;background:white}.output iframe{border:0;width:100%;height:100%;background:white}.output pre{display:none;margin:0;padding:16px;height:100%;overflow:auto;background:#080b12;color:#e5edf8;white-space:pre-wrap;overflow-wrap:anywhere;font:13px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace}.empty{display:none;position:absolute;inset:0;align-items:center;justify-content:center;text-align:center;padding:24px;background:#0a0e16;color:var(--muted)}.consolebar{height:38px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;background:#0c111b;border-top:1px solid var(--line);color:var(--muted);font-size:12px}.bottom{height:28px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-top:1px solid var(--line);background:#0c111b;color:var(--muted);font-size:11px}.note{padding:12px 16px;color:var(--muted);font-size:12px;border-top:1px solid var(--line);line-height:1.6}.hidden{display:none!important}.mobilehint{display:none}
+@media(max-width:800px){body{height:auto;min-height:100vh;overflow:auto}.top{padding:0 10px}.crumb,.status{display:none}.toolbar{height:auto;min-height:52px;flex-wrap:wrap;padding:8px}.toolbar select{max-width:140px}.workspace{height:auto;display:flex;flex-direction:column}.left,.right{height:58vh;min-height:360px}.left{border-right:0;border-bottom:2px solid var(--line)}.right{height:50vh}.bottom{position:static}.mobilehint{display:block}.brand{font-size:13px}}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="/" aria-label="YouthDeveloper 홈">Youth<span>Developer</span></a>
+  <span class="crumb">/ Editor · Online IDE</span><div class="spacer"></div>
+  <span id="status" class="status">준비됨</span>
+  <button id="saveBtn" title="브라우저에 저장">저장</button>
+  <button id="downloadBtn" title="현재 파일 다운로드">다운로드</button>
+</header>
+<div class="toolbar">
+  <label for="language">언어</label>
+  <select id="language" aria-label="프로그래밍 언어">
+    <option value="html">HTML</option><option value="javascript">JavaScript</option><option value="css">CSS</option><option value="typescript">TypeScript</option><option value="json">JSON</option><option value="python">Python</option><option value="csharp">C#</option><option value="java">Java</option><option value="c">C</option><option value="cpp">C++</option><option value="php">PHP</option><option value="go">Go</option><option value="rust">Rust</option><option value="sql">SQL</option><option value="markdown">Markdown</option><option value="xml">XML</option><option value="yaml">YAML</option><option value="shell">Shell</option>
+  </select>
+  <label for="theme">테마</label><select id="theme" aria-label="편집기 테마"><option value="vs-dark">Dark</option><option value="light">Light</option><option value="hc-black">High Contrast</option></select>
+  <button id="runBtn" class="primary">▶ 실행</button><button id="resetBtn">초기 코드</button><div class="spacer"></div><button id="openBtn">파일 열기</button><input id="fileInput" type="file" class="hidden" accept=".html,.htm,.js,.mjs,.cjs,.css,.ts,.json,.py,.cs,.java,.c,.h,.cpp,.cc,.cxx,.php,.go,.rs,.sql,.md,.xml,.yaml,.yml,.sh,.txt">
+</div>
+<main class="workspace">
+  <section class="left" aria-label="코드 편집기">
+    <div class="filebar"><span class="filedot"></span><span id="filename" class="filename">index.html</span><span class="spacer"></span><span id="cursor" class="status">Ln 1, Col 1</span><button id="copyBtn" class="small">코드 복사</button></div>
+    <div class="editorwrap"><div id="editor"><div style="padding:18px;color:#9aa9bd">코드 편집기를 불러오는 중입니다…</div></div></div>
+  </section>
+  <section class="right" aria-label="실행 결과">
+    <div class="panelhead"><div class="tabs"><button class="tab active" data-panel="preview">미리보기</button><button class="tab" data-panel="console">콘솔 / 출력</button></div><div class="spacer"></div><button id="clearBtn" class="small">출력 지우기</button></div>
+    <div class="output" id="previewPanel"><iframe id="preview" title="코드 실행 미리보기" sandbox="allow-scripts"></iframe></div>
+    <div class="output hidden" id="consolePanel"><pre id="console"></pre><div id="consoleEmpty" class="empty" style="display:flex">실행 결과와 오류가 여기에 표시됩니다.</div></div>
+    <div class="consolebar"><span id="runInfo">실행할 코드를 작성해 주세요.</span><span id="languageInfo">HTML / Browser</span></div>
+    <div class="note">HTML·CSS·JavaScript는 브라우저에서 실행됩니다. Python·C#·C/C++ 등은 외부 코드 실행 API를 이용하므로 인터넷 연결이 필요합니다. 서버에 비밀키나 비밀번호를 입력하지 마세요.</div>
+  </section>
+</main>
+<footer class="bottom"><span>YouthDeveloper Editor · 실험적 서비스</span><span>브라우저 저장은 현재 기기에만 적용됩니다.</span></footer>
+<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js"></script>
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const starters={
+html:'<!doctype html>\n<html lang="ko">\n<head>\n  <meta charset="utf-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1">\n  <title>내 웹 페이지</title>\n  <style>body{font-family:system-ui,sans-serif;padding:2rem}button{padding:.6rem 1rem}</style>\n</head>\n<body>\n  <h1>안녕하세요, YouthDeveloper!</h1>\n  <p>이곳에서 HTML, CSS, JavaScript를 실험해 보세요.</p>\n  <button id="hello">눌러 보기</button>\n  <script>document.querySelector("#hello").addEventListener("click",()=>alert("잘 작동합니다!"));<\\/script>\n</body>\n</html>',
+javascript:'console.log("Hello, YouthDeveloper!");\nconst sum = (a, b) => a + b;\nconsole.log("2 + 3 =", sum(2, 3));',
+css:'body {\n  font-family: system-ui, sans-serif;\n  background: #f3f6fb;\n  color: #172033;\n  padding: 2rem;\n}\n',
+typescript:'const greeting: string = "Hello, TypeScript!";\nconsole.log(greeting);',
+json:'{\n  "project": "YouthDeveloper",\n  "language": "json",\n  "ready": true\n}',
+python:'def greet(name: str) -> str:\n    return f"안녕하세요, {name}!"\n\nprint(greet("YouthDeveloper"))',
+csharp:'using System;\n\nclass Program\n{\n    static void Main()\n    {\n        Console.WriteLine("Hello, YouthDeveloper!");\n    }\n}',
+java:'public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello, YouthDeveloper!");\n    }\n}',
+c:'#include <stdio.h>\n\nint main(void) {\n    printf("Hello, YouthDeveloper!\\n");\n    return 0;\n}',
+cpp:'#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Hello, YouthDeveloper!" << endl;\n    return 0;\n}',
+php:'<?php\necho "Hello, YouthDeveloper!";\n',
+go:'package main\n\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Hello, YouthDeveloper!")\n}',
+rust:'fn main() {\n    println!("Hello, YouthDeveloper!");\n}',
+sql:'SELECT \'Hello, YouthDeveloper!\' AS greeting;\n',
+markdown:'# Hello, YouthDeveloper!\n\n온라인 코드 편집기에서 **Markdown**을 작성하고 있습니다.\n',
+xml:'<?xml version="1.0" encoding="UTF-8"?>\n<project>\n  <name>YouthDeveloper</name>\n  <status>ready</status>\n</project>',
+yaml:'project: YouthDeveloper\nlanguage: yaml\nready: true\n',
+shell:'echo "Hello, YouthDeveloper!"\n'
+};
+const ext={html:"html",javascript:"js",css:"css",typescript:"ts",json:"json",python:"py",csharp:"cs",java:"java",c:"c",cpp:"cpp",php:"php",go:"go",rust:"rs",sql:"sql",markdown:"md",xml:"xml",yaml:"yml",shell:"sh"};
+const piston={javascript:"javascript",typescript:"typescript",python:"python",csharp:"csharp",java:"java",c:"c",cpp:"cpp",php:"php",go:"go",rust:"rust",sql:"sqlite3",shell:"bash"};
+let editor=null, currentFile="index.html", currentLanguage="html", savedDrafts={};
+const status=s=>{$("status").textContent=s};
+function setFilename(){if(!currentFile||currentFile==="index.html"&&currentLanguage!=="html")currentFile="main."+ (ext[currentLanguage]||"txt");$("filename").textContent=currentFile;$("languageInfo").textContent=currentLanguage.toUpperCase()+(["html","javascript","css"].includes(currentLanguage)?" / Browser":" / Runtime API")}
+function activeCode(){return editor?editor.getValue():""}
+function setCode(code){if(editor)editor.setValue(code)}
+function setLanguage(lang,loadStarter){
+ currentLanguage=lang;
+ if(loadStarter){setCode(starters[lang]||"");currentFile="main."+(ext[lang]||"txt")}
+ if(editor){monaco.editor.setModelLanguage(editor.getModel(),lang==="csharp"?"csharp":lang==="shell"?"shell":lang==="markdown"?"markdown":lang);editor.updateOptions({readOnly:false})}
+ setFilename();$("runInfo").textContent=["html","javascript","css"].includes(lang)?"브라우저에서 실행할 수 있습니다.":"외부 실행 API로 코드를 전송합니다.";
+}
+function showConsole(text,isError){
+ $("console").style.display="block";$("consoleEmpty").style.display="none";$("console").textContent=text||"(출력 없음)";
+ $("console").style.color=isError?"#ff9aa2":"#e5edf8";switchPanel("console");
+}
+function switchPanel(panel){
+ document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.panel===panel));
+ $("previewPanel").classList.toggle("hidden",panel!=="preview");$("consolePanel").classList.toggle("hidden",panel!=="console");
+}
+function runBrowser(){
+ const code=activeCode(); const frame=$("preview");
+ if(currentLanguage==="html"){frame.srcdoc=code;showConsole("HTML 미리보기를 갱신했습니다.",false);switchPanel("preview");return}
+ if(currentLanguage==="css"){
+ frame.srcdoc='<!doctype html><html><head><meta charset="utf-8"><style>'+code.replace(/<\\/style/gi,"<\\\\/style")+'</style></head><body><h1>CSS 미리보기</h1><p>현재 CSS가 이 페이지에 적용됩니다.</p><button>샘플 버튼</button></body></html>';switchPanel("preview");$("runInfo").textContent="CSS 미리보기 완료";return;
+ }
+ const escaped=code.replace(/<\\/script/gi,"<\\\\/script");
+ frame.srcdoc='<!doctype html><html><head><meta charset="utf-8"></head><body><div id="app"></div><script>const send=(...a)=>parent.postMessage({type:"yd-editor-console",args:a.map(x=>{try{return typeof x==="string"?x:JSON.stringify(x)}catch(e){return String(x)}})},"*");console.log=(...a)=>send(...a);console.error=(...a)=>send("ERROR:",...a);window.onerror=(m,s,l,c,e)=>send("ERROR:",m+" ("+l+":"+c+")");try{'+escaped+'}catch(e){console.error(e.stack||e.message)}<\\/script></body></html>';
+ switchPanel("preview");$("runInfo").textContent="JavaScript 실행 완료";
+}
+window.addEventListener("message",e=>{if(e.data&&e.data.type==="yd-editor-console"){const line=(e.data.args||[]).join(" ");$("console").style.display="block";$("consoleEmpty").style.display="none";$("console").textContent+=($("console").textContent?"\n":"")+line;switchPanel("console")}});
+async function runRemote(){
+ const lang=currentLanguage;
+ if(!piston[lang]){showConsole("이 언어는 현재 자동 실행 기능이 연결되어 있지 않습니다. 코드 편집 및 다운로드는 사용할 수 있습니다.",true);return}
+ const code=activeCode();$("runBtn").disabled=true;$("runBtn").textContent="실행 중…";status("코드 실행 요청 중");$("console").textContent="";$("consoleEmpty").style.display="none";$("console").style.display="block";
+ try{
+  const response=await fetch("https://emkc.org/api/v2/piston/execute",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({language:piston[lang],version:"*",files:[{name:currentFile||("main."+(ext[lang]||"txt")),content:code}],stdin:""})});
+  if(!response.ok)throw new Error("실행 서비스 응답 오류 (HTTP "+response.status+")");
+  const data=await response.json();const output=[data.compile&&data.compile.output?"[컴파일]\n"+data.compile.output:"",data.run&&data.run.output?data.run.output:"",data.compile&&data.compile.stderr?"[컴파일 오류]\n"+data.compile.stderr:"",data.run&&data.run.stderr?"[오류]\n"+data.run.stderr:""].filter(Boolean).join("\n");
+  showConsole(output||"프로그램이 종료되었습니다. 출력이 없습니다.",!!(data.compile&&data.compile.code||data.run&&data.run.code));$("runInfo").textContent=data.run&&data.run.code?"종료 코드: "+data.run.code:"실행 완료";status("실행 완료");
+ }catch(err){showConsole("코드를 실행하지 못했습니다. 인터넷 연결과 외부 실행 서비스 상태를 확인해 주세요.\n\n상세 정보: "+err.message,true);$("runInfo").textContent="실행 실패";status("오류")}
+ finally{$("runBtn").disabled=false;$("runBtn").textContent="▶ 실행"}
+}
+function run(){if(!editor)return;if(["html","javascript","css"].includes(currentLanguage)){if(currentLanguage==="javascript"){$("console").textContent=""}runBrowser()}else runRemote()}
+function save(){savedDrafts[currentLanguage]={code:activeCode(),file:currentFile,updatedAt:new Date().toISOString()};try{localStorage.setItem("yd-editor-drafts-v1",JSON.stringify(savedDrafts));status("브라우저에 저장됨");$("runInfo").textContent="현재 코드가 이 기기의 브라우저에 저장되었습니다."}catch(e){status("저장 실패");showConsole("브라우저 저장 공간을 사용할 수 없습니다.",true)}}
+function download(){const blob=new Blob([activeCode()],{type:"text/plain;charset=utf-8"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=currentFile||("main."+(ext[currentLanguage]||"txt"));a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+require.config({paths:{vs:"https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs"}});
+require(["vs/editor/editor.main"],function(){
+ $("editor").innerHTML="";
+ try{savedDrafts=JSON.parse(localStorage.getItem("yd-editor-drafts-v1")||"{}")}catch(e){savedDrafts={}}
+ const initial=(savedDrafts.html&&savedDrafts.html.code)||starters.html;
+ editor=monaco.editor.create($("editor"),{value:initial,language:"html",theme:"vs-dark",automaticLayout:true,fontSize:14,minimap:{enabled:false},scrollBeyondLastLine:false,wordWrap:"on",tabSize:2,insertSpaces:true,renderWhitespace:"selection",quickSuggestions:true,suggestOnTriggerCharacters:true,formatOnPaste:true,formatOnType:false,ariaLabel:"YouthDeveloper 코드 편집기"});
+ editor.onDidChangeCursorPosition(e=>$("cursor").textContent="Ln "+e.position.lineNumber+", Col "+e.position.column);
+ editor.onDidChangeModelContent(()=>status("수정됨"));
+ setFilename();$("runInfo").textContent="HTML 코드를 편집하고 실행 버튼을 눌러 보세요.";
+});
+$("language").addEventListener("change",e=>{const lang=e.target.value;let draft=savedDrafts[lang];setLanguage(lang,false);if(draft){setCode(draft.code);currentFile=draft.file||("main."+(ext[lang]||"txt"));setFilename()}else setLanguage(lang,true);});
+$("theme").addEventListener("change",e=>{if(editor)monaco.editor.setTheme(e.target.value)});
+$("runBtn").addEventListener("click",run);$("saveBtn").addEventListener("click",save);$("downloadBtn").addEventListener("click",download);
+$("resetBtn").addEventListener("click",()=>{if(confirm("현재 코드를 초기 템플릿으로 바꾸시겠습니까?")){setLanguage(currentLanguage,true);status("초기 코드로 변경됨")}});
+$("openBtn").addEventListener("click",()=>$("fileInput").click());
+$("fileInput").addEventListener("change",async e=>{const file=e.target.files&&e.target.files[0];if(!file)return;const code=await file.text();const name=file.name;const extname=name.split(".").pop().toLowerCase();const map={html:"html",htm:"html",js:"javascript",mjs:"javascript",cjs:"javascript",css:"css",ts:"typescript",json:"json",py:"python",cs:"csharp",java:"java",c:"c",h:"c",cpp:"cpp",cc:"cpp",cxx:"cpp",php:"php",go:"go",rs:"rust",sql:"sql",md:"markdown",xml:"xml",yaml:"yaml",yml:"yaml",sh:"shell"};currentFile=name;const lang=map[extname];if(lang){$("language").value=lang;setLanguage(lang,false)}setCode(code);setFilename();status("파일을 불러왔습니다");e.target.value=""});
+$("copyBtn").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(activeCode());status("코드 복사됨")}catch(e){showConsole("클립보드 접근이 거부되었습니다. 코드 편집기에서 직접 선택해 복사해 주세요.",true)}});
+$("clearBtn").addEventListener("click",()=>{$("console").textContent="";$("console").style.display="none";$("consoleEmpty").style.display="flex";$("runInfo").textContent="출력을 지웠습니다."});
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>switchPanel(b.dataset.panel)));
+window.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key==="s"){e.preventDefault();save()}if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();run()}});
+})();
+</script>
+</body>
+</html>
