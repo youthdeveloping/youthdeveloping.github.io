@@ -16,7 +16,7 @@
 <body>
 <header>
   <a class="brand" href="/youthcraft/" aria-label="PhotoCraft 홈"><span class="logo">✳</span><span>PhotoCraft<small>by YouthDeveloper · Image Editor</small></span></a>
-  <div class="head-actions"><button id="openBtn" class="quiet">이미지 열기</button><button id="saveBtn" class="primary">PNG 내보내기</button></div>
+  <div class="head-actions"><button id="openBtn" class="quiet">이미지 열기</button><button id="saveBtn" title="PNG 내보내기 (Ctrl+S)" class="primary">PNG 내보내기</button></div>
 </header>
 <div class="layout">
 <aside class="left">
@@ -44,7 +44,7 @@
   </section>
 </aside>
 <main class="workspace">
-  <div class="workspace-top"><div class="left-actions"><button id="undoBtn" disabled>↶ 실행 취소</button><button id="redoBtn" disabled>↷ 다시 실행</button><button id="deleteBtn" class="danger" disabled>삭제</button></div><div class="right-actions"><span id="canvasInfo" class="status">캔버스 준비됨</span><button id="newBtn">새 캔버스</button></div></div>
+  <div class="workspace-top"><div class="left-actions"><button id="undoBtn" title="실행 취소 (Ctrl+Z)" disabled>↶ 실행 취소</button><button id="redoBtn" title="다시 실행 (Ctrl+Y)" disabled>↷ 다시 실행</button><button id="deleteBtn" class="danger" disabled>삭제</button></div><div class="right-actions"><span id="canvasInfo" class="status">캔버스 준비됨</span><button id="newBtn">새 캔버스</button></div></div>
   <div class="stage" id="stage">
     <div class="empty" id="emptyState"><div class="big">✳</div><h2>무엇을 만들어 볼까요?</h2><p>이미지를 불러오거나 새 캔버스를 시작해 보세요. 텍스트와 도형을 추가하고 색상과 이미지 필터를 조정할 수 있습니다.</p><div class="empty-actions"><button id="emptyOpen" class="primary">이미지 열기</button><button id="emptyNew">새 캔버스</button></div></div>
     <div class="canvas-wrap hidden" id="canvasWrap"><canvas id="canvas" width="1200" height="800" aria-label="이미지 편집 캔버스"></canvas></div>
@@ -107,5 +107,6 @@ document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLower
 commit();updateHistoryButtons();
 })();
 </script>
+<script src="/youthcraft/studio.js" defer></script>
 </body>
 </html>
