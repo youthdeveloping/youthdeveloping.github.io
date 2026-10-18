@@ -119,11 +119,11 @@ function runWebProject(){
  const js=Object.keys(files).filter(p=>getExt(p)==="js").map(p=>files[p]).join("\n;\n");
  const styleTag="<style>\n"+escapeClosingTag(css,"style")+"\n</style>";
  const scriptTag="<script>\n"+escapeClosingTag(js,"script")+"\n<"+"/script>";
- if(css&&!/<link[^>]+href=["'][^"']+\.css["']/i.test(html)){
-  if(/<\/head>/i.test(html))html=html.replace(/<\/head>/i,styleTag+"\n</head>");else html=styleTag+html;
+ if(css){
+  if(/<\\/head>/i.test(html))html=html.replace(/<\\/head>/i,styleTag+"\\n</head>");else html=styleTag+html;
  }
- if(js&&!/<script[^>]+src=["'][^"']+\.js["']/i.test(html)){
-  if(/<\/body>/i.test(html))html=html.replace(/<\/body>/i,scriptTag+"\n</body>");else html+=scriptTag;
+ if(js){
+  if(/<\\/body>/i.test(html))html=html.replace(/<\\/body>/i,scriptTag+"\\n</body>");else html+=scriptTag;
  }
  $("preview").srcdoc=html;switchPanel("preview");$("runInfo").textContent="웹 프로젝트 실행 완료 ("+Object.keys(files).length+"개 파일)";setStatus("실행 완료");
 }
