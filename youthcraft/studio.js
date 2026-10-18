@@ -16,6 +16,26 @@ const style=document.createElement('style');style.textContent=`
 const bar=document.createElement('div');bar.id='yc-workspace-tools';bar.innerHTML='<span class="yc-label">YOUTHCRAFT WORKSPACE</span><span class="yc-status" id="yc-status">자동 저장 준비</span><button id="yc-save">프로젝트 저장</button><button id="yc-load">프로젝트 열기</button><button id="yc-help">단축키 / 도움말</button><input id="yc-file" type="file" accept=".ycproject,.json,application/json" hidden>';
 const header=document.querySelector('header');if(header)header.insertAdjacentElement('afterend',bar);else document.body.prepend(bar);
 const status=t=>{const e=document.getElementById('yc-status');if(e)e.textContent=t};
+const nav=document.createElement('nav');nav.id='yc-tool-nav';nav.setAttribute('aria-label','YouthCraft 도구 바로가기');nav.innerHTML=[
+['PhotoCraft','editor.html'],['VectorCraft','vectorcraft.html'],['FilmCraft','filmcraft.html'],['LightCraft','lightcraft.html'],['PDFCraft','pdfcraft.html'],['EffectCraft','effectcraft.html'],['DesignCraft','designcraft.html'],['FigCraft','figcraft.html'],['WordCraft','wordcraft.html'],['SoundCraft','soundcraft.html'],['DeckCraft','deckcraft.html'],['CADCraft','cadcraft.html'],['GridCraft','gridcraft.html']
+].map(([name,path])=>'<a href="/youthcraft/'+path+'"'+(location.pathname.endsWith('/'+path)?' aria-current="page"':'')+'>'+name+'</a>').join('');
+bar.insertAdjacentElement('afterend',nav);
+const quick=document.createElement('div');quick.id='yc-quick-actions';quick.innerHTML='<button type="button" id="yc-export">빠른 내보내기</button><button type="button" id="yc-fullscreen">전체 화면</button><button type="button" id="yc-reset">입력 초기화</button><span>작업은 이 브라우저에서 처리됩니다</span>';
+nav.insertAdjacentElement('afterend',quick);
+const extraStyle=document.createElement('style');extraStyle.textContent=`
+#yc-tool-nav{display:flex;gap:6px;overflow-x:auto;padding:8px 14px;background:#111115;border-bottom:1px solid #303039;scrollbar-width:thin}
+#yc-tool-nav a{flex:0 0 auto;text-decoration:none;color:#c9c9d2;border:1px solid #35353e;background:#1c1c22;border-radius:7px;padding:7px 10px;font-size:11px}
+#yc-tool-nav a[aria-current="page"]{background:#70f0bd;color:#101014;border-color:#70f0bd;font-weight:750}
+#yc-quick-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:8px 14px;background:#202027;border-bottom:1px solid #393942}
+#yc-quick-actions button{font:inherit;font-size:11px;padding:7px 10px;border-radius:7px;border:1px solid #464650;background:#2b2b34;color:#f7f7fa;cursor:pointer}
+#yc-quick-actions button:hover{border-color:#70f0bd;color:#70f0bd}
+#yc-quick-actions span{font-size:10px;color:#9b9ba7;margin-left:auto}
+@media(max-width:600px){#yc-quick-actions span{width:100%;margin-left:0}}
+@media(prefers-reduced-motion:no-preference){#yc-tool-nav a,#yc-quick-actions button{transition:background .15s,border-color .15s,color .15s}}
+`;document.head.append(extraStyle);
+document.getElementById('yc-export').onclick=()=>{const buttons=[...document.querySelectorAll('#actions button,button')].filter(b=>!b.closest('#yc-workspace-tools')&&!b.closest('#yc-quick-actions')&&!b.disabled);const preferred=buttons.find(b=>/png|svg|csv|html|저장|내보내기|export|download|pdf/i.test(b.textContent));if(preferred)preferred.click();else window.print()};
+document.getElementById('yc-fullscreen').onclick=async()=>{try{if(!document.fullscreenElement)await document.documentElement.requestFullscreen();else await document.exitFullscreen()}catch(_){status('전체 화면은 브라우저 메뉴에서 켜 주세요')}};
+document.getElementById('yc-reset').onclick=()=>{if(!confirm('현재 도구의 입력값을 초기화할까요?'))return;controls().forEach(e=>{if(e.type==='file')return;if(e.type==='checkbox')e.checked=false;else if(e.tagName==='SELECT')e.selectedIndex=0;else e.value='';e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}))});try{localStorage.removeItem(KEY)}catch(_){}status('입력값 초기화됨')};
 const controls=()=>Array.from(document.querySelectorAll('input,textarea,select')).filter(e=>e.id&&e.type!=='file'&&!e.closest('#yc-workspace-tools'));
 const snapshot=()=>({format:'YouthCraftProject',version:1,tool:document.title,path:location.pathname,savedAt:new Date().toISOString(),fields:controls().map(e=>({id:e.id,type:e.type,value:e.type==='checkbox'?e.checked:e.value})),appState:window.youthCraftProjectAdapter?.export?window.youthCraftProjectAdapter.export():null,canvas:(()=>{const c=document.querySelector('canvas');try{return c&&c.width&&c.height?{width:c.width,height:c.height,data:c.toDataURL('image/png')}:null}catch(_){return null}})()});
 let timer;function autosave(){clearTimeout(timer);timer=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(snapshot()));status('자동 저장됨')}catch(_){status('자동 저장 제한됨')}},450)}
