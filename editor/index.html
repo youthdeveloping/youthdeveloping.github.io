@@ -120,10 +120,12 @@ function runWebProject(){
  const styleTag="<style>\n"+escapeClosingTag(css,"style")+"\n</style>";
  const scriptTag="<script>\n"+escapeClosingTag(js,"script")+"\n<"+"/script>";
  if(css){
-  if(/<\\/head>/i.test(html))html=html.replace(/<\\/head>/i,styleTag+"\\n</head>");else html=styleTag+html;
+  const headAt=html.toLowerCase().lastIndexOf("</head>");
+  if(headAt>=0)html=html.slice(0,headAt)+styleTag+"\n"+html.slice(headAt);else html=styleTag+html;
  }
  if(js){
-  if(/<\\/body>/i.test(html))html=html.replace(/<\\/body>/i,scriptTag+"\\n</body>");else html+=scriptTag;
+  const bodyAt=html.toLowerCase().lastIndexOf("</body>");
+  if(bodyAt>=0)html=html.slice(0,bodyAt)+scriptTag+"\n"+html.slice(bodyAt);else html+=scriptTag;
  }
  $("preview").srcdoc=html;switchPanel("preview");$("runInfo").textContent="웹 프로젝트 실행 완료 ("+Object.keys(files).length+"개 파일)";setStatus("실행 완료");
 }
