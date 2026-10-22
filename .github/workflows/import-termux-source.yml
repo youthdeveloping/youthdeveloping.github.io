@@ -1,0 +1,51 @@
+name: Import Termux v0.118.0 source
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import-source:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Download and extract upstream source
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/termux-src
+          curl --fail --location --retry 3 \
+            https://github.com/termux/termux-app/archive/refs/tags/v0.118.0.zip \
+            -o /tmp/termux-source.zip
+          unzip -q /tmp/termux-source.zip -d /tmp/termux-src
+          SRC="$(find /tmp/termux-src -mindepth 1 -maxdepth 1 -type d | head -n 1)"
+          test -n "$SRC"
+          DEST="termux/source/termux-app-0.118.0"
+          mkdir -p "$DEST"
+          rsync -a --delete \
+            --exclude='app/dev_keystore.jks' \
+            --exclude='.git/' \
+            "$SRC/" "$DEST/"
+          cat > "$DEST/IMPORT-NOTICE.md" <<'EOF'
+          Imported from the upstream Termux Android app repository, tag v0.118.0.
+          Upstream: https://github.com/termux/termux-app
+          The app/dev_keystore.jks file is intentionally excluded. Review upstream licenses and notices before redistributing.
+          EOF
+
+      - name: Commit imported source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add termux/source/termux-app-0.118.0
+          if git diff --cached --quiet; then
+            echo "No source changes to commit."
+            exit 0
+          fi
+          git commit -m "Import Termux v0.118.0 source (excluding signing keystore)"
+          git push
