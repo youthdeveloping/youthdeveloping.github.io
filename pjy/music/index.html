@@ -53,6 +53,14 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
    <p class="hint">파트별로 악기를 바꿔가며 음표를 입력할 수 있어. 마디 수를 늘리면 더 긴 곡을 만들 수 있어.</p>
   </section>
   <section class="panel">
+   <h2>음향 효과 · 전체 악기</h2>
+   <div class="field"><label for="masterVolume">전체 음량 <span id="volumeValue">75%</span></label><input id="masterVolume" type="range" min="0" max="100" value="75"></div>
+   <div class="field"><label for="toneBrightness">음색 밝기 <span id="brightnessValue">60%</span></label><input id="toneBrightness" type="range" min="0" max="100" value="60"></div>
+   <div class="field"><label for="reverbAmount">공간감 · 잔향 <span id="reverbValue">25%</span></label><input id="reverbAmount" type="range" min="0" max="100" value="25"></div>
+   <div class="field"><label for="soundPreset">공간 효과</label><select id="soundPreset"><option value="studio">스튜디오</option><option value="room">작은 방</option><option value="hall">콘서트홀</option><option value="dry">잔향 없음</option></select></div>
+   <p class="hint">모든 악기에 음량·필터·잔향을 적용합니다. 악기마다 다른 합성 음색을 사용하며 기타 주법도 재생 소리에 반영됩니다.</p>
+  </section>
+  <section class="panel">
    <h2>음표 입력</h2>
    <div class="field"><label for="octave">옥타브</label><select id="octave"><option value="2">2 (낮음)</option><option value="3">3</option><option value="4" selected>4</option><option value="5">5</option><option value="6">6 (높음)</option></select></div>
    <div class="pitch-grid" id="pitchGrid">
