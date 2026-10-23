@@ -49,6 +49,10 @@ async function boot(){
      {type:"proc",path:"/proc"}
    ]});
    cx.setConsole($("console"));
+// Keep Backspace inside the virtual terminal instead of triggering browser navigation.
+$("console").addEventListener("keydown", event => {
+  if (event.key === "Backspace") event.preventDefault();
+});
    status("loading","Linux 셸 시작 중","첫 실행은 다운로드 때문에 시간이 걸릴 수 있습니다.");
    await cx.run("/bin/bash",["--login"],{env:["HOME=/home/user","USER=user","SHELL=/bin/bash","TERM=xterm-256color","LANG=C.UTF-8"],cwd:"/home/user",uid:1000,gid:1000});
    status("ready","셸 세션이 종료되었습니다","다시 시작 버튼을 눌러 새 세션을 시작하세요.");
