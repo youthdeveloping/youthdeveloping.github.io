@@ -18,6 +18,9 @@ main{max-width:1500px;margin:0 auto;padding:22px clamp(12px,3vw,32px) 60px;displ
 .two{display:grid;grid-template-columns:1fr 1fr;gap:9px}.pitch-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.pitch-grid button{padding:10px 3px}.pitch-grid button.active{background:var(--soft);border-color:var(--green);color:var(--green)}
 .duration-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.duration-grid button{font-size:20px;padding:9px 2px}.duration-grid button small{display:block;font-size:10px;margin-top:3px}
 .hint{font-size:12px;color:var(--muted);line-height:1.6}.toolbar{margin-bottom:14px}.toolbar .spacer{flex:1}.workspace{min-width:0}.score-card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}.score-head{padding:17px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.score-head h2{margin:0;font-size:18px}.score-head p{margin:4px 0 0;color:var(--muted);font-size:12px}.score-scroll{overflow:auto;padding:18px;min-height:280px}.score-paper{min-width:650px}.part-title{font-size:13px;color:#4d5b4a;font-weight:800;margin:10px 0 2px}.staff{width:100%;min-height:140px}.empty{padding:50px 20px;text-align:center;color:var(--muted)}.empty strong{display:block;color:var(--ink);margin-bottom:8px}.notes-panel{margin-top:16px}.notes-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}.notes-head h2{margin:0}.note-list{display:flex;gap:8px;flex-wrap:wrap}.note-chip{display:flex;align-items:center;gap:6px;background:#f7f9f5;border:1px solid var(--line);border-radius:10px;padding:6px 8px;font-size:12px}.note-chip.selected{border-color:var(--green);background:var(--soft)}.note-chip button{padding:2px 6px;border:0;background:transparent;color:var(--danger)}.status{font-size:12px;color:var(--muted);margin-top:10px;min-height:18px}.kbd{border:1px solid #d4d9d0;border-bottom-width:2px;border-radius:5px;padding:1px 5px;font-size:11px;background:#fff}.pill{background:var(--soft);color:var(--green);padding:4px 8px;border-radius:99px;font-size:11px;font-weight:800}
+.notation-toggle{display:flex;border:1px solid var(--line);border-radius:10px;padding:3px;background:#f5f7f2;gap:3px}
+.notation-toggle button{border:0;padding:6px 10px;font-size:12px;background:transparent}
+.notation-toggle button.active{background:var(--green);color:white}
 footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
 @media(max-width:900px){main{grid-template-columns:1fr}.sidebar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.sidebar .panel:first-child{grid-column:1/-1}}
 @media(max-width:560px){header{padding:14px}.brand h1{font-size:18px}.header-actions{width:100%}.header-actions button{flex:1}main{padding:12px}.sidebar{display:flex}.panel{padding:14px}.toolbar button{flex:1}.score-scroll{padding:8px}.score-paper{min-width:600px}}
@@ -59,6 +62,15 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
     <button id="chordModeBtn" aria-pressed="false">＋ 화음 입력 OFF</button>
     <div class="field" style="margin:0"><label for="hand">피아노 손</label><select id="hand"><option value="auto">옥타브로 자동</option><option value="treble">오른손 · 높은음자리표</option><option value="bass">왼손 · 낮은음자리표</option></select></div>
    </div>
+   <div id="guitarControls" hidden style="margin-top:14px;padding-top:13px;border-top:1px solid var(--line)">
+    <h2 style="margin-bottom:10px">기타 전용 설정</h2>
+    <div class="two"><div class="field"><label for="guitarTuning">튜닝</label><select id="guitarTuning"><option value="standard">표준 튜닝 EADGBE</option><option value="dropd">Drop D · DADGBE</option></select></div>
+     <div class="field"><label for="guitarCapo">카포</label><select id="guitarCapo"><option value="0">없음</option><option value="1">1프렛</option><option value="2">2프렛</option><option value="3">3프렛</option><option value="4">4프렛</option><option value="5">5프렛</option><option value="7">7프렛</option><option value="9">9프렛</option><option value="12">12프렛</option></select></div></div>
+    <div class="two"><div class="field"><label for="guitarString">줄 선택</label><select id="guitarString"><option value="1">1번 줄 · 높은 E</option><option value="2">2번 줄 · B</option><option value="3">3번 줄 · G</option><option value="4">4번 줄 · D</option><option value="5">5번 줄 · A</option><option value="6">6번 줄 · 낮은 E</option></select></div>
+     <div class="field"><label for="guitarFret">프렛 (카포 기준)</label><input id="guitarFret" type="number" min="0" max="24" value="0"></div></div>
+    <div class="field"><label for="guitarTechnique">주법</label><select id="guitarTechnique"><option value="normal">일반 피킹</option><option value="palm-mute">팜 뮤트 (PM)</option><option value="slide">슬라이드</option><option value="bend">벤딩</option><option value="hammer-on">해머링 온 (H)</option><option value="pull-off">풀링 오프 (P)</option><option value="harmonic">하모닉스</option></select></div>
+    <p class="hint">줄과 프렛을 지정하면 해당 기타 음높이로 입력됩니다. 카포와 튜닝 설정은 타브 표시와 재생에 반영됩니다.</p>
+   </div>
    <p class="hint" id="chordHint">화음 입력을 켜고 음을 여러 개 선택하면 동시에 울리는 화음을 만들 수 있어.</p>
    <div class="field" style="margin-top:13px"><label for="accidental">임시표</label><select id="accidental"><option value="">없음</option><option value="#">샵 ♯</option><option value="b">플랫 ♭</option></select></div>
    <div class="field"><label>음표 길이</label><div class="duration-grid" id="durationGrid">
@@ -78,7 +90,7 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
    <button id="playBtn" class="primary">▶ 재생</button><button id="stopBtn">■ 정지</button><button id="sampleBtn">예시 멜로디</button><span class="spacer"></span><span class="pill" id="noteCount">0개 음표</span>
   </div>
   <div class="score-card">
-   <div class="score-head"><div><h2 id="displayTitle">새로운 멜로디</h2><p id="displayMeta">작곡가 미입력 · ♩ = 100 · 4/4</p></div><div class="no-print"><span class="pill">Music Studio</span></div></div>
+   <div class="score-head"><div><h2 id="displayTitle">새로운 멜로디</h2><p id="displayMeta">작곡가 미입력 · ♩ = 100 · 4/4</p></div><div class="no-print" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><div id="guitarNotationToggle" class="notation-toggle" hidden role="group" aria-label="기타 악보 종류"><button type="button" data-notation="staff" class="active" aria-pressed="true">오선보</button><button type="button" data-notation="tab" aria-pressed="false">타브 악보</button></div><span class="pill">Music Studio</span></div></div>
    <div class="score-scroll"><div class="score-paper" id="scorePaper"><div class="empty"><strong>악보를 준비하고 있어요</strong>왼쪽에서 음표를 추가하거나 예시 멜로디를 눌러 봐.</div></div></div>
   </div>
   <section class="panel notes-panel">
@@ -96,7 +108,7 @@ const $=id=>document.getElementById(id);
 const VF=window.Vex;
 const names={piano:'피아노',guitar:'기타',drums:'드럼',winds:'관악기',strings:'현악기'};
 const midiBase={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
-let selectedPitch='C',selectedDuration='q',selectedNoteId=null,nextId=1,history=[],audioCtx=null,playTimers=[],chordMode=false,selectedPitches=[];
+let selectedPitch='C',selectedDuration='q',selectedNoteId=null,nextId=1,history=[],audioCtx=null,playTimers=[],activeSources=new Set(),chordMode=false,selectedPitches=[],guitarNotation='staff';
 let parts=[{id:'part1',instrument:'piano',notes:[]}],activePartId='part1';
 const activePart=()=>parts.find(p=>p.id===activePartId)||parts[0];
 const midiOf=n=>n.rest?null:12*(Number(n.octave)+1)+(midiBase[n.pitch]??0)+(n.accidental==='#'?1:n.accidental==='b'?-1:0);
@@ -105,7 +117,7 @@ function snapshot(){history.push(JSON.stringify({parts,activePartId,nextId}));if
 function durationBeats(d){return ({w:4,h:2,q:1,'8':.5})[d]||1}
 function durationName(d){return ({w:'온음표',h:'2분음표',q:'4분음표','8':'8분음표'})[d]||d}
 function noteName(n){if(n.rest)return '쉼표';const ps=(n.pitches&&n.pitches.length?n.pitches:[n]).map(x=>x.pitch+(x.accidental||'')+x.octave);return ps.join(' + ')}
-function updateSettings(){ $('displayTitle').textContent=$('title').value||'제목 없는 곡';$('displayMeta').textContent=($('composer').value?$('composer').value+' · ':'')+'♩ = '+clampTempo()+' · '+$('meter').value+' · '+names[activePart().instrument];}
+function updateSettings(){ $('displayTitle').textContent=$('title').value||'제목 없는 곡';$('displayMeta').textContent=($('composer').value?$('composer').value+' · ':'')+'♩ = '+clampTempo()+' · '+$('meter').value+' · '+names[activePart().instrument];$('guitarControls').hidden=activePart().instrument!=='guitar';$('guitarNotationToggle').hidden=activePart().instrument!=='guitar';}
 function clampTempo(){let v=Number($('tempo').value)||100;v=Math.max(30,Math.min(240,v));$('tempo').value=v;return v}
 function setPitch(p){
  selectedPitch=p;
@@ -122,16 +134,27 @@ function setPitch(p){
  }
 }
 function setDuration(d){selectedDuration=d;document.querySelectorAll('#durationGrid button').forEach(b=>b.classList.toggle('active',b.dataset.dur===d));$('inputStatus').textContent=`${chordMode?'화음':selectedPitch}${$('octave').value}, ${durationName(d)}가 선택되어 있어.`}
+function guitarMidi(stringNo,fret){
+ const base={1:64,2:59,3:55,4:50,5:45,6:40};if($('guitarTuning').value==='dropd')base[6]=38;
+ return base[Number(stringNo)]+Number($('guitarCapo').value||0)+Number(fret||0);
+}
+function pitchFromMidi(midi){
+ const pc=((midi%12)+12)%12;return {pitch:['C','C','D','D','E','F','F','G','G','A','A','B'][pc],octave:Math.floor(midi/12)-1,accidental:([1,3,6,8,10].includes(pc)?'#':'')};
+}
 function addNote(rest=false){
  snapshot();const p=activePart();let pitches=[];
- if(!rest && chordMode && selectedPitches.length)pitches=selectedPitches.map(x=>({...x}));
- else if(!rest && selectedPitch!=='R')pitches=[{pitch:selectedPitch,octave:Number($('octave').value),accidental:$('accidental').value}];
+ const isRest=rest||selectedPitch==='R';
+ if(!isRest&&p.instrument==='guitar'){
+  const stringNo=Number($('guitarString').value),fret=Math.max(0,Math.min(24,Number($('guitarFret').value)||0));$('guitarFret').value=fret;
+  const base=pitchFromMidi(guitarMidi(stringNo,fret));pitches=[{...base,guitarString:stringNo,fret,technique:$('guitarTechnique').value}];
+ }else if(!isRest&&chordMode&&selectedPitches.length)pitches=selectedPitches.map(x=>({...x}));
+ else if(!isRest)pitches=[{pitch:selectedPitch,octave:Number($('octave').value),accidental:$('accidental').value}];
  const first=pitches[0]||{pitch:'C',octave:Number($('octave').value),accidental:''};
- const hand=$('hand').value;
- const staff=hand==='auto'?(first.octave<=3?'bass':'treble'):hand;
- p.notes.push({id:nextId++,pitch:rest?'R':first.pitch,octave:first.octave,accidental:first.accidental,duration:selectedDuration,rest:rest||selectedPitch==='R',pitches:rest?[]:pitches,staff});
+ const hand=$('hand').value,staff=hand==='auto'?(first.octave<=3?'bass':'treble'):hand;
+ const extra=p.instrument==='guitar'&&!isRest?{guitarString:pitches[0].guitarString,guitarFret:pitches[0].fret,guitarTechnique:pitches[0].technique,guitarTuning:$('guitarTuning').value,guitarCapo:Number($('guitarCapo').value||0)}:{};
+ p.notes.push({id:nextId++,pitch:isRest?'R':first.pitch,octave:first.octave,accidental:first.accidental,duration:selectedDuration,rest:isRest,pitches:isRest?[]:pitches,staff,...extra});
  selectedNoteId=p.notes[p.notes.length-1].id;selectedPitches=[];render();
- say(rest||selectedPitch==='R'?'쉼표 추가됨':(pitches.length>1?'화음 추가됨':noteName(p.notes[p.notes.length-1])+' 추가됨'));
+ say(isRest?'쉼표 추가됨':(p.instrument==='guitar'?'기타 '+$('guitarString').value+'번 줄 '+$('guitarFret').value+'프렛 입력됨':(pitches.length>1?'화음 추가됨':noteName(p.notes[p.notes.length-1])+' 추가됨')));
  if(chordMode){document.querySelectorAll('#pitchGrid button').forEach(b=>b.classList.remove('active'));$('inputStatus').textContent='다음 화음의 음을 골라 줘.'}
 }
 function deleteNote(id){const p=activePart();const idx=p.notes.findIndex(n=>n.id===id);if(idx<0)return;snapshot();p.notes.splice(idx,1);selectedNoteId=null;render();say('음표를 삭제했어.')}
@@ -152,8 +175,32 @@ function makeVFNote(n,clef){
  }
  return st;
 }
+function renderGuitarTab(part,out,width){
+ const total=Number($('measures').value),per=partBeats(),notes=part.notes,rows=Math.ceil(total/4),rowH=150,left=34,right=12,ns='http://www.w3.org/2000/svg';
+ const svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 '+width+' '+(rows*rowH+12));svg.setAttribute('width','100%');svg.setAttribute('role','img');svg.setAttribute('aria-label','기타 타브 악보');
+ const add=(tag,attrs,txt)=>{const el=document.createElementNS(ns,tag);Object.entries(attrs||{}).forEach(([k,v])=>el.setAttribute(k,v));if(txt!==undefined)el.textContent=txt;svg.append(el);return el};
+ let cursor=0;
+ for(let m=0;m<total;m++){
+  const row=Math.floor(m/4),col=m%4,x0=left+col*(width-left-right)/4,x1=left+(col+1)*(width-left-right)/4,y0=18+row*rowH,cellW=x1-x0;
+  if(col===0)add('text',{x:6,y:y0+13,'font-size':10,fill:'#687166'},String(row*4+1));
+  for(let s=0;s<6;s++){const y=y0+25+s*16;add('line',{x1:x0,y1:y,x2:x1-4,y2:y,stroke:'#647060','stroke-width':1})}
+  add('line',{x1:x0,y1:y0+25,x2:x0,y2:y0+105,stroke:'#647060','stroke-width':1.5});add('line',{x1:x1-4,y1:y0+25,x2:x1-4,y2:y0+105,stroke:'#647060','stroke-width':1});
+  if(m===0)['e','B','G','D','A','E'].forEach((s,i)=>add('text',{x:8,y:y0+29+i*16,'font-size':10,fill:'#347a43'},s));
+  let used=0,events=[];while(cursor<notes.length&&used+durationBeats(notes[cursor].duration)<=per+0.0001){events.push(notes[cursor]);used+=durationBeats(notes[cursor].duration);cursor++}
+  let time=0;events.forEach(n=>{const xx=x0+12+(Math.min(per,time)/per)*Math.max(8,cellW-28);
+   if(n.rest)add('text',{x:xx,y:y0+72,'font-size':12,fill:'#687166'},'休');
+   else{const sn=Number(n.guitarString)||null,fret=n.guitarFret;
+    if(sn&&Number.isFinite(Number(fret))){const yy=y0+25+(sn-1)*16;add('rect',{x:xx-7,y:yy-10,width:18,height:14,rx:3,fill:'#fff',stroke:'#347a43'});add('text',{x:xx+2,y:yy+1,'font-size':11,'font-weight':700,'text-anchor':'middle',fill:'#20251f'},String(fret));if(n.guitarTechnique&&n.guitarTechnique!=='normal'){const short={'palm-mute':'PM','slide':'/','bend':'b','hammer-on':'H','pull-off':'P','harmonic':'Harm'}[n.guitarTechnique]||'';add('text',{x:xx+2,y:yy-12,'font-size':8,'text-anchor':'middle',fill:'#347a43'},short)}}
+    else add('text',{x:xx,y:y0+68,'font-size':10,fill:'#20251f'},n.pitch||'•');
+   }time+=durationBeats(n.duration);
+  });
+  add('text',{x:x0+4,y:y0+122,'font-size':10,fill:'#687166'},String(m+1));
+ }
+ out.append(svg);
+}
 function renderPart(part,idx){
- const wrap=document.createElement('div');const title=document.createElement('div');title.className='part-title';title.textContent=(idx+1)+'. '+names[part.instrument]+(part.id===activePartId?' · 편집 중':'');wrap.append(title);const out=document.createElement('div');out.className='staff';wrap.append(out);
+ const wrap=document.createElement('div');const title=document.createElement('div');title.className='part-title';title.textContent=(idx+1)+'. '+names[part.instrument]+(part.id===activePartId?' · 편집 중':'')+(part.instrument==='guitar'&&guitarNotation==='tab'?' · 타브 악보':'');wrap.append(title);const out=document.createElement('div');out.className='staff';wrap.append(out);
+ if(part.instrument==='guitar'&&guitarNotation==='tab'){const width=Math.max(650,Math.min(1100,($('scorePaper').clientWidth||850)-8));renderGuitarTab(part,out,width);return wrap}
  if(!VF){out.textContent='악보 표시 라이브러리를 불러오지 못했어. 인터넷 연결을 확인해 줘.';return wrap}
  try{
   const width=Math.max(650,Math.min(1100,($('scorePaper').clientWidth||850)-8));
@@ -190,7 +237,7 @@ function renderPart(part,idx){
  }catch(e){console.error(e);out.innerHTML='<p class="hint">악보 표시 중 문제가 생겼어. 음표 길이와 박자를 확인해 줘.</p>'}
  return wrap
 }
-function render(){updateSettings();const paper=$('scorePaper');paper.innerHTML='';parts.forEach((p,i)=>paper.append(renderPart(p,i)));renderList();$('noteCount').textContent=parts.reduce((a,p)=>a+p.notes.length,0)+'개 음표';}
+function render(){updateSettings();renderPartSelector();const paper=$('scorePaper');paper.innerHTML='';parts.forEach((p,i)=>paper.append(renderPart(p,i)));renderList();$('noteCount').textContent=parts.reduce((a,p)=>a+p.notes.length,0)+'개 음표';document.querySelectorAll('#guitarNotationToggle button').forEach(b=>{const on=b.dataset.notation===guitarNotation;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on))});}
 function setActivePart(id){activePartId=id;const p=activePart();$('instrument').value=p.instrument;render()}
 function undo(){if(!history.length){say('되돌릴 작업이 없어.');return}const s=JSON.parse(history.pop());parts=s.parts;activePartId=s.activePartId;nextId=s.nextId;$('instrument').value=activePart().instrument;render();say('실행 취소했어.')}
 function downloadBlob(blob,name){const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1200)}
@@ -198,6 +245,7 @@ function safeName(s){return (s||'music-score').replace(/[\\/:*?"<>|]/g,'_').slic
 function saveSource(){const data={format:'MusicStudio',version:1,title:$('title').value,composer:$('composer').value,tempo:clampTempo(),meter:$('meter').value,measures:Number($('measures').value),parts,activePartId};downloadBlob(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),safeName(data.title)+'.musicstudio');say('악보 원본 파일을 저장했어.')}
 function loadSource(file){const reader=new FileReader();reader.onload=()=>{try{const d=JSON.parse(reader.result);if(!d||!Array.isArray(d.parts))throw Error('형식이 올바르지 않아');snapshot();$('title').value=d.title||'불러온 악보';$('composer').value=d.composer||'';$('tempo').value=d.tempo||100;$('meter').value=d.meter||'4/4';$('measures').value=String(d.measures||8);parts=d.parts.map((p,i)=>({id:p.id||'part'+(i+1),instrument:names[p.instrument]?p.instrument:'piano',notes:Array.isArray(p.notes)?p.notes.map(n=>({...n,id:Number(n.id)||nextId++,pitches:Array.isArray(n.pitches)?n.pitches:(!n.rest?[{pitch:n.pitch||'C',octave:Number(n.octave)||4,accidental:n.accidental||''}]:[]),staff:n.staff||(Number(n.octave)<=3?'bass':'treble')})):[]}));activePartId=parts.some(p=>p.id===d.activePartId)?d.activePartId:parts[0].id;nextId=Math.max(nextId,...parts.flatMap(p=>p.notes.map(n=>Number(n.id)+1)),1);$('instrument').value=activePart().instrument;render();say('악보를 불러왔어.')}catch(e){say('파일을 읽지 못했어: '+e.message)}};reader.readAsText(file)}
 function addPart(){const inst=$('instrument').value;const id='part'+(nextId++);parts.push({id,instrument:inst,notes:[]});activePartId=id;render();say(names[inst]+' 파트를 추가했어.')}
+function renderPartSelector(){let bar=$('partSelector');if(!bar){bar=document.createElement('div');bar.id='partSelector';bar.className='button-row';bar.style.marginBottom='12px';const workspace=document.querySelector('.workspace');workspace.insertBefore(bar,workspace.firstChild)}bar.innerHTML='';parts.forEach((p,i)=>{const b=document.createElement('button');b.textContent=(i+1)+'. '+names[p.instrument];b.classList.toggle('primary',p.id===activePartId);b.setAttribute('aria-pressed',String(p.id===activePartId));b.onclick=()=>setActivePart(p.id);bar.append(b)})}
 function midiFile(){
  const tempo=clampTempo(),ticksPerBeat=480,tracks=[];
  const vlq=value=>{let buffer=value&0x7f;const out=[];while((value=Math.floor(value/128))>0){buffer<<=8;buffer|=((value&0x7f)|0x80)}while(true){out.push(buffer&255);if(buffer&0x80)buffer>>=8;else break}return out};
@@ -231,19 +279,22 @@ function play(){
  if(!all.length){say('먼저 음표를 추가해 줘.');return}
  try{
   audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();audioCtx.resume();
-  all.forEach(e=>{const start=audioCtx.currentTime+0.08+e.t,osc=audioCtx.createOscillator(),gain=audioCtx.createGain();const midi=12*(Number(e.n.octave)+1)+(midiBase[e.n.pitch]??0)+(e.n.accidental==='#'?1:e.n.accidental==='b'?-1:0);
+  all.forEach(e=>{const start=audioCtx.currentTime+0.08+e.t,osc=audioCtx.createOscillator(),gain=audioCtx.createGain();const midi=(e.inst==='guitar'&&e.n.guitarString)?guitarMidi(e.n.guitarString,e.n.guitarFret):12*(Number(e.n.octave)+1)+(midiBase[e.n.pitch]??0)+(e.n.accidental==='#'?1:e.n.accidental==='b'?-1:0);
    osc.type=e.inst==='guitar'?'triangle':e.inst==='drums'?'square':e.inst==='winds'?'sine':e.inst==='strings'?'sawtooth':'triangle';
-   osc.frequency.value=440*Math.pow(2,(midi-69)/12);gain.gain.setValueAtTime(.0001,start);gain.gain.exponentialRampToValueAtTime(.11,start+.015);gain.gain.exponentialRampToValueAtTime(.0001,start+Math.max(.07,e.dur*.86));osc.connect(gain);gain.connect(audioCtx.destination);osc.start(start);osc.stop(start+e.dur);
+   osc.frequency.value=440*Math.pow(2,(midi-69)/12);gain.gain.setValueAtTime(.0001,start);gain.gain.exponentialRampToValueAtTime(.11,start+.015);gain.gain.exponentialRampToValueAtTime(.0001,start+Math.max(.07,e.dur*.86));osc.connect(gain);gain.connect(audioCtx.destination);activeSources.add(osc);osc.onended=()=>activeSources.delete(osc);osc.start(start);osc.stop(start+e.dur);
   });say('재생 중… 화음은 동시에 울리며, 음높이는 MIDI 음정 기준으로 계산돼.');
  }catch(e){say('오디오를 시작할 수 없어. 재생 버튼을 다시 눌러 줘.')}
 }
-function stop(){playTimers.forEach(clearTimeout);playTimers=[];if(audioCtx){/* Scheduled notes naturally decay; suspend/resume avoids clicks. */}say('재생을 정지했어.')}
+function stop(){playTimers.forEach(clearTimeout);playTimers=[];activeSources.forEach(src=>{try{src.stop()}catch(_){}});activeSources.clear();if(audioCtx){try{audioCtx.suspend()}catch(_){}}say('재생을 정지했어.')}
 function sample(){snapshot();const p=activePart();p.notes=[['C',4,'q'],['D',4,'q'],['E',4,'q'],['G',4,'q'],['G',4,'h'],['E',4,'q'],['D',4,'q'],['C',4,'h']].map(([pitch,octave,duration])=>({id:nextId++,pitch,octave,duration,accidental:'',rest:false}));selectedNoteId=null;render();say('예시 멜로디를 넣었어. 재생 버튼을 눌러 봐.')}
 $('pitchGrid').addEventListener('click',e=>{const b=e.target.closest('button[data-pitch]');if(b)setPitch(b.dataset.pitch)});
 $('chordModeBtn').onclick=()=>{chordMode=!chordMode;selectedPitches=[];$('chordModeBtn').textContent='＋ 화음 입력 '+(chordMode?'ON':'OFF');$('chordModeBtn').setAttribute('aria-pressed',String(chordMode));$('chordModeBtn').classList.toggle('primary',chordMode);$('chordHint').textContent=chordMode?'도레미 버튼으로 화음에 포함할 음을 여러 개 고른 다음 “선택한 음표 추가”를 눌러 줘.':'화음 입력을 켜고 음을 여러 개 선택하면 동시에 울리는 화음을 만들 수 있어.';document.querySelectorAll('#pitchGrid button').forEach(b=>b.classList.remove('active'));} ;
 $('durationGrid').addEventListener('click',e=>{const b=e.target.closest('button[data-dur]');if(b)setDuration(b.dataset.dur)});
 $('addNoteBtn').onclick=()=>addNote(false);$('addRestBtn').onclick=()=>addNote(true);$('undoBtn').onclick=undo;$('clearBtn').onclick=()=>{if(!activePart().notes.length)return;snapshot();activePart().notes=[];selectedNoteId=null;render();say('현재 파트를 비웠어.')};
-$('instrument').onchange=()=>{activePart().instrument=$('instrument').value;render()};$('addPartBtn').onclick=addPart;
+$('instrument').onchange=()=>{activePart().instrument=$('instrument').value;render()};
+document.querySelectorAll('#guitarNotationToggle button').forEach(b=>b.onclick=()=>{guitarNotation=b.dataset.notation;render();say(guitarNotation==='tab'?'기타 타브 악보로 전환했어.':'기타 오선보로 전환했어.')});
+['guitarTuning','guitarCapo','guitarString','guitarFret','guitarTechnique'].forEach(id=>$(id).addEventListener('change',()=>{if(activePart().instrument==='guitar')render()}));
+$('addPartBtn').onclick=addPart;
 ['title','composer','tempo','meter','measures'].forEach(id=>$(id).addEventListener('change',()=>{if(id==='measures'&&!['4','8','12','16'].includes($('measures').value))$('measures').value='8';render()}));
 $('saveBtn').onclick=saveSource;$('openBtn').onclick=()=>$('fileInput').click();$('fileInput').onchange=e=>{if(e.target.files[0])loadSource(e.target.files[0]);e.target.value=''};
 $('pdfBtn').onclick=()=>{updateSettings();window.print()};$('midiBtn').onclick=midiFile;$('playBtn').onclick=play;$('stopBtn').onclick=stop;$('sampleBtn').onclick=sample;
