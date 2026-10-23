@@ -108,7 +108,7 @@ const $=id=>document.getElementById(id);
 const VF=window.Vex;
 const names={piano:'피아노',guitar:'기타',drums:'드럼',winds:'관악기',strings:'현악기'};
 const midiBase={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
-let selectedPitch='C',selectedDuration='q',selectedNoteId=null,nextId=1,history=[],audioCtx=null,playTimers=[],activeSources=new Set(),chordMode=false,selectedPitches=[],guitarNotation='staff';
+let selectedPitch='C',selectedDuration='q',selectedNoteId=null,nextId=1,history=[],audioCtx=null,playTimers=[],activeSources=new Set(),chordMode=false,selectedPitches=[],guitarNotation='staff',masterGain=null,masterFilter=null,delayNode=null,delayFeedback=null,delayWet=null,impulseNode=null,reverbWet=null;
 let parts=[{id:'part1',instrument:'piano',notes:[]}],activePartId='part1';
 const activePart=()=>parts.find(p=>p.id===activePartId)||parts[0];
 const midiOf=n=>n.rest?null:12*(Number(n.octave)+1)+(midiBase[n.pitch]??0)+(n.accidental==='#'?1:n.accidental==='b'?-1:0);
@@ -273,17 +273,89 @@ function midiFile(){
  const all=[...ascii('MThd'),...be32(6),...be16(1),...be16(tracks.length+1),...be16(ticksPerBeat),...tempoTrack,...tracks.flat()];
  downloadBlob(new Blob([new Uint8Array(all)],{type:'audio/midi'}),safeName($('title').value)+'.mid');say('화음과 파트가 포함된 MIDI 파일을 내보냈어.');
 }
+function ensureAudioEngine(){
+ audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();
+ if(masterGain)return;
+ masterGain=audioCtx.createGain();masterFilter=audioCtx.createBiquadFilter();masterFilter.type='lowpass';
+ delayNode=audioCtx.createDelay(1);delayFeedback=audioCtx.createGain();delayWet=audioCtx.createGain();reverbWet=audioCtx.createGain();
+ const dry=audioCtx.createGain(),wetMix=audioCtx.createGain();
+ // A short feedback delay provides adjustable spatial depth without downloading samples.
+ delayNode.delayTime.value=.19;delayFeedback.gain.value=.16;delayNode.connect(delayFeedback);delayFeedback.connect(delayNode);delayNode.connect(delayWet);
+ masterFilter.connect(dry);dry.connect(masterGain);masterFilter.connect(delayNode);delayWet.connect(wetMix);wetMix.connect(masterGain);masterGain.connect(audioCtx.destination);
+ const length=Math.floor(audioCtx.sampleRate*1.6),buffer=audioCtx.createBuffer(2,length,audioCtx.sampleRate);
+ for(let ch=0;ch<2;ch++){const data=buffer.getChannelData(ch);for(let i=0;i<length;i++)data[i]=(Math.random()*2-1)*Math.pow(1-i/length,3.2)}
+ impulseNode=audioCtx.createConvolver();impulseNode.buffer=buffer;masterFilter.connect(impulseNode);impulseNode.connect(reverbWet);reverbWet.connect(masterGain);
+ applySoundSettings();
+}
+function applySoundSettings(){
+ if(!audioCtx||!masterGain)return;
+ const volume=Number($('masterVolume')?.value??75)/100;
+ const bright=Number($('toneBrightness')?.value??60);
+ const reverb=Number($('reverbAmount')?.value??25)/100;
+ const preset=$('soundPreset')?.value||'studio';
+ const room={dry:0,studio:.55,room:.75,hall:1.35}[preset]||.55;
+ masterGain.gain.setTargetAtTime(volume*.62,audioCtx.currentTime,.025);
+ masterFilter.frequency.setTargetAtTime(700+bright*115,audioCtx.currentTime,.03);
+ delayWet.gain.setTargetAtTime(preset==='dry'?0:reverb*.24*room,audioCtx.currentTime,.04);
+ reverbWet.gain.setTargetAtTime(preset==='dry'?0:reverb*.32*room,audioCtx.currentTime,.04);
+ delayFeedback.gain.setTargetAtTime(preset==='dry'?0:Math.min(.42,.08+reverb*.25*room),audioCtx.currentTime,.04);
+}
+function connectVoice(osc,gain,when,panValue=0){
+ const p=audioCtx.createStereoPanner?audioCtx.createStereoPanner():null;
+ if(p){p.pan.value=panValue;osc.connect(gain);gain.connect(p);p.connect(masterFilter)}else{osc.connect(gain);gain.connect(masterFilter)}
+}
+function tone(midi,when,dur,inst,meta={},velocity=.8,pan=0){
+ const base=440*Math.pow(2,(midi-69)/12),tech=meta.guitarTechnique||'normal';
+ const amp=audioCtx.createGain(),oscillators=[];
+ let attack=.012,release=Math.min(.24,Math.max(.045,dur*.35)),level=.16*velocity;
+ if(inst==='guitar'&&tech==='palm-mute'){release=Math.min(.09,dur*.25);level*=.8}
+ if(inst==='guitar'&&tech==='harmonic'){level*=.48;midi+=12}
+ amp.gain.setValueAtTime(.0001,when);amp.gain.exponentialRampToValueAtTime(Math.max(.0002,level),when+attack);
+ const end=Math.max(when+attack+.015,when+dur-release);
+ amp.gain.setValueAtTime(Math.max(.0002,level),end);amp.gain.exponentialRampToValueAtTime(.0001,Math.max(end+.02,when+dur));
+ const addOsc=(type,freq,gainScale=1,detune=0)=>{
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=type;o.frequency.setValueAtTime(freq,when);o.detune.value=detune;g.gain.value=gainScale;o.connect(g);g.connect(amp);o.start(when);o.stop(when+dur+.03);activeSources.add(o);o.onended=()=>activeSources.delete(o);oscillators.push(o);return o;
+ };
+ if(inst==='piano'){
+  addOsc('triangle',base,1);addOsc('sine',base*2,.28);addOsc('sine',base*3,.08);
+  amp.gain.setTargetAtTime(.0001,when+Math.max(.06,dur*.25),Math.max(.04,dur*.45));
+ }else if(inst==='guitar'){
+  addOsc(tech==='harmonic'?'sine':'triangle',base,1);addOsc('sine',base*2,.22);addOsc('triangle',base*3,.08);
+  if(tech==='bend'||tech==='slide'){
+   const o=oscillators[0],target=base*Math.pow(2,(tech==='bend'?2:3)/12);
+   o.frequency.setValueAtTime(base,when+.02);o.frequency.linearRampToValueAtTime(target,when+Math.min(dur*.65,.22));
+  }
+  if(tech==='hammer-on'||tech==='pull-off'){
+   const transient=audioCtx.createOscillator(),tg=audioCtx.createGain();transient.type='triangle';transient.frequency.value=base*(tech==='hammer-on'?1.12:.89);tg.gain.setValueAtTime(.0001,when);tg.gain.exponentialRampToValueAtTime(.055,when+.008);tg.gain.exponentialRampToValueAtTime(.0001,when+.075);transient.connect(tg);tg.connect(masterFilter);transient.start(when);transient.stop(when+.08);activeSources.add(transient);transient.onended=()=>activeSources.delete(transient);
+  }
+ }else if(inst==='winds'){
+  addOsc('sine',base,.8);addOsc('triangle',base*2,.18);addOsc('sine',base*3,.035);attack=.045;
+ }else if(inst==='strings'){
+  addOsc('sawtooth',base,.42,-5);addOsc('sawtooth',base,.38,5);addOsc('sine',base*2,.12);attack=.075;
+ }else{
+  // Percussion part: map pitches to kick, snare, closed/open hi-hat and cymbal-like noise.
+  if(midi<=38){const o=audioCtx.createOscillator();o.type='sine';o.frequency.setValueAtTime(midi<=36?125:190,when);o.frequency.exponentialRampToValueAtTime(42,when+.14);const g=audioCtx.createGain();g.gain.setValueAtTime(.0001,when);g.gain.exponentialRampToValueAtTime(.7*velocity,when+.006);g.gain.exponentialRampToValueAtTime(.0001,when+.2);o.connect(g);g.connect(masterFilter);o.start(when);o.stop(when+.22);activeSources.add(o);o.onended=()=>activeSources.delete(o);return}
+  const length=Math.max(1,Math.floor(audioCtx.sampleRate*(midi>=49?.32:.18))),buf=audioCtx.createBuffer(1,length,audioCtx.sampleRate),arr=buf.getChannelData(0);for(let i=0;i<length;i++)arr[i]=(Math.random()*2-1)*Math.pow(1-i/length,midi>=49?1.5:4);
+  const noise=audioCtx.createBufferSource(),filter=audioCtx.createBiquadFilter(),g=audioCtx.createGain();noise.buffer=buf;filter.type='highpass';filter.frequency.value=midi>=49?5500:1100;g.gain.setValueAtTime(.0001,when);g.gain.exponentialRampToValueAtTime((midi>=49?.19:.28)*velocity,when+.004);g.gain.exponentialRampToValueAtTime(.0001,when+(midi>=49?.28:.16));noise.connect(filter);filter.connect(g);g.connect(masterFilter);noise.start(when);noise.stop(when+length/audioCtx.sampleRate);activeSources.add(noise);noise.onended=()=>activeSources.delete(noise);return;
+ }
+ connectVoice({connect:(g)=>{oscillators.forEach(o=>o.connect(g))}},amp,when,pan);
+}
 function play(){
  stop();const all=[];
- parts.forEach(p=>{let t=0;p.notes.forEach(n=>{const dur=durationBeats(n.duration)*60/clampTempo();if(!n.rest){const pitches=n.pitches&&n.pitches.length?n.pitches:[n];pitches.forEach(pt=>all.push({t,dur,n:pt,inst:p.instrument}))}t+=dur})});
+ parts.forEach((p,pi)=>{let t=0;p.notes.forEach(n=>{const dur=durationBeats(n.duration)*60/clampTempo();if(!n.rest){const pitches=n.pitches&&n.pitches.length?n.pitches:[n];pitches.forEach((pt,ni)=>all.push({t,dur,n:pt,inst:p.instrument,pan:(pi%3-1)*.22+(ni%3-1)*.08}))}t+=dur})});
  if(!all.length){say('먼저 음표를 추가해 줘.');return}
  try{
-  audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();audioCtx.resume();
-  all.forEach(e=>{const start=audioCtx.currentTime+0.08+e.t,osc=audioCtx.createOscillator(),gain=audioCtx.createGain();const midi=(e.inst==='guitar'&&e.n.guitarString)?guitarMidi(e.n.guitarString,e.n.fret,e.n.guitarTuning,e.n.guitarCapo):12*(Number(e.n.octave)+1)+(midiBase[e.n.pitch]??0)+(e.n.accidental==='#'?1:e.n.accidental==='b'?-1:0);
-   osc.type=e.inst==='guitar'?'triangle':e.inst==='drums'?'square':e.inst==='winds'?'sine':e.inst==='strings'?'sawtooth':'triangle';
-   osc.frequency.value=440*Math.pow(2,(midi-69)/12);gain.gain.setValueAtTime(.0001,start);gain.gain.exponentialRampToValueAtTime(.11,start+.015);gain.gain.exponentialRampToValueAtTime(.0001,start+Math.max(.07,e.dur*.86));osc.connect(gain);gain.connect(audioCtx.destination);activeSources.add(osc);osc.onended=()=>activeSources.delete(osc);osc.start(start);osc.stop(start+e.dur);
-  });say('재생 중… 화음은 동시에 울리며, 음높이는 MIDI 음정 기준으로 계산돼.');
- }catch(e){say('오디오를 시작할 수 없어. 재생 버튼을 다시 눌러 줘.')}
+  ensureAudioEngine();audioCtx.resume();applySoundSettings();
+  all.forEach(e=>{
+   const pt=e.n;
+   let midi=(e.inst==='guitar'&&pt.guitarString)?guitarMidi(pt.guitarString,pt.fret,pt.guitarTuning,pt.guitarCapo):12*(Number(pt.octave)+1)+(midiBase[pt.pitch]??0)+(pt.accidental==='#'?1:pt.accidental==='b'?-1:0);
+   if(e.inst==='drums'){const drumMap={C:36,D:38,E:42,F:46,G:49,A:51,B:42};midi=drumMap[pt.pitch]||36}
+   const when=audioCtx.currentTime+.08+e.t;
+   if(e.inst==='drums')tone(midi,when,e.dur,e.inst,pt,.9,e.pan);
+   else tone(midi,when,e.dur,e.inst,pt,.8,e.pan);
+  });
+  say('재생 중 · 악기별 합성 음색과 음향 효과 적용 중');
+ }catch(e){console.error(e);say('오디오를 시작할 수 없어. 재생 버튼을 다시 눌러 주세요.')}
 }
 function stop(){playTimers.forEach(clearTimeout);playTimers=[];activeSources.forEach(src=>{try{src.stop()}catch(_){}});activeSources.clear();if(audioCtx){try{audioCtx.suspend()}catch(_){}}say('재생을 정지했어.')}
 function sample(){snapshot();const p=activePart();p.notes=[['C',4,'q'],['D',4,'q'],['E',4,'q'],['G',4,'q'],['G',4,'h'],['E',4,'q'],['D',4,'q'],['C',4,'h']].map(([pitch,octave,duration])=>({id:nextId++,pitch,octave,duration,accidental:'',rest:false}));selectedNoteId=null;render();say('예시 멜로디를 넣었어. 재생 버튼을 눌러 봐.')}
@@ -294,6 +366,7 @@ $('addNoteBtn').onclick=()=>addNote(false);$('addRestBtn').onclick=()=>addNote(t
 $('instrument').onchange=()=>{activePart().instrument=$('instrument').value;render()};
 document.querySelectorAll('#guitarNotationToggle button').forEach(b=>b.onclick=()=>{guitarNotation=b.dataset.notation;render();say(guitarNotation==='tab'?'기타 타브 악보로 전환했어.':'기타 오선보로 전환했어.')});
 ['guitarTuning','guitarCapo','guitarString','guitarFret','guitarTechnique'].forEach(id=>$(id).addEventListener('change',()=>{if(activePart().instrument==='guitar')render()}));
+['masterVolume','toneBrightness','reverbAmount','soundPreset'].forEach(id=>$(id).addEventListener('input',()=>{const v=Number($(id).value);if(id==='masterVolume')$('volumeValue').textContent=v+'%';if(id==='toneBrightness')$('brightnessValue').textContent=v+'%';if(id==='reverbAmount')$('reverbValue').textContent=v+'%';if(audioCtx&&audioCtx.state!=='closed')applySoundSettings()}));
 $('addPartBtn').onclick=addPart;
 ['title','composer','tempo','meter','measures'].forEach(id=>$(id).addEventListener('change',()=>{if(id==='measures'&&!['4','8','12','16'].includes($('measures').value))$('measures').value='8';render()}));
 $('saveBtn').onclick=saveSource;$('openBtn').onclick=()=>$('fileInput').click();$('fileInput').onchange=e=>{if(e.target.files[0])loadSource(e.target.files[0]);e.target.value=''};
