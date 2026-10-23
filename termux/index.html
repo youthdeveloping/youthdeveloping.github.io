@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#080d14">
-<meta name="description" content="브라우저에서 실행하는 Linux 가상 터미널">
+<meta name="description" content="GitHub Pages에서 실행하는 브라우저 기반 Linux 가상 터미널">
 <title>Virtual Terminal | YouthDeveloper</title>
 <style>
 :root{color-scheme:dark;--bg:#080d14;--panel:#101923;--line:#263746;--text:#edf4fc;--muted:#9aabbd;--blue:#6e8bff;--green:#45d6a0;--red:#ff7777}
@@ -26,8 +26,11 @@ function status(state,title,detail){$("status").dataset.state=state;$("status-te
 async function boot(){
  if(booting)return;booting=true;$("start").disabled=true;
  $("console").textContent="YouthDeveloper Virtual Terminal\nCheerpX 엔진을 불러오는 중입니다…\n";
- status("loading","가상 Linux 초기화 중","Linux 디스크 이미지를 준비하고 있습니다.");
+ status("loading","가상 Linux 초기화 중","GitHub Pages에서 브라우저 실행 환경을 확인하고 있습니다.");
  try{
+   if(!window.crossOriginIsolated){
+     throw new Error("이 페이지에 교차 출처 격리(COOP/COEP) 헤더가 적용되지 않았습니다. GitHub Pages는 저장소의 _headers 파일을 응답 헤더로 적용하지 않습니다. 이 기능을 사용하려면 사용자 소유 도메인을 Cloudflare에 연결하고 프록시/응답 헤더 규칙을 설정해야 합니다. workers.dev는 필요하지 않습니다.");
+   }
    const disk=await CheerpX.HttpBytesDevice.create("https://images.webvm.io/debian_large_20230522_5045437812.res");
    const overlay=await CheerpX.OverlayDevice.create(disk,await CheerpX.IDBDevice.create("yd-root-disk"));
    const home=await CheerpX.IDBDevice.create("yd-home");
@@ -42,7 +45,7 @@ async function boot(){
    await cx.run("/bin/bash",["--login"],{env:["HOME=/home/user","USER=user","SHELL=/bin/bash","TERM=xterm-256color","LANG=C.UTF-8"],cwd:"/home/user",uid:1000,gid:1000});
    status("ready","셸 세션이 종료되었습니다","다시 시작 버튼을 눌러 새 세션을 시작하세요.");
  }catch(e){
-   $("console").textContent+="\n\n[시작 오류]\n"+(e?.message||String(e))+"\n\n외부 이미지 주소, 브라우저 저장소 또는 CheerpX 로딩을 확인해 주세요.";
+   $("console").textContent+="\n\n[시작 오류]\n"+(e?.message||String(e))+"\n\n브라우저 격리 헤더(COOP/COEP), 외부 이미지 주소, 브라우저 저장소 또는 CheerpX 로딩을 확인해 주세요.";
    status("error","시작하지 못했습니다","오류 메시지는 터미널 영역에 표시됩니다.");
  }finally{booting=false;$("start").disabled=false;}
 }
@@ -54,7 +57,7 @@ window.addEventListener("load",boot,{once:true});
 <body>
 <header><div class="wrap nav"><a class="brand" href="../">Youth<span>Developer</span> / Terminal</a><nav aria-label="관련 링크"><a href="../">홈</a><a href="https://github.com/termux/termux-app" target="_blank" rel="noopener noreferrer">Termux 프로젝트</a><a href="https://webvm.io/" target="_blank" rel="noopener noreferrer">WebVM 참고</a></nav></div></header>
 <main class="wrap">
-<div class="eyebrow">WEBASSEMBLY · LINUX</div><h1>Virtual Terminal</h1><p class="lead">브라우저 안에서 Linux Bash 셸을 실행하는 실험용 터미널입니다. 터미널의 검은 영역을 클릭한 뒤 명령어를 입력해 보세요.</p>
+<div class="eyebrow">WEBASSEMBLY · LINUX</div><h1>Virtual Terminal</h1><p class="lead">GitHub Pages에서 제공되는 브라우저 기반 Linux Bash 터미널입니다. 명령 실행은 브라우저 내부에서 이뤄지며, 실행 엔진에 필요한 브라우저 보안 헤더가 적용되어 있어야 합니다.</p>
 <section aria-label="가상 터미널">
 <div class="statusbar"><div class="status" id="status" data-state="loading"><span class="dot"></span><span id="status-text">초기화 중</span></div><span class="muted" id="detail">엔진을 불러오는 중…</span><span class="push"></span><span class="muted">저장: 브라우저 IndexedDB</span></div>
 <div class="console-shell"><div class="console-top">● ● ● &nbsp; user@webvm: /home/user</div><pre id="console" tabindex="0" aria-label="Linux 터미널 콘솔">가상 터미널을 불러오는 중…</pre></div>
