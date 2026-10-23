@@ -54,7 +54,16 @@ if (typeof window === 'undefined') {
                         headers: newHeaders,
                     });
                 })
-                .catch((e) => console.error(e))
+                .catch((e) => {
+                    // A failed cross-origin request must still resolve to a valid Response.
+                    // Return a clear network error response instead of rejecting the FetchEvent.
+                    console.error("COI service worker fetch failed:", r.url, e);
+                    return new Response("Cross-origin request failed in the COI service worker: " + r.url, {
+                        status: 502,
+                        statusText: "Bad Gateway",
+                        headers: { "Content-Type": "text/plain; charset=utf-8" }
+                    });
+                })
         );
     });
 
