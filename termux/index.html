@@ -39,7 +39,7 @@ async function boot(){
        throw new Error("브라우저 격리 설정을 활성화하지 못했습니다. 페이지를 한 번 새로고침하고, 일반 브라우저 창에서 다시 시도해 주세요. 서비스 워커가 차단되는 브라우저 설정에서는 CheerpX를 실행할 수 없습니다.");
      }
    }
-   const disk=await CheerpX.HttpBytesDevice.create("https://images.webvm.io/debian_large_20230522_5045437812.res");
+   const disk=await CheerpX.CloudDevice.create("wss://disks.webvm.io/debian_large_20230522_5044875331.ext2");
    const overlay=await CheerpX.OverlayDevice.create(disk,await CheerpX.IDBDevice.create("yd-root-disk"));
    const home=await CheerpX.IDBDevice.create("yd-home");
    cx=await CheerpX.Linux.create({mounts:[
