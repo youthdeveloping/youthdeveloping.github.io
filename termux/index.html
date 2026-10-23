@@ -1,126 +1,68 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#080d14">
-  <meta name="description" content="브라우저에서 실행되는 WebAssembly 기반 가상 Linux 터미널 실험실">
-  <title>Virtual Terminal | YouthDeveloper</title>
-  <link rel="stylesheet" href="https://webvm.io/assets/xterm.css">
-  <script defer src="https://webvm.io/assets/xterm.js"></script>
-  <script defer src="https://webvm.io/assets/cheerpx.js"></script>
-  <style>
-    :root{color-scheme:dark;--bg:#080d14;--panel:#101923;--panel2:#0b121b;--line:#233243;--text:#edf4fc;--muted:#94a6b8;--blue:#6e8bff;--green:#45d6a0;--amber:#f3b35e;--red:#ff7777}
-    *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#1b3150 0,transparent 55%),var(--bg);color:var(--text);font:15px/1.6 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
-    a{color:#a9bcff}.wrap{width:min(1180px,calc(100% - 32px));margin:auto}
-    header{border-bottom:1px solid var(--line);background:#080d14d9;backdrop-filter:blur(12px)}
-    .nav{height:68px;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{font-weight:800;color:var(--text);text-decoration:none;letter-spacing:-.02em}.brand span{color:var(--blue)}.navlinks{display:flex;gap:18px;flex-wrap:wrap}.navlinks a{text-decoration:none;color:var(--muted);font-size:.9rem}
-    main{padding:42px 0 58px}.eyebrow{color:#9eb0ff;text-transform:uppercase;letter-spacing:.16em;font-size:.75rem;font-weight:800}
-    h1{font-size:clamp(2rem,5vw,3.6rem);letter-spacing:-.055em;line-height:1.08;margin:12px 0}.lead{max-width:760px;color:var(--muted);font-size:1.05rem;margin:0}
-    .hero{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:26px}.hero-copy{max-width:780px}.hero-tag{border:1px solid #315143;background:#10251f;color:#9cf0c9;padding:7px 11px;border-radius:999px;font-size:.8rem;white-space:nowrap}
-    .statusbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:13px 16px;border:1px solid var(--line);border-bottom:0;border-radius:16px 16px 0 0;background:var(--panel)}
-    .status{display:inline-flex;align-items:center;gap:8px;font-size:.88rem;font-weight:700}.dot{width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 12px currentColor}.status[data-state="ready"] .dot{background:var(--green)}.status[data-state="error"] .dot{background:var(--red)}
-    .meta{color:var(--muted);font-size:.82rem}.push{flex:1}
-    .terminal-shell{border:1px solid var(--line);border-radius:0 0 16px 16px;overflow:hidden;background:#000;box-shadow:0 24px 70px #0006}
-    .terminal-top{height:38px;background:#0e151e;border-bottom:1px solid #1e2a37;display:flex;align-items:center;padding:0 14px;gap:7px}.traffic{width:9px;height:9px;border-radius:50%;background:#465465}.terminal-label{margin-left:7px;color:#91a3b6;font-size:.78rem}
-    #terminal{height:min(58vh,600px);min-height:330px;padding:10px 12px}#terminal .xterm{height:100%}
-    .terminal-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 14px;background:#0d141c;border-top:1px solid #1e2a37;color:var(--muted);font-size:.78rem}
-    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.btn{border:1px solid var(--line);border-radius:10px;padding:10px 14px;color:var(--text);background:var(--panel);font:inherit;font-weight:700;text-decoration:none;cursor:pointer}.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}.btn:disabled{opacity:.5;cursor:not-allowed}
-    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:26px}.card{border:1px solid var(--line);border-radius:14px;background:linear-gradient(145deg,#111c28,#0d141d);padding:18px}.card h2{font-size:1rem;margin:0 0 6px}.card p{color:var(--muted);font-size:.9rem;margin:0}
-    .notice{margin-top:18px;border:1px solid #56452c;background:#211b12;color:#e5cfaa;border-radius:12px;padding:14px 16px;font-size:.86rem}.notice strong{color:#ffe2a7}
-    footer{border-top:1px solid var(--line);padding:22px 0;color:var(--muted);font-size:.85rem}.foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
-    @media(max-width:700px){.hero{align-items:flex-start;flex-direction:column}.grid{grid-template-columns:1fr}.nav{height:auto;min-height:64px;align-items:flex-start;padding:15px 0;flex-direction:column}.navlinks{gap:13px}main{padding-top:30px}#terminal{height:52vh;min-height:300px}.push{display:none}}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080d14">
+<meta name="description" content="브라우저에서 실행하는 Linux 가상 터미널">
+<title>Virtual Terminal | YouthDeveloper</title>
+<style>
+:root{color-scheme:dark;--bg:#080d14;--panel:#101923;--line:#263746;--text:#edf4fc;--muted:#9aabbd;--blue:#6e8bff;--green:#45d6a0;--red:#ff7777}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -15%,#1b3150 0,transparent 55%),var(--bg);color:var(--text);font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh}
+.wrap{width:min(1180px,calc(100% - 32px));margin:auto}header{border-bottom:1px solid var(--line)}.nav{min-height:66px;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{font-weight:800;color:var(--text);text-decoration:none}.brand span{color:var(--blue)}nav{display:flex;gap:18px;flex-wrap:wrap}nav a,a{color:#a9bcff}nav a{text-decoration:none}
+main{padding:38px 0 56px}.eyebrow{color:#a9bcff;font-size:.78rem;letter-spacing:.15em;font-weight:800}h1{font-size:clamp(2rem,5vw,3.4rem);line-height:1.1;margin:10px 0}.lead{color:var(--muted);max-width:760px}
+.statusbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:13px 16px;border:1px solid var(--line);border-bottom:0;border-radius:14px 14px 0 0;background:var(--panel)}.status{font-weight:700}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#f3b35e;margin-right:8px}.status[data-state=ready] .dot{background:var(--green)}.status[data-state=error] .dot{background:var(--red)}.muted{color:var(--muted);font-size:.85rem}.push{flex:1}
+.console-shell{background:#000;border:1px solid var(--line);border-radius:0 0 14px 14px;overflow:hidden;box-shadow:0 24px 70px #0005}.console-top{height:38px;background:#0e151e;padding:8px 14px;color:#91a3b6;font-size:.8rem;border-bottom:1px solid #263746}
+#console{margin:0;padding:16px;width:100%;height:min(60vh,640px);min-height:340px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;background:#000;color:#e6edf3;font:14px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;outline:none;user-select:text}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.btn{border:1px solid var(--line);border-radius:10px;padding:10px 14px;color:var(--text);background:var(--panel);font:inherit;font-weight:700;text-decoration:none;cursor:pointer}.primary{background:var(--blue);border-color:var(--blue)}button:disabled{opacity:.55;cursor:wait}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:24px}.card{border:1px solid var(--line);border-radius:14px;background:#101923;padding:18px}.card h2{font-size:1rem;margin:0 0 6px}.card p{font-size:.9rem;color:var(--muted);margin:0}.notice{margin-top:18px;padding:14px 16px;border:1px solid #56452c;background:#211b12;color:#e5cfaa;border-radius:12px;font-size:.86rem}footer{border-top:1px solid var(--line);padding:22px 0;color:var(--muted);font-size:.85rem}
+@media(max-width:700px){.nav{align-items:flex-start;flex-direction:column;padding:14px 0}nav{gap:12px}main{padding-top:28px}.grid{grid-template-columns:1fr}#console{height:55vh;min-height:300px}}
+</style>
+<script type="module">
+import * as CheerpX from "https://cxrtnc.leaningtech.com/1.2.8/cx.esm.js";
+const $=id=>document.getElementById(id);
+let cx=null, booting=false;
+function status(state,title,detail){$("status").dataset.state=state;$("status-text").textContent=title;$("detail").textContent=detail||"";}
+async function boot(){
+ if(booting)return;booting=true;$("start").disabled=true;
+ $("console").textContent="YouthDeveloper Virtual Terminal\nCheerpX 엔진을 불러오는 중입니다…\n";
+ status("loading","가상 Linux 초기화 중","Linux 디스크 이미지를 준비하고 있습니다.");
+ try{
+   const disk=await CheerpX.HttpBytesDevice.create("https://images.webvm.io/debian_large_20230522_5045437812.res");
+   const overlay=await CheerpX.OverlayDevice.create(disk,await CheerpX.IDBDevice.create("yd-root-disk"));
+   const home=await CheerpX.IDBDevice.create("yd-home");
+   cx=await CheerpX.Linux.create({mounts:[
+     {type:"ext2",path:"/",dev:overlay},
+     {type:"dir",path:"/home/user",dev:home},
+     {type:"devs",path:"/dev"},
+     {type:"proc",path:"/proc"}
+   ]});
+   cx.setConsole($("console"));
+   status("loading","Linux 셸 시작 중","첫 실행은 다운로드 때문에 시간이 걸릴 수 있습니다.");
+   await cx.run("/bin/bash",["--login"],{env:["HOME=/home/user","USER=user","SHELL=/bin/bash","TERM=xterm-256color","LANG=C.UTF-8"],cwd:"/home/user",uid:1000,gid:1000});
+   status("ready","셸 세션이 종료되었습니다","다시 시작 버튼을 눌러 새 세션을 시작하세요.");
+ }catch(e){
+   $("console").textContent+="\n\n[시작 오류]\n"+(e?.message||String(e))+"\n\n외부 이미지 주소, 브라우저 저장소 또는 CheerpX 로딩을 확인해 주세요.";
+   status("error","시작하지 못했습니다","오류 메시지는 터미널 영역에 표시됩니다.");
+ }finally{booting=false;$("start").disabled=false;}
+}
+$("start").addEventListener("click",boot);
+$("clear").addEventListener("click",()=>{$("console").textContent="";});
+window.addEventListener("load",boot,{once:true});
+</script>
 </head>
 <body>
-<header><div class="wrap nav"><a class="brand" href="../">Youth<span>Developer</span> / Terminal</a><nav class="navlinks" aria-label="관련 링크"><a href="../">홈</a><a href="https://github.com/termux/termux-app" target="_blank" rel="noopener noreferrer">Termux 프로젝트</a><a href="https://webvm.io/" target="_blank" rel="noopener noreferrer">WebVM</a></nav></div></header>
+<header><div class="wrap nav"><a class="brand" href="../">Youth<span>Developer</span> / Terminal</a><nav aria-label="관련 링크"><a href="../">홈</a><a href="https://github.com/termux/termux-app" target="_blank" rel="noopener noreferrer">Termux 프로젝트</a><a href="https://webvm.io/" target="_blank" rel="noopener noreferrer">WebVM 참고</a></nav></div></header>
 <main class="wrap">
-  <section class="hero">
-    <div class="hero-copy"><div class="eyebrow">WebAssembly · Linux Sandbox</div><h1>Virtual Terminal</h1><p class="lead">브라우저 안에서 Linux 셸을 실행하는 실험용 가상 터미널입니다. 작업 파일은 브라우저 저장소에 보관되도록 구성되어 있습니다.</p></div>
-    <div class="hero-tag">● 브라우저 기반 실험 환경</div>
-  </section>
-  <section aria-label="가상 터미널">
-    <div class="statusbar">
-      <div class="status" id="status" data-state="loading"><span class="dot"></span><span id="status-text">가상 환경 초기화 중</span></div>
-      <span class="meta" id="detail">엔진 및 Linux 이미지 로드 중…</span><span class="push"></span><span class="meta">저장 경로: <code>/home/user</code></span>
-    </div>
-    <div class="terminal-shell">
-      <div class="terminal-top"><span class="traffic"></span><span class="traffic"></span><span class="traffic"></span><span class="terminal-label">user@webvm: ~</span></div>
-      <div id="terminal" aria-label="Linux 터미널 출력"></div>
-      <div class="terminal-foot"><span>키보드 입력을 터미널에 직접 입력하세요.</span><span id="engine-state">WebAssembly runtime</span></div>
-    </div>
-    <div class="actions">
-      <button class="btn primary" id="start-btn" type="button">터미널 다시 시작</button>
-      <button class="btn" id="clear-btn" type="button">화면 지우기</button>
-      <a class="btn" href="https://github.com/termux/termux-app" target="_blank" rel="noopener noreferrer">Termux 원본 소스</a>
-    </div>
-  </section>
-  <section class="grid" aria-label="환경 안내">
-    <article class="card"><h2>Linux 셸</h2><p>가상 Linux 이미지가 정상적으로 로드되면 Bash 셸과 기본 명령줄 도구를 사용할 수 있습니다.</p></article>
-    <article class="card"><h2>브라우저 저장소</h2><p><code>/home/user</code> 경로를 IndexedDB에 연결해 작업 파일의 브라우저 내 보존을 시도합니다.</p></article>
-    <article class="card"><h2>네트워크 프록시</h2><p>가상 네트워크는 외부 WebSocket 프록시에 의존합니다. 프록시 정책이나 서비스 상태에 따라 통신이 제한될 수 있습니다.</p></article>
-  </section>
-  <div class="notice"><strong>실험용 환경 안내:</strong> 이 페이지는 공식 Termux 앱 자체가 아니라, 제3자 WebAssembly 가상화 엔진을 사용하는 브라우저 실험실입니다. 엔진·Linux 이미지·네트워크 프록시는 외부 서비스이므로 작동 여부와 속도를 보장할 수 없습니다. HTTPS로 접속해 주세요. 입력한 명령은 가상 환경에서만 실행되며, 중요한 파일이나 비밀 정보를 입력하지 마세요.</div>
+<div class="eyebrow">WEBASSEMBLY · LINUX</div><h1>Virtual Terminal</h1><p class="lead">브라우저 안에서 Linux Bash 셸을 실행하는 실험용 터미널입니다. 터미널의 검은 영역을 클릭한 뒤 명령어를 입력해 보세요.</p>
+<section aria-label="가상 터미널">
+<div class="statusbar"><div class="status" id="status" data-state="loading"><span class="dot"></span><span id="status-text">초기화 중</span></div><span class="muted" id="detail">엔진을 불러오는 중…</span><span class="push"></span><span class="muted">저장: 브라우저 IndexedDB</span></div>
+<div class="console-shell"><div class="console-top">● ● ● &nbsp; user@webvm: /home/user</div><pre id="console" tabindex="0" aria-label="Linux 터미널 콘솔">가상 터미널을 불러오는 중…</pre></div>
+<div class="actions"><button class="btn primary" id="start" type="button">터미널 시작 / 다시 시작</button><button class="btn" id="clear" type="button">화면 지우기</button><a class="btn" href="https://github.com/termux/termux-app" target="_blank" rel="noopener noreferrer">Termux 원본 소스</a></div>
+</section>
+<section class="grid" aria-label="환경 안내"><article class="card"><h2>Linux Bash</h2><p>이미지가 정상적으로 로드되면 명령줄에서 Linux 도구를 실행할 수 있습니다.</p></article><article class="card"><h2>파일 저장</h2><p>/home/user 경로는 브라우저 IndexedDB를 사용하도록 구성했습니다. 브라우저 데이터를 지우면 파일이 사라질 수 있습니다.</p></article><article class="card"><h2>브라우저 실행</h2><p>Linux 실행은 브라우저 내부에서 이뤄집니다. 초기 이미지 다운로드와 메모리 사용량이 클 수 있습니다.</p></article></section>
+<div class="notice"><strong>실험용:</strong> 공식 Termux Android 앱이 아니라 브라우저 기반 Linux 환경입니다. 외부 엔진과 Linux 이미지가 필요하며, 첫 실행이 오래 걸릴 수 있습니다. 비밀번호나 중요한 비밀 정보는 입력하지 마세요.</div>
 </main>
-<footer><div class="wrap foot"><span>© YouthDeveloper · Virtual Terminal</span><span>기반 기술: CheerpX / Xterm.js · <a href="https://webvm.io/" target="_blank" rel="noopener noreferrer">WebVM</a></span></div></footer>
-<script>
-(function(){
-  const status=document.getElementById('status');
-  const statusText=document.getElementById('status-text');
-  const detail=document.getElementById('detail');
-  const engineState=document.getElementById('engine-state');
-  const startButton=document.getElementById('start-btn');
-  const terminalHost=document.getElementById('terminal');
-  let term=null, starting=false, cx=null;
-  function setStatus(state,label,info){
-    status.dataset.state=state;
-    statusText.textContent=label;
-    detail.textContent=info||'';
-    engineState.textContent=state==='ready'?'셸 실행 중':state==='error'?'엔진 오류':'WebAssembly runtime';
-  }
-  function writeLine(message){if(term)term.writeln(message);}
-  async function initVM(){
-    if(starting)return;
-    starting=true;startButton.disabled=true;
-    setStatus('loading','가상 환경 초기화 중','엔진 및 Linux 이미지 로드 중…');
-    if(term){try{term.dispose()}catch(_){}term=null;}
-    terminalHost.innerHTML='';
-    try{
-      if(typeof Terminal==='undefined'||typeof CheerpX==='undefined'||!CheerpX.Linux||typeof CheerpX.Linux.create!=='function'){
-        throw new Error('터미널 라이브러리를 불러오지 못했습니다. 외부 스크립트 접근을 확인해 주세요.');
-      }
-      term=new Terminal({
-        cursorBlink:true,convertEol:true,fontFamily:'ui-monospace,SFMono-Regular,Consolas,monospace',
-        fontSize:14,scrollback:4000,allowProposedApi:true,
-        theme:{background:'#000000',foreground:'#e6edf3',cursor:'#a9bcff',selectionBackground:'#34445e'}
-      });
-      term.open(terminalHost);
-      term.writeln('YouthDeveloper Virtual Terminal');
-      term.writeln('WebAssembly 기반 Linux 환경을 준비하고 있습니다…');
-      cx=await CheerpX.Linux.create({
-        mounts:[
-          {type:'ext2',url:'https://images.webvm.io/debian_large_20230522_5045437812.res',mountPoint:'/'},
-          {type:'indexeddb',className:'webvm-filesystem',mountPoint:'/home/user'}
-        ],
-        network:'wss://unscramble.leaningtech.com'
-      });
-      setStatus('loading','Linux 부팅 중','Bash 콘솔 연결 중…');
-      cx.createConsole(term);
-      setStatus('ready','터미널 실행 중','Linux 셸을 사용할 수 있습니다.');
-      writeLine('');
-      writeLine('로그인 셸을 시작합니다. 첫 부팅은 시간이 걸릴 수 있습니다.');
-      await cx.run('/bin/bash',['--login'],{env:['USER=user','HOME=/home/user','TERM=xterm-256color']});
-      setStatus('ready','셸 세션 종료','다시 시작하려면 “터미널 다시 시작”을 누르세요.');
-    }catch(error){
-      const message=error&&error.message?error.message:String(error);
-      setStatus('error','시작하지 못했습니다','외부 엔진 또는 네트워크 연결을 확인해 주세요.');
-      if(term){term.writeln('');term.writeln('\x1b[31m[오류] 가상 Linux 환경을 시작하지 못했습니다.\x1b[0m');term.writeln(message);term.writeln('');term.writeln('가능한 원인: 외부 스크립트 차단, 이미지 로드 실패, 프록시 연결 제한 또는 엔진 API 변경.');}
-    }finally{starting=false;startButton.disabled=false;}
-  }
-  startButton.addEventListener('click',initVM);
-  document.getElementById('clear-btn').addEventListener('click',function(){if(term)term.clear();});
-  window.addEventListener('load',initVM,{once:true});
-})();
-</script>
+<footer><div class="wrap">© YouthDeveloper · 기반 기술: CheerpX · <a href="https://cheerpx.io/docs/getting-started">공식 CheerpX 문서</a></div></footer>
 </body>
 </html>
