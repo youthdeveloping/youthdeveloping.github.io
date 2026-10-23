@@ -18,6 +18,7 @@ main{padding:38px 0 56px}.eyebrow{color:#a9bcff;font-size:.78rem;letter-spacing:
 .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:24px}.card{border:1px solid var(--line);border-radius:14px;background:#101923;padding:18px}.card h2{font-size:1rem;margin:0 0 6px}.card p{font-size:.9rem;color:var(--muted);margin:0}.notice{margin-top:18px;padding:14px 16px;border:1px solid #56452c;background:#211b12;color:#e5cfaa;border-radius:12px;font-size:.86rem}footer{border-top:1px solid var(--line);padding:22px 0;color:var(--muted);font-size:.85rem}
 @media(max-width:700px){.nav{align-items:flex-start;flex-direction:column;padding:14px 0}nav{gap:12px}main{padding-top:28px}.grid{grid-template-columns:1fr}#console{height:55vh;min-height:300px}}
 </style>
+<script src="./coi-serviceworker.js"></script>
 <script type="module">
 import * as CheerpX from "https://cxrtnc.leaningtech.com/1.2.8/cx.esm.js";
 const $=id=>document.getElementById(id);
@@ -29,7 +30,14 @@ async function boot(){
  status("loading","가상 Linux 초기화 중","GitHub Pages에서 브라우저 실행 환경을 확인하고 있습니다.");
  try{
    if(!window.crossOriginIsolated){
-     throw new Error("이 페이지에 교차 출처 격리(COOP/COEP) 헤더가 적용되지 않았습니다. GitHub Pages는 저장소의 _headers 파일을 응답 헤더로 적용하지 않습니다. 이 기능을 사용하려면 사용자 소유 도메인을 Cloudflare에 연결하고 프록시/응답 헤더 규칙을 설정해야 합니다. workers.dev는 필요하지 않습니다.");
+     status("loading","브라우저 격리 설정 적용 중","무료 서비스 워커가 보안 헤더를 적용하고 있습니다. 잠시 기다려 주세요.");
+     const deadline=Date.now()+20000;
+     while(!window.crossOriginIsolated && Date.now()<deadline){
+       await new Promise(resolve=>setTimeout(resolve,250));
+     }
+     if(!window.crossOriginIsolated){
+       throw new Error("브라우저 격리 설정을 활성화하지 못했습니다. 페이지를 한 번 새로고침하고, 일반 브라우저 창에서 다시 시도해 주세요. 서비스 워커가 차단되는 브라우저 설정에서는 CheerpX를 실행할 수 없습니다.");
+     }
    }
    const disk=await CheerpX.HttpBytesDevice.create("https://images.webvm.io/debian_large_20230522_5045437812.res");
    const overlay=await CheerpX.OverlayDevice.create(disk,await CheerpX.IDBDevice.create("yd-root-disk"));
@@ -45,7 +53,7 @@ async function boot(){
    await cx.run("/bin/bash",["--login"],{env:["HOME=/home/user","USER=user","SHELL=/bin/bash","TERM=xterm-256color","LANG=C.UTF-8"],cwd:"/home/user",uid:1000,gid:1000});
    status("ready","셸 세션이 종료되었습니다","다시 시작 버튼을 눌러 새 세션을 시작하세요.");
  }catch(e){
-   $("console").textContent+="\n\n[시작 오류]\n"+(e?.message||String(e))+"\n\n브라우저 격리 헤더(COOP/COEP), 외부 이미지 주소, 브라우저 저장소 또는 CheerpX 로딩을 확인해 주세요.";
+   $("console").textContent+="\n\n[시작 오류]\n"+(e?.message||String(e))+"\n\n서비스 워커 등록, 브라우저 저장소, 외부 이미지 주소 또는 CheerpX 로딩을 확인해 주세요.";
    status("error","시작하지 못했습니다","오류 메시지는 터미널 영역에 표시됩니다.");
  }finally{booting=false;$("start").disabled=false;}
 }
@@ -57,7 +65,7 @@ window.addEventListener("load",boot,{once:true});
 <body>
 <header><div class="wrap nav"><a class="brand" href="../">Youth<span>Developer</span> / Terminal</a><nav aria-label="관련 링크"><a href="../">홈</a><a href="https://github.com/termux/termux-app" target="_blank" rel="noopener noreferrer">Termux 프로젝트</a><a href="https://webvm.io/" target="_blank" rel="noopener noreferrer">WebVM 참고</a></nav></div></header>
 <main class="wrap">
-<div class="eyebrow">WEBASSEMBLY · LINUX</div><h1>Virtual Terminal</h1><p class="lead">GitHub Pages에서 제공되는 브라우저 기반 Linux Bash 터미널입니다. 명령 실행은 브라우저 내부에서 이뤄지며, 실행 엔진에 필요한 브라우저 보안 헤더가 적용되어 있어야 합니다.</p>
+<div class="eyebrow">WEBASSEMBLY · LINUX</div><h1>Virtual Terminal</h1><p class="lead">GitHub Pages에서 제공되는 브라우저 기반 Linux Bash 터미널입니다. 무료 서비스 워커가 브라우저 격리 헤더를 보완하며, 명령 실행은 브라우저 내부에서 이뤄집니다.</p>
 <section aria-label="가상 터미널">
 <div class="statusbar"><div class="status" id="status" data-state="loading"><span class="dot"></span><span id="status-text">초기화 중</span></div><span class="muted" id="detail">엔진을 불러오는 중…</span><span class="push"></span><span class="muted">저장: 브라우저 IndexedDB</span></div>
 <div class="console-shell"><div class="console-top">● ● ● &nbsp; user@webvm: /home/user</div><pre id="console" tabindex="0" aria-label="Linux 터미널 콘솔">가상 터미널을 불러오는 중…</pre></div>
