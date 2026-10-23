@@ -279,7 +279,7 @@ function play(){
  if(!all.length){say('먼저 음표를 추가해 줘.');return}
  try{
   audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();audioCtx.resume();
-  all.forEach(e=>{const start=audioCtx.currentTime+0.08+e.t,osc=audioCtx.createOscillator(),gain=audioCtx.createGain();const midi=(e.inst==='guitar'&&e.n.guitarString)?guitarMidi(e.n.guitarString,e.n.guitarFret,e.n.guitarTuning,e.n.guitarCapo):12*(Number(e.n.octave)+1)+(midiBase[e.n.pitch]??0)+(e.n.accidental==='#'?1:e.n.accidental==='b'?-1:0);
+  all.forEach(e=>{const start=audioCtx.currentTime+0.08+e.t,osc=audioCtx.createOscillator(),gain=audioCtx.createGain();const midi=(e.inst==='guitar'&&e.n.guitarString)?guitarMidi(e.n.guitarString,e.n.fret,e.n.guitarTuning,e.n.guitarCapo):12*(Number(e.n.octave)+1)+(midiBase[e.n.pitch]??0)+(e.n.accidental==='#'?1:e.n.accidental==='b'?-1:0);
    osc.type=e.inst==='guitar'?'triangle':e.inst==='drums'?'square':e.inst==='winds'?'sine':e.inst==='strings'?'sawtooth':'triangle';
    osc.frequency.value=440*Math.pow(2,(midi-69)/12);gain.gain.setValueAtTime(.0001,start);gain.gain.exponentialRampToValueAtTime(.11,start+.015);gain.gain.exponentialRampToValueAtTime(.0001,start+Math.max(.07,e.dur*.86));osc.connect(gain);gain.connect(audioCtx.destination);activeSources.add(osc);osc.onended=()=>activeSources.delete(osc);osc.start(start);osc.stop(start+e.dur);
   });say('재생 중… 화음은 동시에 울리며, 음높이는 MIDI 음정 기준으로 계산돼.');
