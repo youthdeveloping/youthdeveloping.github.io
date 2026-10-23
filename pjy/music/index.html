@@ -260,7 +260,7 @@ function midiFile(){
    if(!n.rest){
     const ps=n.pitches&&n.pitches.length?n.pitches:[n];
     ps.forEach(pt=>{
-     let pitch=12*(Number(pt.octave)+1)+(midiBase[pt.pitch]??0)+(pt.accidental==='#'?1:pt.accidental==='b'?-1:0);
+     let pitch=(part.instrument==='guitar'&&pt.guitarString)?guitarMidi(pt.guitarString,pt.fret):12*(Number(pt.octave)+1)+(midiBase[pt.pitch]??0)+(pt.accidental==='#'?1:pt.accidental==='b'?-1:0);
      if(part.instrument==='drums'){const drumMap={C:36,D:38,E:42,F:46,G:49,A:51,B: 38};pitch=drumMap[pt.pitch]||36}
      pitch=Math.max(0,Math.min(127,pitch));ev.push({t:tick,b:[0x90|channel,pitch,88]});ev.push({t:tick+Math.max(1,dur-5),b:[0x80|channel,pitch,0]});
     });
