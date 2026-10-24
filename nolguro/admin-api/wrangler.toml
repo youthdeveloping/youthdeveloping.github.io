@@ -1,0 +1,8 @@
+name = "nolguro-admin-api"
+main = "worker.js"
+compatibility_date = "2026-10-24"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "nolguro-admin"
+database_id = "9f2d31dc-3e21-48ff-a4c8-32d9689eb652"
