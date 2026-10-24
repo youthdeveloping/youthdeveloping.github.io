@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#172a24">
+<title>놀구로 관리자 | NOL GO</title>
+<style>
+:root{--ink:#172a24;--green:#246b50;--lime:#d9f27e;--cream:#fbf8ee;--mint:#eaf3e8;--line:#dce5d9;--muted:#617168;--red:#a33232}*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","Noto Sans KR",sans-serif;line-height:1.55}button,input,textarea,select{font:inherit}button{cursor:pointer}.wrap{width:min(1160px,calc(100% - 32px));margin:auto}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 0}.brand{font-weight:900;font-size:1.25rem;text-decoration:none;color:inherit}.brand span{color:var(--green)}.top a{color:inherit}.hero{padding:28px;border-radius:24px;background:var(--ink);color:white;margin-bottom:18px}.hero h1{margin:0 0 8px;font-size:clamp(2rem,5vw,3.2rem);letter-spacing:-.05em}.hero p{margin:0;color:#d5e1dc;max-width:800px}.warning{margin:16px 0;padding:15px 17px;border:1px solid #e7c98d;background:#fff2d9;border-radius:14px;color:#68461f}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.tab,.btn{border:1px solid var(--line);border-radius:999px;padding:10px 15px;background:white;color:var(--ink);font-weight:750}.tab[aria-selected=true],.btn.primary{background:var(--green);border-color:var(--green);color:white}.btn.danger{color:var(--red);border-color:#e7caca}.panel{background:white;border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:16px}.panel h2{margin:0 0 14px;letter-spacing:-.03em}.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:12px}.toolbar input{max-width:340px}.formgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.field{display:flex;flex-direction:column;gap:5px}.field label{font-weight:750;font-size:.88rem}.field input,.field textarea,.field select,input.search{width:100%;border:1px solid #cbd7cc;border-radius:10px;padding:10px 11px;background:#fffefa;color:var(--ink)}.field textarea{min-height:76px;resize:vertical}.span2{grid-column:span 2}.span4{grid-column:1/-1}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.tablewrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:620px}th,td{text-align:left;padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:top}th{font-size:.83rem;color:var(--muted);background:#f5f7f1}td .rowactions{display:flex;gap:6px;flex-wrap:wrap}.rowactions button{padding:5px 9px;border-radius:8px;border:1px solid var(--line);background:white}.empty{padding:25px;text-align:center;color:var(--muted)}.statline{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}.stat{padding:8px 12px;background:var(--mint);border-radius:10px;font-weight:800}.status{font-size:.9rem;color:var(--muted);margin-top:10px;min-height:1.5em}.help{color:var(--muted);font-size:.9rem}.hidden{display:none!important}footer{padding:28px 0 40px;color:var(--muted);font-size:.85rem}@media(max-width:780px){.formgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.span4{grid-column:1/-1}}@media(max-width:480px){.formgrid{grid-template-columns:1fr}.span2,.span4{grid-column:auto}.hero{padding:22px}.panel{padding:15px}}
+</style>
+</head>
+<body>
+<header class="wrap top"><a class="brand" href="/nolguro/index.html">NOL <span>GO</span> / 관리자</a><a href="/nolguro/index.html">사이트 보기 ↗</a></header>
+<main class="wrap">
+<section class="hero"><h1>놀구로 관리 도구</h1><p>보드게임 품목, 행사 목록, 사이트 페이지 목록을 정리하고 JSON으로 내보낼 수 있습니다.</p></section>
+<div class="warning"><strong>저장 범위 안내</strong><br>현재 GitHub Pages는 정적 사이트이므로 이 화면에서 저장한 내용은 <strong>이 브라우저에만</strong> 저장됩니다. 다른 방문자에게 즉시 반영되거나 실제 HTML을 수정하지는 않습니다. 전체 사이트에 반영하려면 서버 API(예: Cloudflare Worker + D1)와 관리자 인증을 연결해야 합니다. 비밀번호나 API 토큰을 HTML/JavaScript에 직접 넣지 마세요.</div>
+<div class="tabs" role="tablist" aria-label="관리 항목">
+<button class="tab" role="tab" aria-selected="true" data-tab="games">보드게임 품목</button>
+<button class="tab" role="tab" aria-selected="false" data-tab="events">이벤트 목록</button>
+<button class="tab" role="tab" aria-selected="false" data-tab="pages">전체 페이지 목록</button>
+<button class="tab" role="tab" aria-selected="false" data-tab="backup">백업·가져오기</button>
+</div>
+<section id="games" class="tabpane">
+<div class="panel"><div class="toolbar"><div><h2>보드게임 보유 현황</h2><div class="help">품목 추가·수정·삭제와 수량 변경을 관리합니다.</div></div><input class="search" id="gameSearch" placeholder="품목 검색" aria-label="보드게임 검색"></div>
+<div class="statline"><div class="stat" id="gameKinds">품목 0종</div><div class="stat" id="gameTotal">수량 합계 0개</div></div>
+<form id="gameForm"><input type="hidden" id="gameId"><div class="formgrid">
+<div class="field span2"><label for="gameName">품목 이름 *</label><input id="gameName" required maxlength="100" placeholder="예: 사망토론"></div>
+<div class="field"><label for="gameQty">수량</label><input id="gameQty" type="number" min="0" step="1" placeholder="수량 미기재 가능"></div>
+<div class="field"><label for="gameNote">비고</label><input id="gameNote" maxlength="300" placeholder="선택 입력"></div>
+</div><div class="actions"><button class="btn primary" type="submit" id="gameSubmit">품목 추가</button><button class="btn" type="button" id="gameCancel">입력 초기화</button></div></form></div>
+<div class="panel tablewrap"><table><thead><tr><th>품목 이름</th><th>수량</th><th>비고</th><th>관리</th></tr></thead><tbody id="gameRows"></tbody></table><div id="gameEmpty" class="empty hidden">검색 결과가 없습니다.</div></div>
+</section>
+<section id="events" class="tabpane hidden">
+<div class="panel"><h2>이벤트 목록 관리</h2><p class="help">행사 안내 페이지의 목록을 정리합니다. URL은 사이트 내 실제 페이지 경로를 입력해 주세요.</p>
+<form id="eventForm"><input type="hidden" id="eventId"><div class="formgrid">
+<div class="field span2"><label for="eventName">행사 이름 *</label><input id="eventName" required maxlength="120" placeholder="예: 보드게임 라운지"></div>
+<div class="field span2"><label for="eventPath">페이지 경로 *</label><input id="eventPath" required placeholder="/nolguro/events/board_game.html"></div>
+<div class="field span4"><label for="eventDesc">설명</label><textarea id="eventDesc" maxlength="600" placeholder="행사에 대한 간단한 설명"></textarea></div>
+</div><div class="actions"><button class="btn primary" type="submit" id="eventSubmit">이벤트 추가</button><button class="btn" type="button" id="eventCancel">입력 초기화</button></div></form></div>
+<div class="panel tablewrap"><table><thead><tr><th>행사 이름</th><th>페이지 경로</th><th>설명</th><th>관리</th></tr></thead><tbody id="eventRows"></tbody></table></div>
+</section>
+<section id="pages" class="tabpane hidden">
+<div class="panel"><h2>전체 페이지 목록</h2><p class="help">현재 프로젝트의 주요 페이지를 목록으로 관리합니다. 이 목록은 저장·백업용이며, 페이지 파일 자체를 생성하거나 수정하지는 않습니다.</p>
+<form id="pageForm"><input type="hidden" id="pageId"><div class="formgrid">
+<div class="field span2"><label for="pageName">페이지 이름 *</label><input id="pageName" required maxlength="120" placeholder="예: 직원소개"></div>
+<div class="field span2"><label for="pagePath">페이지 경로 *</label><input id="pagePath" required placeholder="/nolguro/staff/index.html"></div>
+<div class="field"><label for="pageType">분류</label><select id="pageType"><option>일반 페이지</option><option>행사</option><option>정책·안내</option><option>사업 소개</option><option>관리</option></select></div>
+<div class="field span2"><label for="pageDesc">메모</label><input id="pageDesc" maxlength="300" placeholder="관리 메모"></div>
+<div class="field"><label for="pageStatus">상태</label><select id="pageStatus"><option>운영 중</option><option>준비 중</option><option>점검 필요</option></select></div>
+</div><div class="actions"><button class="btn primary" type="submit" id="pageSubmit">페이지 추가</button><button class="btn" type="button" id="pageCancel">입력 초기화</button></div></form></div>
+<div class="panel"><div class="toolbar"><strong>등록된 페이지</strong><input class="search" id="pageSearch" placeholder="페이지 검색" aria-label="페이지 검색"></div><div class="tablewrap"><table><thead><tr><th>페이지 이름</th><th>분류 / 상태</th><th>경로</th><th>메모</th><th>관리</th></tr></thead><tbody id="pageRows"></tbody></table></div></div>
+</section>
+<section id="backup" class="tabpane hidden">
+<div class="panel"><h2>데이터 백업 및 복원</h2><p class="help">현재 브라우저의 관리 데이터를 JSON 파일로 내려받거나, JSON을 붙여넣어 복원할 수 있습니다. 복원하면 이 브라우저의 현재 관리 데이터가 교체됩니다.</p><div class="actions"><button class="btn primary" id="exportBtn" type="button">JSON 백업 다운로드</button><button class="btn" id="copyBtn" type="button">JSON 복사</button></div><div class="field" style="margin-top:14px"><label for="backupText">JSON 데이터</label><textarea id="backupText" style="min-height:220px" placeholder="백업 파일의 JSON 내용을 붙여넣으세요."></textarea></div><div class="actions"><button class="btn primary" id="importBtn" type="button">JSON 가져오기</button><button class="btn danger" id="resetBtn" type="button">초기 데이터로 되돌리기</button></div><p id="backupStatus" class="status" role="status"></p></div>
+</section>
+<p class="status" id="status" role="status" aria-live="polite"></p>
+</main>
+<footer class="wrap">놀구로 관리자 도구 · 저장 데이터는 현재 브라우저의 localStorage에 보관됩니다.</footer>
+<script>
+(function(){
+"use strict";
+const KEY="nolguro-admin-data-v1";
+const initial={
+games:[
+["라온",1,""],["꼬치의 달인",2,""],["젠가",1,""],["통아저씨",2,""],["할리갈리",2,""],["모두의마블",1,""],["루미큐브",1,""],["텔레스트레이션",1,""],["러시아워",1,""],["13클루",1,""],["로스트시티",1,""],["우봉구",1,""],["5초준다",1,"놀구로 카드로 바꿀 수 있음"],["심술쟁이고양이",1,""],["보난자",1,""],["다빈치코드",3,""],["달무티",1,""],["바보타임",1,""],["성격유형논쟁게임",1,""],["사망토론",1,""],["트럼프",null,"목록에 ‘트럼프 2마리’로 기재됨 — 수량 단위 확인 필요"]
+].map((x,i)=>({id:"g"+(i+1),name:x[0],qty:x[1],note:x[2]})),
+events:[
+{id:"e1",name:"보드게임 라운지",path:"/nolguro/events/board_game.html",desc:"보드게임 자유 체험과 팀 대항 미니 리그"},
+{id:"e2",name:"미스터리 추리 미션",path:"/nolguro/events/mystery_clue.html",desc:"단서를 관찰하고 연결해 사건을 추리하는 팀 미션"},
+{id:"e3",name:"퀴즈 챌린지",path:"/nolguro/events/index.html#booths",desc:"상식·넌센스·그림 퀴즈"},
+{id:"e4",name:"미니게임 존",path:"/nolguro/events/index.html#booths",desc:"규칙이 간단한 짧은 도전형 게임"}
+],
+pages:[
+["놀구로 메인","/nolguro/index.html","일반 페이지","시설과 서비스 소개","운영 중"],
+["기관소개","/nolguro/about/index.html","일반 페이지","","운영 중"],
+["법인소개","/nolguro/organization/index.html","일반 페이지","","운영 중"],
+["직원소개","/nolguro/staff/index.html","일반 페이지","직원 프로필과 담당 업무","운영 중"],
+["공간소개","/nolguro/spaces/index.html","일반 페이지","","운영 중"],
+["오시는 길","/nolguro/directions/index.html","일반 페이지","","운영 중"],
+["이용안내","/nolguro/usage/index.html","정책·안내","","운영 중"],
+["공지사항","/nolguro/notices/index.html","정책·안내","","운영 중"],
+["미래역량","/nolguro/business/future.html","사업 소개","","운영 중"],
+["문화예술","/nolguro/business/arts.html","사업 소개","","운영 중"],
+["성장지원","/nolguro/business/support.html","사업 소개","","운영 중"],
+["293르네상스","/nolguro/business/renaissance.html","사업 소개","","운영 중"],
+["프로그램 신청","/nolguro/apply/index.html","일반 페이지","","운영 중"],
+["행사 안내","/nolguro/events/index.html","행사","","운영 중"],
+["보드게임 라운지","/nolguro/events/board_game.html","행사","보드게임 보유 현황 포함","운영 중"],
+["미스터리 추리 미션","/nolguro/events/mystery_clue.html","행사","","운영 중"],
+["사이트 검색","/nolguro/search.html","일반 페이지","","운영 중"],
+["이용약관","/nolguro/terms.html","정책·안내","","운영 중"],
+["개인정보처리방침","/nolguro/privacy.html","정책·안내","","운영 중"],
+["관리자","/nolguro/admin.html","관리","관리 도구","운영 중"]
+].map((x,i)=>({id:"p"+(i+1),name:x[0],path:x[1],type:x[2],desc:x[3],status:x[4]}))
+};
+let data=load();
+function load(){try{const x=JSON.parse(localStorage.getItem(KEY));if(x&&Array.isArray(x.games)&&Array.isArray(x.events)&&Array.isArray(x.pages))return x}catch(e){}return structuredClone(initial)}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(data));document.getElementById("status").textContent="이 브라우저에 저장했습니다. 실제 공개 페이지에는 자동 반영되지 않습니다."}catch(e){document.getElementById("status").textContent="저장에 실패했습니다. 브라우저 저장 공간 설정을 확인해 주세요."}}
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function uid(prefix){return prefix+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function showTab(name){document.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===name)));document.querySelectorAll(".tabpane").forEach(s=>s.classList.toggle("hidden",s.id!==name))}
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.tab)));
+function renderGames(){const q=document.getElementById("gameSearch").value.trim().toLowerCase();const rows=data.games.filter(x=>(x.name+" "+x.note).toLowerCase().includes(q));document.getElementById("gameRows").innerHTML=rows.map(x=>'<tr><td>'+esc(x.name)+'</td><td>'+(x.qty===null||x.qty===""?"미기재":esc(x.qty))+'</td><td>'+esc(x.note||"—")+'</td><td><div class="rowactions"><button data-edit-game="'+esc(x.id)+'">수정</button><button data-del-game="'+esc(x.id)+'">삭제</button></div></td></tr>').join("");document.getElementById("gameEmpty").classList.toggle("hidden",rows.length>0);document.getElementById("gameKinds").textContent="품목 "+data.games.length+"종";const total=data.games.reduce((s,x)=>s+(x.qty===null||x.qty===""?0:Number(x.qty)||0),0);document.getElementById("gameTotal").textContent="수량 합계 "+total+"개 (미기재 제외")}
+function resetGame(){document.getElementById("gameForm").reset();document.getElementById("gameId").value="";document.getElementById("gameSubmit").textContent="품목 추가"}
+document.getElementById("gameForm").addEventListener("submit",e=>{e.preventDefault();const id=document.getElementById("gameId").value,name=document.getElementById("gameName").value.trim(),raw=document.getElementById("gameQty").value,qty=raw===""?null:Number(raw),note=document.getElementById("gameNote").value.trim();if(!name)return;if(qty!==null&&(!Number.isInteger(qty)||qty<0)){alert("수량은 0 이상의 정수로 입력해 주세요.");return}if(id){const x=data.games.find(x=>x.id===id);if(x)Object.assign(x,{name,qty,note})}else data.games.push({id:uid("g"),name,qty,note});save();resetGame();renderGames()});
+document.getElementById("gameCancel").addEventListener("click",resetGame);document.getElementById("gameSearch").addEventListener("input",renderGames);
+document.getElementById("gameRows").addEventListener("click",e=>{const a=e.target.closest("[data-edit-game]"),d=e.target.closest("[data-del-game]");if(a){const x=data.games.find(x=>x.id===a.dataset.editGame);if(!x)return;document.getElementById("gameId").value=x.id;document.getElementById("gameName").value=x.name;document.getElementById("gameQty").value=x.qty??"";document.getElementById("gameNote").value=x.note;document.getElementById("gameSubmit").textContent="변경 저장";document.getElementById("gameName").focus()}if(d){const x=data.games.find(x=>x.id===d.dataset.delGame);if(x&&confirm("‘"+x.name+"’ 품목을 삭제하시겠습니까?")){data.games=data.games.filter(y=>y.id!==x.id);save();renderGames()}}});
+function renderEvents(){document.getElementById("eventRows").innerHTML=data.events.map(x=>'<tr><td>'+esc(x.name)+'</td><td><a href="'+esc(x.path)+'">'+esc(x.path)+'</a></td><td>'+esc(x.desc||"—")+'</td><td><div class="rowactions"><button data-edit-event="'+esc(x.id)+'">수정</button><button data-del-event="'+esc(x.id)+'">삭제</button></div></td></tr>').join("")}
+function resetEvent(){document.getElementById("eventForm").reset();document.getElementById("eventId").value="";document.getElementById("eventSubmit").textContent="이벤트 추가"}
+document.getElementById("eventForm").addEventListener("submit",e=>{e.preventDefault();const id=document.getElementById("eventId").value,x={name:document.getElementById("eventName").value.trim(),path:document.getElementById("eventPath").value.trim(),desc:document.getElementById("eventDesc").value.trim()};if(!x.name||!x.path.startsWith("/nolguro/")){alert("이름과 /nolguro/로 시작하는 경로를 입력해 주세요.");return}if(id){const old=data.events.find(y=>y.id===id);if(old)Object.assign(old,x)}else data.events.push({id:uid("e"),...x});save();resetEvent();renderEvents()});
+document.getElementById("eventCancel").addEventListener("click",resetEvent);document.getElementById("eventRows").addEventListener("click",e=>{const a=e.target.closest("[data-edit-event]"),d=e.target.closest("[data-del-event]");if(a){const x=data.events.find(x=>x.id===a.dataset.editEvent);if(!x)return;document.getElementById("eventId").value=x.id;document.getElementById("eventName").value=x.name;document.getElementById("eventPath").value=x.path;document.getElementById("eventDesc").value=x.desc;document.getElementById("eventSubmit").textContent="변경 저장"}if(d){const x=data.events.find(x=>x.id===d.dataset.delEvent);if(x&&confirm("‘"+x.name+"’ 이벤트를 목록에서 삭제하시겠습니까?")){data.events=data.events.filter(y=>y.id!==x.id);save();renderEvents()}}});
+function renderPages(){const q=document.getElementById("pageSearch").value.trim().toLowerCase();document.getElementById("pageRows").innerHTML=data.pages.filter(x=>(x.name+" "+x.path+" "+x.type+" "+x.desc+" "+x.status).toLowerCase().includes(q)).map(x=>'<tr><td>'+esc(x.name)+'</td><td>'+esc(x.type)+'<br><small>'+esc(x.status)+'</small></td><td><a href="'+esc(x.path)+'">'+esc(x.path)+'</a></td><td>'+esc(x.desc||"—")+'</td><td><div class="rowactions"><button data-edit-page="'+esc(x.id)+'">수정</button><button data-del-page="'+esc(x.id)+'">삭제</button></div></td></tr>').join("")}
+function resetPage(){document.getElementById("pageForm").reset();document.getElementById("pageId").value="";document.getElementById("pageSubmit").textContent="페이지 추가"}
+document.getElementById("pageForm").addEventListener("submit",e=>{e.preventDefault();const id=document.getElementById("pageId").value,x={name:document.getElementById("pageName").value.trim(),path:document.getElementById("pagePath").value.trim(),type:document.getElementById("pageType").value,desc:document.getElementById("pageDesc").value.trim(),status:document.getElementById("pageStatus").value};if(!x.name||!x.path.startsWith("/nolguro/")){alert("이름과 /nolguro/로 시작하는 경로를 입력해 주세요.");return}if(id){const old=data.pages.find(y=>y.id===id);if(old)Object.assign(old,x)}else data.pages.push({id:uid("p"),...x});save();resetPage();renderPages()});
+document.getElementById("pageCancel").addEventListener("click",resetPage);document.getElementById("pageSearch").addEventListener("input",renderPages);document.getElementById("pageRows").addEventListener("click",e=>{const a=e.target.closest("[data-edit-page]"),d=e.target.closest("[data-del-page]");if(a){const x=data.pages.find(x=>x.id===a.dataset.editPage);if(!x)return;document.getElementById("pageId").value=x.id;document.getElementById("pageName").value=x.name;document.getElementById("pagePath").value=x.path;document.getElementById("pageType").value=x.type;document.getElementById("pageDesc").value=x.desc;document.getElementById("pageStatus").value=x.status;document.getElementById("pageSubmit").textContent="변경 저장"}if(d){const x=data.pages.find(x=>x.id===d.dataset.delPage);if(x&&confirm("페이지 목록에서 ‘"+x.name+"’을 삭제하시겠습니까? 실제 HTML 파일은 삭제되지 않습니다.")){data.pages=data.pages.filter(y=>y.id!==x.id);save();renderPages()}}});
+function backup(){return JSON.stringify({version:1,exportedAt:new Date().toISOString(),...data},null,2)}
+function download(){const blob=new Blob([backup()],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="nolguro-admin-backup.json";a.click();URL.revokeObjectURL(url);document.getElementById("backupStatus").textContent="JSON 백업 파일을 생성했습니다."}
+document.getElementById("exportBtn").addEventListener("click",download);document.getElementById("copyBtn").addEventListener("click",async()=>{const s=backup();document.getElementById("backupText").value=s;try{await navigator.clipboard.writeText(s);document.getElementById("backupStatus").textContent="JSON을 복사했습니다."}catch(e){document.getElementById("backupStatus").textContent="JSON 칸에 내용을 넣었습니다. 직접 선택해 복사해 주세요."}});
+document.getElementById("importBtn").addEventListener("click",()=>{try{const x=JSON.parse(document.getElementById("backupText").value);if(!Array.isArray(x.games)||!Array.isArray(x.events)||!Array.isArray(x.pages))throw Error("missing data");if(!confirm("가져온 데이터로 현재 브라우저의 관리 데이터를 교체하시겠습니까?"))return;data={games:x.games,events:x.events,pages:x.pages};save();renderAll();document.getElementById("backupStatus").textContent="JSON 데이터를 가져왔습니다."}catch(e){document.getElementById("backupStatus").textContent="JSON 형식이 올바르지 않거나 필수 목록이 없습니다."}});
+document.getElementById("resetBtn").addEventListener("click",()=>{if(!confirm("현재 브라우저의 관리 데이터를 초기 목록으로 되돌리시겠습니까?"))return;data=structuredClone(initial);save();renderAll();document.getElementById("backupText").value="";document.getElementById("backupStatus").textContent="초기 데이터로 되돌렸습니다."});
+function renderAll(){renderGames();renderEvents();renderPages()}renderAll();
+})();
+</script>
+</body></html>
