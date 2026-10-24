@@ -1,0 +1,12 @@
+{
+  "questions": [
+    {
+      "id": "nolgo-basics",
+      "question": "놀고는 무엇이고, 놀고의 현재 인원수는 몇 명일까요?"
+    },
+    {
+      "id": "nolguro-locations",
+      "question": "놀구로에 있는 이름이 붙은 위치를 모두 말하시오."
+    }
+  ]
+}
