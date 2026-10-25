@@ -1098,7 +1098,8 @@ dialog::backdrop{background:rgba(0,0,0,.65)}
   $('socialSaveBtn').addEventListener('click', saveSocials);
   $('socialLoadBtn').addEventListener('click', loadSocials);
   fetch('/data/socials.json?t=' + Date.now(), {cache:'no-store'}).then(r => r.ok ? r.json() : null).then(data => { if (data) fillSocials(data); }).catch(() => {});
-\n  /* ---------- 시작 ---------- */
+
+  /* ---------- 시작 ---------- */
   let logged = false;
   try { logged = sessionStorage.getItem(SESSION_KEY) === '1'; } catch (e) {}
   if (logged) showPanel();
