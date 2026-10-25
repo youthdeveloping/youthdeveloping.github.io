@@ -979,7 +979,7 @@ dialog::backdrop{background:rgba(0,0,0,.65)}
 
   $('publishBtn').addEventListener('click', publish);
   $('pullBtn').addEventListener('click', pull);
-  ['syRepo', 'syBranch', 'syPath', 'syToken', 'syRemember'].forEach(id => $(id).addEventListener('change', saveSync));
+  ['syRepo', 'syBranch', 'syPath'].forEach(id => $(id).addEventListener('change', saveSync));
   loadSync();
 
 
