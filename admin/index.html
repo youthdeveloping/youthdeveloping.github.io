@@ -136,6 +136,31 @@ dialog::backdrop{background:rgba(0,0,0,.65)}
       <label class="check"><input id="syRemember" type="checkbox"> 이 브라우저에 토큰 기억하기 (공용 기기에서는 사용하지 마세요)</label>
     </details>
 
+    <section class="head" id="socialAdmin">
+      <h1>SNS 바로가기 관리</h1>
+      <p>공식 SNS 주소와 공개 여부를 수정합니다. 저장하면 <b>data/socials.json</b>에 반영되어 SNS 페이지에 적용됩니다.</p>
+    </section>
+    <div class="notice"><b>SNS 설정.</b> 아래 주소를 수정한 다음 <b>SNS 설정 저장</b>을 누르세요. GitHub 연결 설정에 입력한 저장소와 토큰을 함께 사용합니다.</div>
+    <div class="sync-grid">
+      <label class="field"><span>YouTube 주소</span><input id="socialYoutube" type="url" value="https://www.youtube.com/@%EC%B2%AD%EC%86%8C%EB%85%84%EA%B0%9C%EB%B0%9C%EC%9E%90"></label>
+      <label class="field"><span>네이버 블로그 주소</span><input id="socialNaver" type="url" value="https://blog.naver.com/youthdeveloper"></label>
+      <label class="field"><span>Instagram 주소</span><input id="socialInstagram" type="url" value="https://www.instagram.com/youthdeveloper.github/"></label>
+      <label class="field"><span>Facebook 주소</span><input id="socialFacebook" type="url" value="https://www.facebook.com/profile.php?id=61595232134877"></label>
+    </div>
+    <div class="sync-grid">
+      <label class="check"><input id="socialYoutubeEnabled" type="checkbox" checked> YouTube 표시</label>
+      <label class="check"><input id="socialNaverEnabled" type="checkbox" checked> 네이버 블로그 표시</label>
+      <label class="check"><input id="socialInstagramEnabled" type="checkbox" checked> Instagram 표시</label>
+      <label class="check"><input id="socialFacebookEnabled" type="checkbox" checked> Facebook 표시</label>
+    </div>
+    <div class="toolbar">
+      <button class="btn" id="socialSaveBtn" type="button">SNS 설정 저장</button>
+      <button class="btn ghost" id="socialLoadBtn" type="button">저장소에서 SNS 설정 불러오기</button>
+      <a class="btn ghost" href="/sns/" target="_blank" rel="noopener noreferrer">SNS 페이지 열기</a>
+      <span class="sync-state" id="socialState" role="status"></span>
+    </div>
+    <div style="height:1px;background:var(--line);margin:28px 0"></div>
+
     <div class="toolbar">
       <button class="btn" id="publishBtn" type="button">사이트에 반영</button>
       <button class="btn ghost" id="pullBtn" type="button">사이트에서 불러오기</button>
