@@ -93,7 +93,7 @@ dialog::backdrop{background:rgba(0,0,0,.65)}
 <main class="login" id="loginView">
   <form class="login-box" id="loginForm" autocomplete="off">
     <h1>관리자 로그인</h1>
-    <p>YouthDeveloper 관리자 전용 페이지입니다. 비밀번호를 입력해 주세요.</p>
+    <p>YouthDeveloper 관리자 전용 페이지입니다. Cloudflare Worker에서 인증합니다.</p>
     <label class="field">
       <span>비밀번호</span>
       <input id="pw" type="password" autocomplete="current-password" required autofocus>
@@ -122,7 +122,7 @@ dialog::backdrop{background:rgba(0,0,0,.65)}
     </section>
 
     <div class="notice">
-      <b>사이트 반영 방법.</b> 서비스를 고친 뒤 <b>사이트에 반영</b>을 누르면 GitHub 저장소의 <b>data/apps.json</b>이 갱신되고, 1~2분 뒤 방문자에게 적용됩니다. 처음 한 번만 아래에서 GitHub 토큰을 입력해 주세요.
+      <b>사이트 반영 방법.</b> 서비스나 SNS 설정을 저장하면 Cloudflare Worker가 서버의 <b>GIT_TOKEN</b>으로 GitHub 저장소를 갱신합니다. GitHub 토큰은 이 페이지에 입력하거나 저장하지 않습니다.
     </div>
 
     <details class="sync" id="syncBox">
@@ -131,9 +131,7 @@ dialog::backdrop{background:rgba(0,0,0,.65)}
         <label class="field"><span>저장소</span><input id="syRepo" value="youthdeveloping/youthdeveloping.github.io" spellcheck="false"></label>
         <label class="field"><span>브랜치</span><input id="syBranch" value="main" spellcheck="false"></label>
         <label class="field"><span>파일 경로</span><input id="syPath" value="data/apps.json" spellcheck="false"></label>
-        <label class="field"><span>토큰 (Fine-grained, Contents 읽기/쓰기)</span><input id="syToken" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_..."></label>
       </div>
-      <label class="check"><input id="syRemember" type="checkbox"> 이 브라우저에 토큰 기억하기 (공용 기기에서는 사용하지 마세요)</label>
     </details>
 
     <section class="head" id="socialAdmin">
@@ -218,8 +216,7 @@ dialog::backdrop{background:rgba(0,0,0,.65)}
 (() => {
   'use strict';
 
-  // 비밀번호는 원문이 아닌 SHA-256 해시로만 보관합니다.
-  const PASS_HASH = '0a43382445adf542c3df8cc1da6b90229c770f5087591d6348aa2d118cf89a1e';
+  const API_BASE = 'https://web.youthdeveloper-github.workers.dev';
   const SESSION_KEY = 'yd_admin_session';
   const DATA_KEY = 'yd_apps_v2';
   const LOCK_KEY = 'yd_admin_lock';
@@ -687,27 +684,28 @@ dialog::backdrop{background:rgba(0,0,0,.65)}
   $('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const msg = $('loginMsg');
-    const left = lockedLeft();
-    if (left) { msg.textContent = '시도 횟수를 초과했습니다. ' + left + '초 후 다시 시도해 주세요.'; return; }
-    if (!window.crypto || !crypto.subtle) { msg.textContent = 'HTTPS 환경에서만 사용할 수 있습니다.'; return; }
     $('loginBtn').disabled = true;
+    msg.textContent = 'Cloudflare 인증 중...';
     try {
-      const h = await sha256($('pw').value);
-      if (h === PASS_HASH) {
-        try { sessionStorage.setItem(SESSION_KEY, '1'); sessionStorage.removeItem(LOCK_KEY); } catch (e) {}
-        msg.textContent = '';
-        showPanel();
-      } else {
-        addFail();
-        msg.textContent = '비밀번호가 올바르지 않습니다.';
-        $('pw').select();
-      }
+      const response = await fetch(API_BASE + '/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: $('pw').value })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.token) throw new Error(result.error || '로그인에 실패했습니다.');
+      sessionStorage.setItem(SESSION_KEY, result.token);
+      sessionStorage.removeItem(LOCK_KEY);
+      msg.textContent = '';
+      showPanel();
+    } catch (err) {
+      msg.textContent = err.message || 'Cloudflare Worker에 연결할 수 없습니다.';
+      $('pw').select();
     } finally { $('loginBtn').disabled = false; }
   });
 
   $('logoutBtn').addEventListener('click', () => {
     try { sessionStorage.removeItem(SESSION_KEY); sessionStorage.removeItem(TOKEN_KEY); } catch (e) {}
-    $('syToken').value = '';
     showLogin();
   });
 
@@ -886,30 +884,21 @@ dialog::backdrop{background:rgba(0,0,0,.65)}
   /* ---------- 사이트 반영 (GitHub) ---------- */
   function loadSync() {
     try {
-      const s = JSON.parse(localStorage.getItem(SYNC_KEY) || '{}');
-      if (s.repo) $('syRepo').value = s.repo;
-      if (s.branch) $('syBranch').value = s.branch;
-      if (s.path) $('syPath').value = s.path;
-      $('syRemember').checked = !!s.remember;
+      const settings = JSON.parse(localStorage.getItem(SYNC_KEY) || '{}');
+      if (settings.repo) $('syRepo').value = settings.repo;
+      if (settings.branch) $('syBranch').value = settings.branch;
+      if (settings.path) $('syPath').value = settings.path;
     } catch (e) {}
-    let t = '';
-    try { t = localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY) || ''; } catch (e) {}
-    $('syToken').value = t;
-    if (!t) $('syncBox').open = true;
+    $('syToken')?.closest('.field')?.remove();
+    $('syRemember')?.closest('.check')?.remove();
   }
   function saveSync() {
-    const remember = $('syRemember').checked;
     try {
       localStorage.setItem(SYNC_KEY, JSON.stringify({
         repo: $('syRepo').value.trim(),
-        branch: $('syBranch').value.trim(),
-        path: $('syPath').value.trim(),
-        remember
+        branch: $('syBranch').value.trim() || 'main',
+        path: $('syPath').value.trim()
       }));
-      const tok = $('syToken').value.trim();
-      sessionStorage.removeItem(TOKEN_KEY);
-      localStorage.removeItem(TOKEN_KEY);
-      if (tok) (remember ? localStorage : sessionStorage).setItem(TOKEN_KEY, tok);
     } catch (e) {}
   }
   function cfg() {
@@ -917,89 +906,66 @@ dialog::backdrop{background:rgba(0,0,0,.65)}
     const c = {
       repo: $('syRepo').value.trim(),
       branch: $('syBranch').value.trim() || 'main',
-      path: $('syPath').value.trim().replace(/^\/+/, ''),
-      token: $('syToken').value.trim()
+      path: $('syPath').value.trim().replace(/^\\/+/, '')
     };
-    if (!/^[\w.-]+\/[\w.-]+$/.test(c.repo)) throw new Error('저장소 형식은 "계정/저장소"여야 합니다.');
+    if (c.repo !== 'youthdeveloping/youthdeveloping.github.io') throw new Error('허용된 저장소는 youthdeveloping/youthdeveloping.github.io 입니다.');
+    if (c.branch !== 'main') throw new Error('현재 main 브랜치만 지원합니다.');
     if (!c.path) throw new Error('파일 경로를 입력해 주세요.');
-    if (!c.token) { $('syncBox').open = true; throw new Error('GitHub 토큰을 입력해 주세요.'); }
     return c;
   }
   function state(text, kind) {
-    const s = $('syncState');
-    s.textContent = text;
-    s.className = 'sync-state' + (kind ? ' ' + kind : '');
+    const status = $('syncState');
+    status.textContent = text;
+    status.className = 'sync-state' + (kind ? ' ' + kind : '');
   }
-  function endpoint(c) {
-    return 'https://api.github.com/repos/' + c.repo + '/contents/' + c.path.split('/').map(encodeURIComponent).join('/');
+  async function adminApi(path, options = {}) {
+    const token = sessionStorage.getItem(SESSION_KEY) || '';
+    const response = await fetch(API_BASE + path, {
+      ...options,
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        ...(options.body ? {'Content-Type':'application/json'} : {}),
+        ...(options.headers || {})
+      }
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      if (response.status === 401) {
+        sessionStorage.removeItem(SESSION_KEY);
+        showLogin();
+      }
+      throw new Error(data.error || 'Worker 요청 실패 (' + response.status + ')');
+    }
+    return data;
   }
-  function headers(c) {
-    return { 'Accept': 'application/vnd.github+json', 'Authorization': 'Bearer ' + c.token, 'X-GitHub-Api-Version': '2022-11-28' };
-  }
-  function toB64(str) {
-    const bytes = new TextEncoder().encode(str);
-    let bin = '';
-    for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
-    return btoa(bin);
-  }
-  function fromB64(b) {
-    const bin = atob(b.replace(/\s/g, ''));
-    return new TextDecoder().decode(Uint8Array.from(bin, ch => ch.charCodeAt(0)));
-  }
-  async function apiError(res) {
-    let detail = '';
-    try { detail = (await res.json()).message || ''; } catch (e) {}
-    if (res.status === 401) return '토큰이 올바르지 않거나 만료되었습니다.';
-    if (res.status === 403 || res.status === 404) return '권한이 없거나 저장소를 찾을 수 없습니다. 토큰의 저장소 접근 권한과 Contents 쓰기 권한을 확인해 주세요.';
-    if (res.status === 409 || res.status === 422) return '다른 곳에서 파일이 바뀌었습니다. "사이트에서 불러오기" 후 다시 시도해 주세요.';
-    return '요청 실패 (' + res.status + ') ' + detail;
-  }
-
   async function publish() {
-    let c;
-    try { c = cfg(); } catch (e) { state(e.message, 'err'); return; }
+    try { cfg(); } catch (e) { state(e.message, 'err'); return; }
     if (!apps.length && !confirm('서비스가 하나도 없습니다. 그래도 사이트에 반영할까요?')) return;
     $('publishBtn').disabled = true;
-    state('반영 중...');
+    state('Worker를 통해 반영 중...');
     try {
-      let sha;
-      const cur = await fetch(endpoint(c) + '?ref=' + encodeURIComponent(c.branch), { headers: headers(c), cache: 'no-store' });
-      if (cur.ok) sha = (await cur.json()).sha;
-      else if (cur.status !== 404) throw new Error(await apiError(cur));
-
-      const body = { message: 'Update apps via admin', content: toB64(json()), branch: c.branch };
-      if (sha) body.sha = sha;
-      const put = await fetch(endpoint(c), {
-        method: 'PUT',
-        headers: Object.assign({ 'Content-Type': 'application/json' }, headers(c)),
-        body: JSON.stringify(body)
-      });
-      if (!put.ok) throw new Error(await apiError(put));
-      state('저장소에 반영했습니다. 사이트 적용까지 1~2분 걸립니다.', 'ok');
-      toast('반영했습니다.');
-    } catch (e) {
-      state(e.message || '반영에 실패했습니다.', 'err');
-    } finally { $('publishBtn').disabled = false; }
+      const result = await adminApi('/api/admin/github', { method:'PUT', body:JSON.stringify({
+        repo:'youthdeveloping/youthdeveloping.github.io', branch:'main', path:'data/apps.json',
+        message:'Update apps via YouthDeveloper admin', content:json()
+      })});
+      state('저장소에 반영했습니다. 사이트 적용까지 1~2분 걸릴 수 있습니다.', 'ok');
+      toast('반영했습니다. ' + (result.commit ? result.commit.slice(0,7) : ''));
+    } catch (e) { state(e.message || '반영에 실패했습니다.', 'err'); }
+    finally { $('publishBtn').disabled = false; }
   }
 
   async function pull() {
-    let c;
-    try { c = cfg(); } catch (e) { state(e.message, 'err'); return; }
+    try { cfg(); } catch (e) { state(e.message, 'err'); return; }
     if (!confirm('저장소의 현재 목록으로 이 화면의 내용을 덮어쓸까요?')) return;
     $('pullBtn').disabled = true;
-    state('불러오는 중...');
+    state('Worker를 통해 불러오는 중...');
     try {
-      const res = await fetch(endpoint(c) + '?ref=' + encodeURIComponent(c.branch), { headers: headers(c), cache: 'no-store' });
-      if (res.status === 404) throw new Error('저장소에 아직 파일이 없습니다. 먼저 "사이트에 반영"을 눌러 주세요.');
-      if (!res.ok) throw new Error(await apiError(res));
-      const file = await res.json();
-      apps = parseApps(JSON.parse(fromB64(file.content)));
-      save();
-      render();
-      state('불러왔습니다.', 'ok');
-    } catch (e) {
-      state(e.message || '불러오기에 실패했습니다.', 'err');
-    } finally { $('pullBtn').disabled = false; }
+      const result = await adminApi('/api/admin/github?path=data/apps.json&branch=main');
+      apps = parseApps(JSON.parse(result.content));
+      save(); render();
+      state('저장소에서 불러왔습니다.', 'ok');
+    } catch (e) { state(e.message || '불러오기에 실패했습니다.', 'err'); }
+    finally { $('pullBtn').disabled = false; }
   }
 
   async function loadLive() {
@@ -1052,45 +1018,27 @@ dialog::backdrop{background:rgba(0,0,0,.65)}
     }
   }
   async function saveSocials() {
-    let c, data;
-    try {
-      c = cfg();
-      data = collectSocials();
-    } catch (e) { socialState(e.message, 'err'); return; }
+    let data;
+    try { cfg(); data = collectSocials(); }
+    catch (e) { socialState(e.message, 'err'); return; }
     $('socialSaveBtn').disabled = true;
-    socialState('저장 중...');
+    socialState('Worker를 통해 저장 중...');
     try {
-      const path = 'data/socials.json';
-      const url = 'https://api.github.com/repos/' + c.repo + '/contents/' + path;
-      const headersObj = headers(c);
-      let sha;
-      const current = await fetch(url + '?ref=' + encodeURIComponent(c.branch), { headers: headersObj, cache: 'no-store' });
-      if (current.ok) sha = (await current.json()).sha;
-      else if (current.status !== 404) throw new Error(await apiError(current));
-      const bytes = new TextEncoder().encode(JSON.stringify(data, null, 2) + '\n');
-      let binary = '';
-      for (let i=0;i<bytes.length;i+=0x8000) binary += String.fromCharCode.apply(null, bytes.subarray(i,i+0x8000));
-      const body = { message: 'Update official social links via admin', content: btoa(binary), branch: c.branch };
-      if (sha) body.sha = sha;
-      const response = await fetch(url, { method:'PUT', headers:Object.assign({'Content-Type':'application/json'},headersObj), body:JSON.stringify(body) });
-      if (!response.ok) throw new Error(await apiError(response));
+      await adminApi('/api/admin/github', {method:'PUT', body:JSON.stringify({
+        repo:'youthdeveloping/youthdeveloping.github.io', branch:'main', path:'data/socials.json',
+        message:'Update official social links via admin', content:JSON.stringify(data,null,2)+'\\n'
+      })});
       socialState('SNS 설정을 저장했습니다. 사이트 적용까지 1~2분 걸릴 수 있습니다.', 'ok');
     } catch (e) { socialState(e.message || '저장에 실패했습니다.', 'err'); }
     finally { $('socialSaveBtn').disabled = false; }
   }
   async function loadSocials() {
-    let c;
-    try { c = cfg(); } catch (e) { socialState(e.message, 'err'); return; }
+    try { cfg(); } catch (e) { socialState(e.message, 'err'); return; }
     $('socialLoadBtn').disabled = true;
-    socialState('불러오는 중...');
+    socialState('Worker를 통해 불러오는 중...');
     try {
-      const url = 'https://api.github.com/repos/' + c.repo + '/contents/data/socials.json?ref=' + encodeURIComponent(c.branch);
-      const response = await fetch(url, { headers:headers(c), cache:'no-store' });
-      if (!response.ok) throw new Error(await apiError(response));
-      const file = await response.json();
-      const binary = atob(file.content.replace(/\s/g,''));
-      const bytes = Uint8Array.from(binary, ch => ch.charCodeAt(0));
-      fillSocials(JSON.parse(new TextDecoder().decode(bytes)));
+      const result = await adminApi('/api/admin/github?path=data/socials.json&branch=main');
+      fillSocials(JSON.parse(result.content));
       socialState('저장소의 SNS 설정을 불러왔습니다.', 'ok');
     } catch (e) { socialState(e.message || '불러오기에 실패했습니다.', 'err'); }
     finally { $('socialLoadBtn').disabled = false; }
@@ -1101,7 +1049,7 @@ dialog::backdrop{background:rgba(0,0,0,.65)}
 
   /* ---------- 시작 ---------- */
   let logged = false;
-  try { logged = sessionStorage.getItem(SESSION_KEY) === '1'; } catch (e) {}
+  try { logged = !!sessionStorage.getItem(SESSION_KEY); } catch (e) {}
   if (logged) showPanel();
 })();
 </script>
