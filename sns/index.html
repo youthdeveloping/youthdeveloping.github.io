@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#05070a">
+<meta name="description" content="YouthDeveloper 공식 SNS 바로가기">
+<title>YouthDeveloper // SNS</title>
+<style>
+:root{color-scheme:dark;--bg:#05070a;--panel:#0c1016;--line:rgba(255,255,255,.1);--text:#edf2f7;--muted:#8995a2;--green:#61ff9a;--cyan:#62e8ff;--mono:ui-monospace,SFMono-Regular,Consolas,monospace;--sans:Inter,Pretendard,"Noto Sans KR",system-ui,sans-serif}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--text);font-family:var(--sans);background:radial-gradient(circle at 85% 8%,rgba(98,232,255,.09),transparent 28rem),radial-gradient(circle at 10% 80%,rgba(97,255,154,.06),transparent 26rem),var(--bg)}
+a{color:inherit;text-decoration:none}.shell{width:min(1000px,calc(100% - 32px));margin:auto}
+nav{height:72px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);font-family:var(--mono)}
+.brand{font-weight:800;letter-spacing:-.04em}.brand b{color:var(--green)}.back{font-size:12px;color:var(--muted)}.back:hover{color:var(--green)}
+.hero{padding:72px 0 28px}.eyebrow{color:var(--green);font:700 11px var(--mono);letter-spacing:.17em}.hero h1{font-size:clamp(42px,8vw,72px);letter-spacing:-.07em;line-height:1;margin:18px 0}.hero p{color:var(--muted);line-height:1.8;max-width:620px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:22px 0 72px}
+.card{display:flex;align-items:center;gap:18px;min-height:142px;padding:24px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(145deg,rgba(255,255,255,.035),rgba(255,255,255,.012));transition:transform .18s,border-color .18s,background .18s}
+.card:hover{transform:translateY(-3px);border-color:rgba(97,255,154,.42);background:rgba(97,255,154,.035)}
+.icon{width:58px;height:58px;flex:0 0 58px;border-radius:16px;display:grid;place-items:center;font:700 27px var(--mono);color:white}
+.youtube{background:#ff0033}.naver{background:#03c75a}.instagram{background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045)}.facebook{background:#1877f2}
+.info{min-width:0;flex:1}.info h2{font-size:20px;margin:0 0 7px;letter-spacing:-.03em}.info p{font-size:13px;color:var(--muted);margin:0;line-height:1.6;overflow-wrap:anywhere}.arrow{font-size:22px;color:var(--muted)}
+footer{border-top:1px solid var(--line);padding:22px 0 30px;color:var(--muted);font:11px var(--mono)}
+@media(max-width:600px){.grid{grid-template-columns:1fr}.hero{padding-top:48px}.card{min-height:120px;padding:20px}.icon{width:52px;height:52px;flex-basis:52px}}
+</style>
+</head>
+<body><div class="shell">
+<nav><a class="brand" href="/"><b>&gt;_</b> YouthDeveloper</a><a class="back" href="/">← 메인으로</a></nav>
+<header class="hero"><div class="eyebrow">// CONNECT WITH US</div><h1>Social<br>Networks.</h1><p>YouthDeveloper의 공식 소셜 채널입니다. 아래 카드를 누르면 해당 플랫폼의 공식 계정으로 이동합니다.</p></header>
+<main class="grid" id="socialGrid" aria-live="polite">
+<a class="card" data-social="youtube" href="https://www.youtube.com/@%EC%B2%AD%EC%86%8C%EB%85%84%EA%B0%9C%EB%B0%9C%EC%9E%90" target="_blank" rel="noopener noreferrer"><span class="icon youtube">▶</span><span class="info"><h2>YouTube</h2><p>청소년 개발자 공식 유튜브 채널</p></span><span class="arrow">↗</span></a>
+<a class="card" data-social="naver" href="https://blog.naver.com/youthdeveloper" target="_blank" rel="noopener noreferrer"><span class="icon naver">N</span><span class="info"><h2>네이버 블로그</h2><p>YouthDeveloper의 소식과 개발 기록</p></span><span class="arrow">↗</span></a>
+<a class="card" data-social="instagram" href="https://www.instagram.com/youthdeveloper.github/" target="_blank" rel="noopener noreferrer"><span class="icon instagram">◎</span><span class="info"><h2>Instagram</h2><p>프로젝트 소식과 활동 공유</p></span><span class="arrow">↗</span></a>
+<a class="card" data-social="facebook" href="https://www.facebook.com/profile.php?id=61595232134877" target="_blank" rel="noopener noreferrer"><span class="icon facebook">f</span><span class="info"><h2>Facebook</h2><p>YouthDeveloper 페이스북 페이지</p></span><span class="arrow">↗</span></a>
+</main>
+<footer>YOUTHDEVELOPER · OFFICIAL SOCIAL LINKS</footer>
+</div>
+<script>
+(async()=>{try{const r=await fetch('/data/socials.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;const data=await r.json();document.querySelectorAll('#socialGrid a[data-social]').forEach(a=>{const x=data[a.dataset.social];if(x&&/^https:\/\//i.test(x.url||''))a.href=x.url;if(x&&x.enabled===false)a.hidden=true;});}catch(e){}})();
+</script>
+</body></html>
