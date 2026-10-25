@@ -906,7 +906,7 @@ dialog::backdrop{background:rgba(0,0,0,.65)}
     const c = {
       repo: $('syRepo').value.trim(),
       branch: $('syBranch').value.trim() || 'main',
-      path: $('syPath').value.trim().replace(/^\\/+/, '')
+      path: $('syPath').value.trim().replace(/^\/+/, '')
     };
     if (c.repo !== 'youthdeveloping/youthdeveloping.github.io') throw new Error('허용된 저장소는 youthdeveloping/youthdeveloping.github.io 입니다.');
     if (c.branch !== 'main') throw new Error('현재 main 브랜치만 지원합니다.');
