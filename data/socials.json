@@ -1,0 +1,22 @@
+{
+  "youtube": {
+    "name": "YouTube",
+    "url": "https://www.youtube.com/@%EC%B2%AD%EC%86%8C%EB%85%84%EA%B0%9C%EB%B0%9C%EC%9E%90",
+    "enabled": true
+  },
+  "naver": {
+    "name": "네이버 블로그",
+    "url": "https://blog.naver.com/youthdeveloper",
+    "enabled": true
+  },
+  "instagram": {
+    "name": "Instagram",
+    "url": "https://www.instagram.com/youthdeveloper.github/",
+    "enabled": true
+  },
+  "facebook": {
+    "name": "Facebook",
+    "url": "https://www.facebook.com/profile.php?id=61595232134877",
+    "enabled": true
+  }
+}\n
