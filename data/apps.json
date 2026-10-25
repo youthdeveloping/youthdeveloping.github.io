@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-25T06:03:20.709Z",
+  "updated": "2026-10-25T07:20:57.641Z",
   "apps": [
     {
       "id": "timer",
@@ -286,7 +286,7 @@
       "icon": "💬",
       "name": "채팅방",
       "desc": "서버 계정끼리 실시간 채팅",
-      "url": "",
+      "url": "/server-tools/?app=chat",
       "status": "on",
       "group": "server",
       "featured": false
@@ -296,7 +296,7 @@
       "icon": "💰",
       "name": "용돈 기록장",
       "desc": "수입·지출 기록",
-      "url": "",
+      "url": "/server-tools/?app=ledger",
       "status": "on",
       "group": "server",
       "featured": false
@@ -306,7 +306,7 @@
       "icon": "📨",
       "name": "건의함",
       "desc": "관리자에게 의견 보내기",
-      "url": "",
+      "url": "/server-tools/?app=suggestions",
       "status": "on",
       "group": "server",
       "featured": false
@@ -316,7 +316,7 @@
       "icon": "📰",
       "name": "서버 공지",
       "desc": "관리자 공지 등록",
-      "url": "",
+      "url": "/server-tools/?app=notices",
       "status": "on",
       "group": "server",
       "featured": false
@@ -326,7 +326,7 @@
       "icon": "🟢",
       "name": "서버 상태",
       "desc": "정상·점검·장애 표시",
-      "url": "",
+      "url": "/server-tools/?app=status",
       "status": "on",
       "group": "server",
       "featured": false
@@ -336,7 +336,7 @@
       "icon": "📈",
       "name": "서버 통계",
       "desc": "접속자·사용량 확인",
-      "url": "",
+      "url": "/server-tools/?app=stats",
       "status": "on",
       "group": "server",
       "featured": false
@@ -346,7 +346,7 @@
       "icon": "🕵️",
       "name": "내 접속 정보",
       "desc": "브라우저·OS·화면 정보",
-      "url": "",
+      "url": "/server-tools/?app=device",
       "status": "on",
       "group": "server",
       "featured": false
@@ -356,7 +356,7 @@
       "icon": "📝",
       "name": "익명 한마디",
       "desc": "이름 없이 메시지 남기기",
-      "url": "https://youthdeveloping.github.io/services/anonymous.html",
+      "url": "/services/anonymous.html",
       "status": "on",
       "group": "server",
       "featured": false
