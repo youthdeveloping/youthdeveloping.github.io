@@ -8,7 +8,7 @@
 <div class="layout"><section class="panel"><h2>TOOLS / 도구</h2><div id="controls"></div><div class="actions" id="actions"></div><div id="status" class="status">브라우저에서 실행됩니다.</div></section><section class="panel"><h2>사진 보정</h2><div class="stage" id="stage"></div><p class="hint" id="hint">파일과 작업 내용은 기본적으로 브라우저 안에서 처리됩니다.</p></section></div>
 <div class="foot">YouthCraft · by YouthDeveloper · 이 도구는 개발 초기 버전입니다.</div></main>
 <script>
-(()=>{const type="image",$=id=>document.getElementById(id),controls=$('controls'),actions=$('actions'),stage=$('stage');let canvas,ctx,loaded=null;
+(()=>{const type="light",$=id=>document.getElementById(id),controls=$('controls'),actions=$('actions'),stage=$('stage');let canvas,ctx,loaded=null;
 function field(label,id,value,type='text'){const d=document.createElement('div');d.className='field';const l=document.createElement('label');l.textContent=label;const i=document.createElement('input');i.id=id;i.type=type;i.value=value;d.append(l,i);controls.append(d);return i}
 function area(label,id,value){const d=document.createElement('div');d.className='field';const l=document.createElement('label');l.textContent=label;const i=document.createElement('textarea');i.id=id;i.value=value;d.append(l,i);controls.append(d);return i}
 function btn(label,fn,primary=false){const b=document.createElement('button');b.textContent=label;if(primary)b.className='primary';b.onclick=fn;actions.append(b);return b}
@@ -37,7 +37,7 @@ if(type==='vector'||type==='cad'){
  const title=field('문서 제목','title','YouthCraft 문서');const text=area('본문','body','PDF로 저장할 내용을 입력하세요.');stage.innerHTML='<div class="output" id="paper" style="white-space:pre-wrap"></div>';function draw(){$('paper').innerHTML='<h1>'+title.value.replace(/[<>&]/g,'')+'</h1><p>'+text.value.replace(/[<>&]/g,'').replace(/\n/g,'<br>')+'</p>'}title.oninput=text.oninput=draw;btn('PDF로 인쇄 / 저장',()=>window.print(),true);btn('텍스트 저장',()=>saveBlob(new Blob([title.value+'\n\n'+text.value],{type:'text/plain;charset=utf-8'}),'document.txt'));draw();$('hint').textContent='“PDF로 인쇄 / 저장”을 누른 뒤 인쇄 대화상자에서 PDF로 저장을 선택하세요.';
 }
 })();
-</script><script src="/youthcraft/pro-tools.js" defer></script>
-<script src="/youthcraft/pro-tools-v2.js" defer></script>
+</script><script src="/youthcraft/pro/core.js" defer></script>
+<script src="/youthcraft/pro/lightcraft.js" defer></script>
 <script src="/youthcraft/studio.js" defer></script>
 </body></html>
