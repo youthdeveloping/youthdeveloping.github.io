@@ -1,26 +1,6 @@
 {
-  "updated": "2026-10-17T02:40:42.000Z",
+  "updated": "2026-10-25T06:03:20.709Z",
   "apps": [
-    {
-      "id": "ai",
-      "icon": "🤖",
-      "name": "이정표 AI",
-      "desc": "우리가 직접 학습시킨 AI 모음",
-      "url": "/ai/",
-      "status": "on",
-      "group": "tool",
-      "featured": true
-    },
-    {
-      "id": "shapes",
-      "icon": "🔺",
-      "name": "도형 분류기",
-      "desc": "카메라나 사진으로 도형을 AI가 맞혀요",
-      "url": "/shapes/",
-      "status": "on",
-      "group": "tool",
-      "featured": true
-    },
     {
       "id": "timer",
       "icon": "⏱️",
@@ -146,7 +126,7 @@
       "icon": "🔗",
       "name": "URL 단축기",
       "desc": "긴 주소 줄이기",
-      "url": "",
+      "url": "https://youthdeveloping.github.io/s/",
       "status": "on",
       "group": "tool",
       "featured": false
@@ -296,7 +276,7 @@
       "icon": "🔗",
       "name": "URL 도구",
       "desc": "주소 확인·정리",
-      "url": "/services/url.html",
+      "url": "/s",
       "status": "on",
       "group": "tool",
       "featured": false
@@ -376,7 +356,7 @@
       "icon": "📝",
       "name": "익명 한마디",
       "desc": "이름 없이 메시지 남기기",
-      "url": "/services/anonymous.html",
+      "url": "https://youthdeveloping.github.io/services/anonymous.html",
       "status": "on",
       "group": "server",
       "featured": false
