@@ -2,6 +2,16 @@
   "updated": "2026-10-25T07:26:07.052Z",
   "apps": [
     {
+      "id": "youthcraft",
+      "icon": "🎨",
+      "name": "YouthCraft",
+      "desc": "이미지·디자인·영상·문서 제작을 위한 크리에이티브 스튜디오",
+      "url": "/youthcraft/",
+      "status": "on",
+      "group": "tool",
+      "featured": true
+    },
+    {
       "id": "timer",
       "icon": "⏱️",
       "name": "타이머",
