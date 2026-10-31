@@ -1,5 +1,6 @@
 /* YouthCraft Studio helpers: local autosave, portable project snapshots, keyboard help */
 (()=>{'use strict';
+if(!window.YDAccount){const accountScript=document.createElement('script');accountScript.src='/account.js';document.head.appendChild(accountScript);}
 const KEY='youthcraft.autosave.'+location.pathname;
 const style=document.createElement('style');style.textContent=`
 #yc-workspace-tools{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:9px 14px;background:#17171c;border-bottom:1px solid #36363f;position:sticky;top:0;z-index:50}
@@ -19,6 +20,7 @@ const status=t=>{const e=document.getElementById('yc-status');if(e)e.textContent
 const nav=document.createElement('nav');nav.id='yc-tool-nav';nav.setAttribute('aria-label','YouthCraft 도구 바로가기');nav.innerHTML=[
 ['PhotoCraft','editor.html'],['VectorCraft','vectorcraft.html'],['FilmCraft','filmcraft.html'],['LightCraft','lightcraft.html'],['PDFCraft','pdfcraft.html'],['EffectCraft','effectcraft.html'],['DesignCraft','designcraft.html'],['FigCraft','figcraft.html'],['WordCraft','wordcraft.html'],['SoundCraft','soundcraft.html'],['DeckCraft','deckcraft.html'],['CADCraft','cadcraft.html'],['GridCraft','gridcraft.html']
 ].map(([name,path])=>'<a href="/youthcraft/'+path+'"'+(location.pathname.endsWith('/'+path)?' aria-current="page"':'')+'>'+name+'</a>').join('');
+nav.insertAdjacentHTML('beforeend','<a href="/account/">통합 계정</a>');
 bar.insertAdjacentElement('afterend',nav);
 const quick=document.createElement('div');quick.id='yc-quick-actions';quick.innerHTML='<button type="button" id="yc-export">빠른 내보내기</button><button type="button" id="yc-fullscreen">전체 화면</button><button type="button" id="yc-reset">입력 초기화</button><span>작업은 이 브라우저에서 처리됩니다</span>';
 nav.insertAdjacentElement('afterend',quick);
