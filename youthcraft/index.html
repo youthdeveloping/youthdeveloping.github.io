@@ -48,5 +48,6 @@
 <script>
 (()=>{const search=document.getElementById('craftSearch'),cards=[...document.querySelectorAll('.catalog .card')],buttons=[...document.querySelectorAll('[data-craft-filter]')],out=document.getElementById('craftResult');let active='all';const sections=[...document.querySelectorAll('.sectionlabel')];function apply(){const q=(search?.value||'').toLowerCase().trim();let n=0;cards.forEach(card=>{const label=card.querySelector('h2')?.textContent||'';const desc=card.querySelector('p')?.textContent||'';const parent=sections.filter(x=>x.compareDocumentPosition(card)&Node.DOCUMENT_POSITION_FOLLOWING).pop();const id=(parent?.id||'').toLowerCase();const ok=(!q||(label+' '+desc).toLowerCase().includes(q))&&(active==='all'||id===active);card.hidden=!ok;if(ok)n++;});sections.forEach(sec=>{let node=sec.nextElementSibling,show=false;while(node&&!node.classList.contains('sectionlabel')){if(node.classList.contains('card')&&!node.hidden)show=true;node=node.nextElementSibling;}sec.hidden=!show;});if(out)out.textContent=n+' TOOLS';}search?.addEventListener('input',apply);buttons.forEach(b=>b.addEventListener('click',()=>{active=b.dataset.craftFilter;buttons.forEach(x=>x.classList.toggle('active',x===b));apply();}));apply();})();
 </script>
+<script src="/account.js"></script>
 </body>
 </html>
