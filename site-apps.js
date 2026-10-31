@@ -116,7 +116,8 @@
         const q = (search && search.value || '').trim().toLocaleLowerCase('ko-KR');
         const cat = category && category.value || 'all';
         let visibleCount = 0;
-        allBox.querySelectorAll('.card').forEach(node => {
+        const cards = [...allBox.querySelectorAll('.card'), ...(serverBox ? serverBox.querySelectorAll('.card') : [])];
+        cards.forEach(node => {
           const matchesText = !q || node.textContent.toLocaleLowerCase('ko-KR').includes(q);
           const matchesCat = cat === 'all' || node.dataset.category === cat;
           const show = matchesText && matchesCat;
