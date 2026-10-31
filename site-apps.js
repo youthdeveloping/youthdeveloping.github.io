@@ -50,6 +50,7 @@
     const url = cleanUrl(app.url);
     const c = el(url ? 'a' : 'div', 'card' + (url ? '' : ' off'));
     if (url) c.href = url;
+    c.dataset.category = groupOf(app) === 'server' ? 'server' : ((app.id === 'youthcraft' || String(url).includes('/youthcraft/')) ? 'creative' : 'tool');
 
     const info = el('div', 'info');
     info.appendChild(el('h3', 'name', app.name));
@@ -104,6 +105,30 @@
 
       if (countEl) countEl.textContent = tools.length + ' TOOLS';
       if (serverWrap) serverWrap.hidden = servers.length === 0;
+
+      const search = document.getElementById('catalogSearch');
+      const category = document.getElementById('catalogCategory');
+      const catalogCount = document.getElementById('catalogCount');
+      const dashToolCount = document.getElementById('dashToolCount');
+      if (dashToolCount) dashToolCount.textContent = tools.length;
+      function filterCatalog() {
+        if (!allBox) return;
+        const q = (search && search.value || '').trim().toLocaleLowerCase('ko-KR');
+        const cat = category && category.value || 'all';
+        let visibleCount = 0;
+        allBox.querySelectorAll('.card').forEach(node => {
+          const matchesText = !q || node.textContent.toLocaleLowerCase('ko-KR').includes(q);
+          const matchesCat = cat === 'all' || node.dataset.category === cat;
+          const show = matchesText && matchesCat;
+          node.hidden = !show;
+          if (show) visibleCount++;
+        });
+        if (catalogCount) catalogCount.textContent = visibleCount + ' RESULTS';
+      }
+      if (search) search.addEventListener('input', filterCatalog);
+      if (category) category.addEventListener('change', filterCatalog);
+      filterCatalog();
+
     })
     .catch(() => { /* 기본 카드 유지 */ });
 })();
