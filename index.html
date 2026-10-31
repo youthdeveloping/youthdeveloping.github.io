@@ -909,5 +909,13 @@
   </script>
 
 <script src="/site-apps.js"></script>
+<script>
+(async()=>{
+ const noticeBox=document.getElementById('homeNotice');
+ try{const r=await fetch('https://web.youthdeveloper-github.workers.dev/api/public/notices',{cache:'no-store'});if(!r.ok)throw 0;const d=await r.json(),n=(d.notices||[])[0];if(noticeBox){noticeBox.replaceChildren();if(n){const a=document.createElement('a');a.className='portal-notice';a.href='/notices/';const h=document.createElement('strong');h.textContent=n.title;const sm=document.createElement('small');sm.textContent=new Date(n.createdAt||Date.now()).toLocaleDateString('ko-KR');a.append(h,sm);noticeBox.append(a);}else{const p=document.createElement('p');p.className='portal-empty';p.textContent='현재 등록된 공지가 없습니다.';noticeBox.append(p);}}}catch{if(noticeBox)noticeBox.textContent='공지 서버에 연결할 수 없습니다.';}
+ const updateBox=document.getElementById('homeUpdates');
+ try{const r=await fetch('/data/updates.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw 0;const d=await r.json(),items=(d.items||[]).slice().sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,3);if(updateBox){updateBox.replaceChildren();if(!items.length){updateBox.textContent='아직 업데이트 기록이 없습니다.';}else items.forEach(x=>{const p=document.createElement('p');p.style.cssText='margin:8px 0;color:var(--muted);font-size:12px';p.textContent=(x.date||'')+' / '+(x.title||'');updateBox.append(p);});}}catch{if(updateBox)updateBox.textContent='업데이트 기록을 불러오지 못했습니다.';}
+})();
+</script>
 </body>
 </html>
