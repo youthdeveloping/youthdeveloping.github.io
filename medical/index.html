@@ -642,7 +642,7 @@ function renderMedicalTerms(){
  const remote=REMOTE_MED_TERMS.map(t=>[t.name_ko||'한국어 명칭 미등록',t.name_en,t.category,[(t.code?'코드 '+t.code+' · ':'')+(t.definition||''),'출처: '+t.source].filter(Boolean).join(' · ')]);
  const combined=[...MED_TERMS,...remote];
  const rows=combined.filter(t=>(type==='all'||t[2]===type||type==='의료 코드'&&t[2]==='수술·시술')&&(!q||t.join(' ').toLocaleLowerCase().includes(q)));
- tc.textContent=rows.length+' / '+MED_TERMS.length+'개 용어';
+ tc.textContent=rows.length+'개 표시 · 기본 사전 '+MED_TERMS.length+'개 + 외부 검색 데이터';
  tl.innerHTML=rows.length?rows.map(t=>'<article class="sk" style="padding:13px 16px"><div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap"><div style="flex:1;min-width:220px"><div style="font-weight:700">'+termEscape(t[0])+'</div><div style="font:12px var(--mono);color:var(--cyan);overflow-wrap:anywhere">'+termEscape(t[1])+'</div><div style="font-size:13px;color:#cfd8e2;margin-top:6px">'+termEscape(t[3])+'</div></div><span class="lv lv2">'+termEscape(t[2])+'</span></div></article>').join(''):'<div class="empty">검색 결과가 없습니다.</div>';
 }
 tq.addEventListener('input',renderMedicalTerms);tt.addEventListener('change',renderMedicalTerms);renderMedicalTerms();
