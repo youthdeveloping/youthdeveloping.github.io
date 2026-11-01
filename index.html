@@ -701,6 +701,7 @@
               <a href="/updates/">업데이트 기록</a>
               <a href="/account/">통합 계정</a>
             </div>
+            <div id="homeAccount" class="portal-empty" aria-live="polite">계정 상태를 확인하고 있습니다.</div>
           </article>
           <article class="portal-card">
             <h3>LATEST NOTICE</h3>
@@ -943,6 +944,7 @@
  try{const r=await fetch('https://web.youthdeveloper-github.workers.dev/api/public/notices',{cache:'no-store'});if(!r.ok)throw 0;const d=await r.json(),n=(d.notices||[])[0];if(noticeBox){noticeBox.replaceChildren();if(n){const a=document.createElement('a');a.className='portal-notice';a.href='/notices/';const h=document.createElement('strong');h.textContent=n.title;const sm=document.createElement('small');sm.textContent=new Date(n.createdAt||Date.now()).toLocaleDateString('ko-KR');a.append(h,sm);noticeBox.append(a);}else{const p=document.createElement('p');p.className='portal-empty';p.textContent='현재 등록된 공지가 없습니다.';noticeBox.append(p);}}}catch{if(noticeBox)noticeBox.textContent='공지 서버에 연결할 수 없습니다.';}
  const updateBox=document.getElementById('homeUpdates');
  try{const r=await fetch('/data/updates.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw 0;const d=await r.json(),items=(d.items||[]).slice().sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,3);if(updateBox){updateBox.replaceChildren();if(!items.length){updateBox.textContent='아직 업데이트 기록이 없습니다.';}else items.forEach(x=>{const p=document.createElement('p');p.style.cssText='margin:8px 0;color:var(--muted);font-size:12px';p.textContent=(x.date||'')+' / '+(x.title||'');updateBox.append(p);});}const count=document.getElementById('dashUpdateCount');if(count)count.textContent=(d.items||[]).length;}catch{if(updateBox)updateBox.textContent='업데이트 기록을 불러오지 못했습니다.';}
+ if(window.YDAccount){const accountBox=document.getElementById('homeAccount');if(accountBox){try{const user=await window.YDAccount.me();accountBox.textContent=user?('로그인됨: '+user.nickname+(user.role==='admin'?' · 관리자':'')):'로그인되지 않았습니다. 통합 계정에서 로그인해 주세요.';}catch{accountBox.textContent='계정 상태를 확인할 수 없습니다.';}}}
 })();
 </script>
 </body>
