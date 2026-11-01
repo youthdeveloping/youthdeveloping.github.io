@@ -1,6 +1,9 @@
 name: Build PhotoCraft Web Engine
 
 on:
+  push:
+    paths:
+      - '.github/workflows/build-photocraft-engine.yml'
   workflow_dispatch:
     inputs:
       upstream_ref:
@@ -30,7 +33,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: storytold/photocraft
-          ref: ${{ inputs.upstream_ref }}
+          ref: ${{ inputs.upstream_ref || 'v0.18.0' }}
           path: upstream/photocraft
 
       - name: Install Rust and WebAssembly target
@@ -44,10 +47,7 @@ jobs:
           workspaces: upstream/photocraft
 
       - name: Install Trunk
-        uses: cargo-bins/cargo-binstall@main
-
-      - name: Install Trunk binary
-        run: cargo binstall trunk --no-confirm
+        run: cargo install trunk --locked
 
       - name: Build PhotoCraft WebAssembly app
         working-directory: upstream/photocraft/apps/photocraft-web
@@ -61,7 +61,7 @@ jobs:
           mkdir -p youthcraft/photocraft-engine
           rsync -a --delete upstream/photocraft/dist/web/ youthcraft/photocraft-engine/
           printf 'Upstream: https://github.com/storytold/photocraft\nRef: %s\nBuilt: %s\n' \
-            "${{ inputs.upstream_ref }}" "$(date -u +%FT%TZ)" > youthcraft/photocraft-engine/UPSTREAM.txt
+            "${{ inputs.upstream_ref || 'v0.18.0' }}" "$(date -u +%FT%TZ)" > youthcraft/photocraft-engine/UPSTREAM.txt
           find youthcraft/photocraft-engine -type f -printf '%s %p\n' | sort -nr | head -20
 
       - name: Commit engine build
