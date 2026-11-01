@@ -686,6 +686,31 @@
         </div>
       </section>
 
+      <section class="portal-dashboard" aria-label="포털 대시보드">
+        <div class="portal-grid">
+          <article class="portal-card">
+            <h3>PORTAL OVERVIEW</h3>
+            <p class="portal-empty">YouthDeveloper의 서비스와 최근 변경 사항을 한눈에 확인하세요.</p>
+            <div class="portal-statrow">
+              <div class="portal-stat"><small>TOOLS</small><strong id="dashToolCount">--</strong></div>
+              <div class="portal-stat"><small>SERVER TOOLS</small><strong id="dashServerCount">--</strong></div>
+              <div class="portal-stat"><small>UPDATES</small><strong id="dashUpdateCount">--</strong></div>
+            </div>
+            <div class="portal-links">
+              <a href="#all-services">서비스 탐색</a>
+              <a href="/updates/">업데이트 기록</a>
+              <a href="/account/">통합 계정</a>
+            </div>
+          </article>
+          <article class="portal-card">
+            <h3>LATEST NOTICE</h3>
+            <div id="homeNotice"><p class="portal-empty">공지를 불러오는 중입니다.</p></div>
+            <h3 style="margin-top:18px">RECENT UPDATES</h3>
+            <div id="homeUpdates"><p class="portal-empty">업데이트를 불러오는 중입니다.</p></div>
+          </article>
+        </div>
+      </section>
+
     <section class="section service-section" id="services">
       <div class="section-head">
         <div>
@@ -917,7 +942,7 @@
  const noticeBox=document.getElementById('homeNotice');
  try{const r=await fetch('https://web.youthdeveloper-github.workers.dev/api/public/notices',{cache:'no-store'});if(!r.ok)throw 0;const d=await r.json(),n=(d.notices||[])[0];if(noticeBox){noticeBox.replaceChildren();if(n){const a=document.createElement('a');a.className='portal-notice';a.href='/notices/';const h=document.createElement('strong');h.textContent=n.title;const sm=document.createElement('small');sm.textContent=new Date(n.createdAt||Date.now()).toLocaleDateString('ko-KR');a.append(h,sm);noticeBox.append(a);}else{const p=document.createElement('p');p.className='portal-empty';p.textContent='현재 등록된 공지가 없습니다.';noticeBox.append(p);}}}catch{if(noticeBox)noticeBox.textContent='공지 서버에 연결할 수 없습니다.';}
  const updateBox=document.getElementById('homeUpdates');
- try{const r=await fetch('/data/updates.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw 0;const d=await r.json(),items=(d.items||[]).slice().sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,3);if(updateBox){updateBox.replaceChildren();if(!items.length){updateBox.textContent='아직 업데이트 기록이 없습니다.';}else items.forEach(x=>{const p=document.createElement('p');p.style.cssText='margin:8px 0;color:var(--muted);font-size:12px';p.textContent=(x.date||'')+' / '+(x.title||'');updateBox.append(p);});}}catch{if(updateBox)updateBox.textContent='업데이트 기록을 불러오지 못했습니다.';}
+ try{const r=await fetch('/data/updates.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw 0;const d=await r.json(),items=(d.items||[]).slice().sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,3);if(updateBox){updateBox.replaceChildren();if(!items.length){updateBox.textContent='아직 업데이트 기록이 없습니다.';}else items.forEach(x=>{const p=document.createElement('p');p.style.cssText='margin:8px 0;color:var(--muted);font-size:12px';p.textContent=(x.date||'')+' / '+(x.title||'');updateBox.append(p);});}const count=document.getElementById('dashUpdateCount');if(count)count.textContent=(d.items||[]).length;}catch{if(updateBox)updateBox.textContent='업데이트 기록을 불러오지 못했습니다.';}
 })();
 </script>
 </body>
