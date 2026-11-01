@@ -111,6 +111,8 @@
       const catalogCount = document.getElementById('catalogCount');
       const dashToolCount = document.getElementById('dashToolCount');
       if (dashToolCount) dashToolCount.textContent = tools.length;
+      const dashServerCount = document.getElementById('dashServerCount');
+      if (dashServerCount) dashServerCount.textContent = servers.length;
       function filterCatalog() {
         if (!allBox) return;
         const q = (search && search.value || '').trim().toLocaleLowerCase('ko-KR');
