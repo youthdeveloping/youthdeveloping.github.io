@@ -1,0 +1,673 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#05070a">
+<meta name="description" content="의학 용어를 어근·접두사·접미사로 해독하고, 약어·검사·병태·약리·임상 점수·술기 분류까지 한곳에서 찾는 의학 용어 사전">
+<title>의학 용어 해독 사전 · YouthDeveloper</title>
+<style>
+:root{--bg:#05070a;--panel:#0c1016;--line:rgba(255,255,255,.09);--text:#edf2f7;--muted:#7d8996;--green:#61ff9a;--cyan:#62e8ff;--purple:#9d7bff;--amber:#ffb454;--mono:"SFMono-Regular","Cascadia Code","Roboto Mono",Consolas,monospace;--sans:Inter,Pretendard,"Noto Sans KR",system-ui,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;color:var(--text);background:radial-gradient(circle at 80% 8%,rgba(98,232,255,.08),transparent 30rem),radial-gradient(circle at 10% 60%,rgba(157,123,255,.06),transparent 30rem),var(--bg);font-family:var(--sans);line-height:1.6}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;cursor:pointer}
+.wrap{width:min(980px,calc(100% - 32px));margin:auto}
+.top{padding:22px 0;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(5,7,10,.88);backdrop-filter:blur(14px);z-index:10}
+.nav{display:flex;justify-content:space-between;align-items:center}
+.brand{font:700 18px var(--mono)}.brand span{color:var(--green)}
+.back{font:11px var(--mono);color:var(--muted)}.back:hover{color:var(--green)}
+.hero{padding:48px 0 18px}
+.eyebrow{font:10px var(--mono);letter-spacing:.14em;color:var(--green)}
+h1{font-size:clamp(34px,6vw,58px);letter-spacing:-.06em;margin:9px 0;line-height:1.1}
+.hero p{color:var(--muted);max-width:700px;line-height:1.8;margin:0}
+.how{margin:22px 0;padding:16px 18px;border:1px solid rgba(98,232,255,.3);background:rgba(98,232,255,.05);border-radius:12px;font-size:13.5px;line-height:1.85;color:#cfe9ef}
+.how b{color:var(--cyan)}
+.how code{font:12.5px var(--mono);color:var(--green)}
+.tools{display:grid;grid-template-columns:1fr auto;gap:10px;margin-bottom:12px}
+.tools input{background:var(--panel);border:1px solid var(--line);color:var(--text);padding:11px 13px;border-radius:9px;font:inherit;font-size:14px;min-width:0}
+.tools input:focus{outline:none;border-color:rgba(97,255,154,.5)}
+.btn{border:1px solid var(--line);background:rgba(255,255,255,.04);padding:9px 14px;border-radius:9px;font-size:13px;white-space:nowrap}
+.btn:hover,.btn.on{border-color:rgba(97,255,154,.5);color:var(--green)}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px}
+.chip{border:1px solid var(--line);background:transparent;padding:6px 12px;border-radius:99px;font-size:12.5px;color:var(--muted)}
+.chip em{font-style:normal;font:10px var(--mono);margin-left:5px;opacity:.7}
+.chip.on{color:#05070a;background:var(--green);border-color:var(--green)}
+.desc{font-size:13px;color:var(--muted);margin:10px 0 4px;line-height:1.7}
+.count{font:11px var(--mono);color:var(--muted);margin:8px 0 12px}
+.grp{font:11px var(--mono);letter-spacing:.12em;color:var(--cyan);margin:24px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.row{display:grid;grid-template-columns:minmax(120px,210px) 1fr;gap:6px 18px;padding:11px 14px;border:1px solid var(--line);background:var(--panel);border-radius:10px;margin-bottom:7px}
+.t{font:700 14px var(--mono);color:var(--green);word-break:break-word}
+.m{font-size:14px;color:#dfe7ef;line-height:1.7}
+.n{display:block;font-size:12.5px;color:var(--muted);margin-top:2px}
+.hide .row .mm{filter:blur(7px);user-select:none;cursor:pointer;transition:filter .15s}
+.hide .row.show .mm{filter:none;user-select:auto}
+.empty{text-align:center;color:var(--muted);padding:50px 0;border:1px dashed var(--line);border-radius:12px}
+.note{margin-top:34px;padding:14px 16px;border:1px solid rgba(255,180,84,.35);background:rgba(255,180,84,.06);border-radius:12px;font-size:13px;color:#e9d6b5;line-height:1.75}
+.note strong{color:var(--amber)}
+footer{margin:40px 0 40px;padding-top:18px;border-top:1px solid var(--line);font:11px var(--mono);color:var(--muted);line-height:1.9}
+@media(max-width:640px){.row{grid-template-columns:1fr}.tools{grid-template-columns:1fr 1fr}.tools input{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap nav"><a class="brand" href="/">Youth<span>Developer</span></a><a class="back" href="/medical/">← 의학 백과</a></div></header>
+<main class="wrap">
+
+<section class="hero">
+  <div class="eyebrow">MEDICAL / TERMS</div>
+  <h1>의학 용어 해독 사전</h1>
+  <p>의학 용어는 외우는 것이 아니라 조립해서 읽는 것입니다. 어근, 접두사, 접미사로 뜻을 풀고, 약어와 검사, 병태, 약리, 임상 점수, 술기 분류까지 한곳에 정리했습니다.</p>
+  <div class="how"><b>용어 해독법</b> 접두사 + 어근 + 접미사로 쪼갭니다. 예) <code>gastr/o + enter/o + -itis</code> = 위장염, <code>hepat/o + -megaly</code> = 간비대, <code>cholecyst/o + -ectomy</code> = 담낭절제술, <code>a- + -pnea</code> = 무호흡. 수술명은 대부분 <code>장기 어근 + 술기 접미사</code>입니다.</div>
+</section>
+
+<section>
+  <div class="tools">
+    <input id="q" type="search" placeholder="용어, 약어, 한글 뜻으로 검색 (예: itis, 심장, STEMI)" aria-label="용어 검색">
+    <button class="btn" id="hideBtn" aria-pressed="false">뜻 가리기(암기 모드)</button>
+  </div>
+  <div class="chips" id="chips"></div>
+  <div class="desc" id="desc"></div>
+  <div class="count" id="count"></div>
+  <div id="list"></div>
+
+  <div class="note"><strong>범위 안내</strong> 의학 용어는 수십만 개에 이르러 한 페이지에 모두 담을 수 없습니다. 이 사전은 용어를 스스로 해독하는 체계와 임상에서 가장 자주 쓰이는 핵심 용어를 정리한 것입니다. 약어는 병원과 나라마다 쓰임이 달라질 수 있고, 점수·기준은 개정되므로 실제 임상에서는 최신 지침과 기관 규정을 확인하세요. 학습용 자료이며 진단·치료를 대신하지 않습니다.</div>
+</section>
+
+<footer>YouthDeveloper · 의학 용어 사전(용어 해독 체계) · 교육용 요약 자료 · 최종 갱신 2026-11-01<br><a href="/medical/terms.html" style="color:var(--cyan)">확장 의학 용어 사전</a> · <a href="/medical/skills/" style="color:var(--cyan)">의학 술기 학습</a></footer>
+</main>
+
+<script>
+'use strict';
+/* 각 줄: 용어|뜻|보충 설명 또는 예 */
+const CATS=[
+{id:'prefix',name:'접두사',desc:'어근 앞에 붙어 위치, 수, 정도, 방향을 바꿉니다.',rows:`
+a-, an-|없음, 부정|anemia 빈혈, apnea 무호흡
+ab-|~에서 떨어져|abduction 외전
+ad-|~쪽으로|adduction 내전
+ante-, pre-|앞, 이전|antepartum 분만 전, preoperative 수술 전
+anti-|반대, 대항|antibiotic 항생제, antihypertensive 항고혈압제
+auto-|자신의|autoimmune 자가면역
+bi-|둘, 양쪽|bilateral 양측
+brady-|느린|bradycardia 서맥
+tachy-|빠른|tachycardia 빈맥, tachypnea 빈호흡
+contra-|반대|contraindication 금기, contralateral 반대쪽
+dia-|통과, 완전히|dialysis 투석, diagnosis 진단
+dys-|비정상, 곤란|dyspnea 호흡곤란, dysphagia 삼킴곤란
+endo-|안쪽의|endoscopy 내시경, endocardium 심내막
+epi-|위, 표면|epidural 경막외, epicardium 심외막
+eu-|정상, 좋은|euthyroid 갑상선 기능 정상
+ex-, exo-|바깥|exophthalmos 안구돌출
+extra-|바깥, 추가|extracellular 세포외
+hemi-|반쪽|hemiplegia 편마비
+hetero-|다른|heterogeneous 비균질
+homo-, homeo-|같은|homeostasis 항상성
+hydro-|물|hydrocephalus 뇌수종
+hyper-|과다, 위|hypertension 고혈압
+hypo-|부족, 아래|hypotension 저혈압, hypoglycemia 저혈당
+infra-|아래|infraspinatus 극하근
+inter-|사이|intercostal 늑간
+intra-|안|intravenous 정맥 내
+iso-|같은|isotonic 등장성
+macro-|큰|macrocytosis 대적혈구증
+micro-|작은|microcytic 소적혈구성
+meta-|변화, 이후, 다른 곳|metastasis 전이, metaplasia 화생
+neo-|새로운|neoplasm 신생물
+oligo-|적은|oliguria 소변감소
+pan-|전체|pancytopenia 범혈구감소증
+para-|옆, 비정상|paraplegia 하반신마비
+peri-|주위|pericardium 심낭
+poly-|많은|polyuria 다뇨
+post-|후|postoperative 수술 후
+retro-|뒤|retroperitoneal 후복막
+sub-|아래|subcutaneous 피하
+supra-|위|supraclavicular 쇄골상
+syn-, sym-|함께|syndrome 증후군
+trans-|가로질러, 통과|transfusion 수혈, transdermal 경피
+uni-|하나|unilateral 일측`},
+
+{id:'root',name:'어근',desc:'신체 부위와 구조를 나타냅니다. 연결 모음 o를 붙여 다른 어근이나 접미사와 이어집니다.',rows:`
+cardi/o|심장|cardiomyopathy 심근병증
+angi/o|혈관|angiography 혈관조영술
+arteri/o|동맥|arteriosclerosis 동맥경화
+aort/o|대동맥|aortic stenosis 대동맥판 협착
+ven/o, phleb/o|정맥|phlebitis 정맥염, venipuncture 정맥천자
+hem/o, hemat/o|혈액|hematoma 혈종, hemoglobin 혈색소
+thromb/o|혈전|thrombosis 혈전증
+embol/o|색전|embolism 색전증
+ather/o|죽종(지방성 플라크)|atherosclerosis 죽상경화증
+pulmon/o|폐|pulmonary 폐의
+pneum/o, pneumon/o|공기, 폐|pneumothorax 기흉, pneumonia 폐렴
+alveol/o|폐포|alveolar 폐포의
+bronch/o|기관지|bronchoscopy 기관지경
+trache/o|기관|tracheostomy 기관절개
+laryng/o|후두|laryngoscopy 후두경
+pharyng/o|인두|pharyngitis 인두염
+rhin/o|코|rhinitis 비염
+ot/o|귀|otitis media 중이염
+ophthalm/o, ocul/o|눈|ophthalmology 안과학
+kerat/o|각막, 각질|keratitis 각막염
+retin/o|망막|retinopathy 망막병증
+cephal/o|머리|hydrocephalus
+crani/o|두개골|craniotomy 개두술
+encephal/o|뇌|encephalitis 뇌염
+mening/o|수막|meningitis 수막염
+neur/o|신경|neuropathy 신경병증
+myel/o|척수, 골수|myelitis 척수염, myeloma 골수종
+vertebr/o, spondyl/o|척추|spondylosis 척추증
+thorac/o|흉부|thoracotomy 개흉술
+pleur/o|흉막|pleuritis 흉막염
+cost/o|늑골|intercostal 늑간
+abdomin/o, lapar/o|복부|laparoscopy 복강경
+peritone/o|복막|peritonitis 복막염
+stomat/o|입|stomatitis 구내염
+gloss/o|혀|glossitis 설염
+esophag/o|식도|esophagitis 식도염
+gastr/o|위|gastritis 위염
+duoden/o|십이지장|duodenal ulcer 십이지장궤양
+jejun/o|공장|jejunostomy 공장조루술
+ile/o|회장|ileus 장폐색
+enter/o|장(주로 소장)|enteritis 장염
+append/o|충수|appendectomy 충수절제
+col/o, colon/o|대장|colectomy 대장절제
+sigmoid/o|S상결장|sigmoidoscopy S상결장경
+rect/o, proct/o|직장|proctitis 직장염
+an/o|항문|perianal 항문 주위의
+hepat/o|간|hepatitis 간염
+chol/e|담즙|cholestasis 담즙정체
+cholecyst/o|담낭|cholecystitis 담낭염
+choledoch/o|총담관|choledocholithiasis 총담관결석
+pancreat/o|췌장|pancreatitis 췌장염
+splen/o|비장|splenomegaly 비장비대
+nephr/o, ren/o|신장|nephritis 신염, renal 신장의
+ur/o, urin/o|소변, 비뇨기|urology 비뇨기학
+cyst/o|방광, 주머니|cystitis 방광염
+ureter/o|요관|ureteral stone 요관결석
+urethr/o|요도|urethritis 요도염
+hyster/o, metr/o|자궁|hysterectomy 자궁적출
+oophor/o, ovari/o|난소|oophorectomy 난소절제
+salping/o|난관|salpingectomy 난관절제
+mast/o, mamm/o|유방|mastectomy 유방절제, mammography 유방촬영
+orchi/o|고환|orchiectomy 고환절제
+prostat/o|전립선|prostatectomy 전립선절제
+oste/o|뼈|osteoporosis 골다공증
+arthr/o|관절|arthroscopy 관절경
+chondr/o|연골|chondromalacia 연골연화
+my/o|근육|myocardium 심근
+ten/o, tendin/o|힘줄|tendinitis 건염
+derm/o, dermat/o|피부|dermatitis 피부염
+cutane/o|피부|subcutaneous 피하
+hist/o|조직|histology 조직학
+cyt/o|세포|cytology 세포학
+lymph/o|림프|lymphoma 림프종
+thyr/o|갑상선|thyroidectomy 갑상선절제
+adren/o|부신|adrenalectomy 부신절제
+gluc/o, glyc/o|포도당, 당|hyperglycemia 고혈당
+lip/o|지방|lipoma 지방종
+lith/o|돌|cholelithiasis 담석증
+scler/o|단단함|sclerosis 경화
+fibr/o|섬유|fibrosis 섬유화
+necr/o|죽음, 괴사|necrosis 괴사
+py/o|고름|pyelonephritis 신우신염
+immun/o|면역|immunology 면역학
+path/o|질병|pathology 병리학
+onc/o|종양|oncology 종양학
+carcin/o|상피성 암|carcinoma 암종
+sarc/o|살, 결합조직|sarcoma 육종
+psych/o|정신|psychiatry 정신건강의학
+nat/o|출생|neonatal 신생아의
+ger/o, geront/o|노인|geriatrics 노인의학
+ped/o|아이|pediatrics 소아과학`},
+
+{id:'suffix',name:'접미사',desc:'상태, 증상, 그리고 시술의 종류를 나타냅니다. 수술명의 핵심입니다.',rows:`
+-ectomy|절제(제거)|cholecystectomy 담낭절제술
+-otomy|절개|thoracotomy 개흉술, craniotomy 개두술
+-ostomy, -stomy|조루술(새 구멍을 만듦)|colostomy 결장조루술, gastrostomy 위조루술, tracheostomy 기관절개술
+-plasty|성형, 재건|angioplasty 혈관성형술
+-scopy|내시경 검사|colonoscopy 대장내시경
+-graphy|영상·기록 촬영 행위|angiography 혈관조영술
+-gram|기록, 영상 결과물|electrocardiogram 심전도
+-centesis|천자(찔러 체액을 뺌)|paracentesis 복수천자, thoracentesis 흉강천자
+-pexy|고정|orchiopexy 고환고정술
+-rrhaphy|봉합|herniorrhaphy 탈장봉합
+-desis|유합, 묶음|arthrodesis 관절유합술
+-lysis|분해, 박리, 해방|adhesiolysis 유착박리, hemolysis 용혈
+-tripsy|분쇄|lithotripsy 쇄석술
+-itis|염증|appendicitis 충수염
+-osis|비정상 상태, 질환|nephrosis 신증, cytosis 세포증가
+-pathy|질병, 병적 상태|cardiomyopathy 심근병증
+-oma|종양, 덩어리|hematoma 혈종, lymphoma 림프종
+-emia|혈액 내 상태|anemia 빈혈, hyperkalemia 고칼륨혈증
+-uria|소변 내 상태|hematuria 혈뇨, proteinuria 단백뇨
+-penia|감소|leukopenia 백혈구감소
+-cytosis|세포 증가|leukocytosis 백혈구증가
+-plasia|형성, 발달|hyperplasia 과형성, dysplasia 이형성
+-trophy|영양, 성장|atrophy 위축, hypertrophy 비대
+-megaly|비대|hepatomegaly 간비대
+-algia, -dynia|통증|neuralgia 신경통, mastodynia 유방통
+-rrhea|흐름, 분비|diarrhea 설사
+-rrhagia, -rrhage|터져 나오는 출혈|hemorrhage 출혈
+-pnea|호흡|dyspnea 호흡곤란, apnea 무호흡
+-plegia|마비|paraplegia 하반신마비, hemiplegia 편마비
+-paresis|부전마비(힘이 약함)|hemiparesis 편부전마비
+-phagia|삼킴, 먹기|dysphagia 삼킴곤란
+-phasia|말, 언어|aphasia 실어증
+-sclerosis|경화|atherosclerosis 죽상경화증
+-stasis|정체, 멈춤|hemostasis 지혈, cholestasis 담즙정체
+-cele|탈출, 헤르니아|hydrocele 음낭수종, cystocele 방광류
+-malacia|연화|osteomalacia 골연화증
+-ptosis|처짐|nephroptosis 신하수
+-ectasis|확장|bronchiectasis 기관지확장증
+-stenosis|협착|pyloric stenosis 유문협착
+-spasm|경련|bronchospasm 기관지경련
+-emesis|구토|hematemesis 토혈
+-lepsy|발작|epilepsy 간질
+-genic|~을 일으키는, ~에서 생긴|iatrogenic 의인성
+-oid|~와 비슷한|lipoid 지방 유사
+-ic, -al, -ar|~의, 관련된|cardiac 심장의, renal 신장의`},
+
+{id:'anatomy',name:'해부·체위',desc:'위치, 면, 움직임, 환자 자세를 나타내는 기본 용어입니다.',rows:`
+anterior (ventral)|전방(배쪽)|몸의 앞쪽
+posterior (dorsal)|후방(등쪽)|몸의 뒤쪽
+superior (cranial)|상방(머리쪽)|
+inferior (caudal)|하방(꼬리쪽)|
+medial|내측|정중선에 가까움
+lateral|외측|정중선에서 먼 쪽
+proximal|근위|몸통에 가까운 쪽(사지 기준)
+distal|원위|몸통에서 먼 쪽(사지 기준)
+superficial|표재, 천층|피부에 가까움
+deep|심부|피부에서 깊은 쪽
+ipsilateral|같은 쪽|
+contralateral|반대쪽|
+bilateral|양측|
+sagittal plane|시상면|좌우로 나눔
+coronal (frontal) plane|관상면(전두면)|앞뒤로 나눔
+transverse (axial) plane|횡단면(수평면)|위아래로 나눔
+supine|앙와위|천장을 보고 누운 자세
+prone|복와위|엎드린 자세
+lateral decubitus|측와위|옆으로 누운 자세
+Trendelenburg|트렌델렌버그 자세|머리가 낮고 다리가 높은 자세(중심정맥관 삽입 등)
+reverse Trendelenburg|역 트렌델렌버그 자세|머리가 높고 다리가 낮은 자세
+lithotomy|쇄석위|양 다리를 들어 올린 자세(산부인과·비뇨기과)
+Fowler / semi-Fowler|좌위 / 반좌위|상체를 90도 / 30~45도 올린 자세
+flexion|굴곡|관절 각도를 줄임
+extension|신전|관절 각도를 늘림
+abduction|외전|정중선에서 멀어지는 움직임
+adduction|내전|정중선에 가까워지는 움직임
+rotation|회전|
+pronation|회내|손바닥이 아래로 향함
+supination|회외|손바닥이 위로 향함
+inversion / eversion|내번 / 외번|발바닥이 안쪽 / 바깥쪽으로 향함
+cranial cavity|두개강|뇌
+thoracic cavity|흉강|심장, 폐, 종격동
+abdominal cavity|복강|소화기관 등
+pelvic cavity|골반강|방광, 생식기
+retroperitoneum|후복막|신장, 췌장 일부, 대동맥, 하대정맥 등
+mediastinum|종격동|흉강 중앙부(심장, 대혈관, 식도)
+visceral / parietal|내장쪽 / 벽쪽|장기 표면 / 체벽 쪽 막`},
+
+{id:'abbr',name:'약어',desc:'차트와 구두 보고에서 자주 쓰는 약어입니다. 병원마다 허용 약어가 다를 수 있습니다.',rows:`
+BP|blood pressure|혈압
+HR|heart rate|심박수
+RR|respiratory rate|호흡수
+BT|body temperature|체온
+SpO2|oxygen saturation|산소포화도
+GCS|Glasgow Coma Scale|의식 수준 척도
+ABCDE|Airway, Breathing, Circulation, Disability, Exposure|초기 평가의 순서
+SBP / DBP|systolic / diastolic BP|수축기 / 이완기 혈압
+MAP|mean arterial pressure|평균동맥압
+CO / CI|cardiac output / index|심박출량 / 심장지수
+EF (LVEF)|ejection fraction|박출률
+ECG (EKG)|electrocardiogram|심전도
+EEG|electroencephalogram|뇌파
+EMG|electromyography|근전도
+CT|computed tomography|컴퓨터단층촬영
+MRI|magnetic resonance imaging|자기공명영상
+PET|positron emission tomography|양전자방출단층촬영
+US|ultrasonography|초음파
+CXR|chest X-ray|흉부 X선
+ABG|arterial blood gas|동맥혈가스
+CBC|complete blood count|일반혈액검사
+WBC|white blood cell|백혈구
+RBC|red blood cell|적혈구
+Hb / Hct|hemoglobin / hematocrit|혈색소 / 적혈구용적률
+PLT|platelet|혈소판
+ANC|absolute neutrophil count|호중구 절대수
+ESR|erythrocyte sedimentation rate|적혈구 침강속도
+CRP|C-reactive protein|C-반응단백
+PT / INR|prothrombin time / international normalized ratio|프로트롬빈 시간 / 국제표준화비
+aPTT|activated partial thromboplastin time|활성화 부분 트롬보플라스틴 시간
+BUN / Cr|blood urea nitrogen / creatinine|요소질소 / 크레아티닌
+eGFR|estimated glomerular filtration rate|추정 사구체여과율
+AST / ALT|aspartate / alanine aminotransferase|간세포 손상 지표
+ALP / GGT|alkaline phosphatase / gamma-glutamyl transferase|담도계 효소
+T-bil / D-bil|total / direct bilirubin|총 / 직접 빌리루빈
+LDH|lactate dehydrogenase|젖산탈수소효소
+CK-MB / cTn|creatine kinase-MB / cardiac troponin|심근 손상 표지자
+BNP / NT-proBNP|B-type natriuretic peptide|심부전 표지자
+HbA1c|glycated hemoglobin|최근 2~3개월 평균 혈당 지표
+TSH|thyroid stimulating hormone|갑상선자극호르몬
+PSA|prostate-specific antigen|전립선특이항원
+AFP|alpha-fetoprotein|간세포암·생식세포종양 표지자
+CEA|carcinoembryonic antigen|대장암 등 종양표지자
+MI|myocardial infarction|심근경색
+STEMI / NSTEMI|ST-elevation / non-ST-elevation MI|ST분절 상승 / 비상승 심근경색
+ACS|acute coronary syndrome|급성관동맥증후군
+CAD|coronary artery disease|관상동맥질환
+HF (CHF)|heart failure|심부전
+AF|atrial fibrillation|심방세동
+VF / VT|ventricular fibrillation / tachycardia|심실세동 / 심실빈맥
+SVT|supraventricular tachycardia|상심실성 빈맥
+PEA|pulseless electrical activity|무맥성 전기활동
+ROSC|return of spontaneous circulation|자발순환 회복
+HTN|hypertension|고혈압
+DM|diabetes mellitus|당뇨병
+DKA / HHS|diabetic ketoacidosis / hyperosmolar hyperglycemic state|당뇨병 응급
+CKD|chronic kidney disease|만성 콩팥병
+AKI|acute kidney injury|급성 신손상
+ESRD|end-stage renal disease|말기 신부전
+HD|hemodialysis|혈액투석
+COPD|chronic obstructive pulmonary disease|만성 폐쇄성 폐질환
+ARDS|acute respiratory distress syndrome|급성호흡곤란증후군
+PE|pulmonary embolism|폐색전증
+DVT|deep vein thrombosis|심부정맥 혈전증
+CVA|cerebrovascular accident|뇌졸중
+TIA|transient ischemic attack|일과성 허혈 발작
+ICH / SAH|intracerebral / subarachnoid hemorrhage|뇌내출혈 / 지주막하출혈
+ICP|intracranial pressure|두개내압
+UTI|urinary tract infection|요로감염
+CAP / HAP / VAP|community / hospital-acquired / ventilator-associated pneumonia|지역사회 / 병원 / 인공호흡기 관련 폐렴
+SIRS|systemic inflammatory response syndrome|전신 염증 반응 증후군
+DIC|disseminated intravascular coagulation|파종성 혈관내 응고
+GERD|gastroesophageal reflux disease|위식도역류질환
+PUD|peptic ulcer disease|소화성 궤양
+IBD (UC, CD)|inflammatory bowel disease|염증성 장질환(궤양성 대장염, 크론병)
+HCC|hepatocellular carcinoma|간세포암
+CRC|colorectal cancer|대장암
+BPH|benign prostatic hyperplasia|전립선비대증
+ICU / CCU / NICU|intensive / coronary / neonatal care unit|중환자실 / 심장 / 신생아
+ER (ED)|emergency room (department)|응급실
+OR / PACU|operating room / post-anesthesia care unit|수술실 / 회복실
+DNR|do not resuscitate|심폐소생술 거부
+NPO|nil per os|금식
+PRN|pro re nata|필요할 때
+STAT|immediately|즉시
+IV / IM / SC / PO / SL|intravenous / intramuscular / subcutaneous / per os / sublingual|투여 경로
+qd / bid / tid / qid|once / twice / three / four times a day|하루 횟수(오해 방지를 위해 일부 기관은 금지)
+CC / HPI / PMH / FH / SH|chief complaint / history of present illness / past medical / family / social history|병력 청취 항목
+ROS|review of systems|계통 문진
+SOAP|Subjective, Objective, Assessment, Plan|경과 기록 형식
+Dx / Tx / Rx / Hx / Sx / Fx|diagnosis / treatment / prescription / history / symptoms / fracture|진단 / 치료 / 처방 / 병력 / 증상 / 골절
+CPR / BLS / ACLS|cardiopulmonary resuscitation / basic / advanced cardiac life support|심폐소생술 / 기본 / 전문
+ATLS / PALS / NRP|advanced trauma life support / pediatric advanced life support / neonatal resuscitation program|외상 / 소아 / 신생아 소생
+ETT / LMA|endotracheal tube / laryngeal mask airway|기관내관 / 후두마스크
+NG / OG tube|nasogastric / orogastric tube|비위관 / 구위관
+CVC / PICC|central venous catheter / peripherally inserted central catheter|중심정맥관 / 말초삽입 중심정맥관
+CRRT|continuous renal replacement therapy|지속적 신대체요법
+ECMO|extracorporeal membrane oxygenation|체외막산소화
+IABP / LVAD|intra-aortic balloon pump / left ventricular assist device|대동맥내 풍선펌프 / 좌심실 보조장치
+PCI / CABG|percutaneous coronary intervention / coronary artery bypass grafting|관상동맥 중재술 / 우회술
+TAVI|transcatheter aortic valve implantation|경피적 대동맥판 삽입술
+EGD|esophagogastroduodenoscopy|상부위장관 내시경
+ERCP|endoscopic retrograde cholangiopancreatography|내시경적 역행성 담췌관조영술
+EUS|endoscopic ultrasound|내시경초음파
+EMR / ESD|endoscopic mucosal resection / submucosal dissection|내시경 점막절제 / 점막하박리
+TACE|transarterial chemoembolization|간동맥 화학색전술
+SBRT / IMRT|stereotactic body radiotherapy / intensity-modulated radiotherapy|정위적 체부방사선치료 / 세기조절방사선치료
+HSCT|hematopoietic stem cell transplantation|조혈모세포이식
+GVHD|graft-versus-host disease|이식편대숙주병
+VATS|video-assisted thoracoscopic surgery|비디오 흉강경 수술
+ASA|American Society of Anesthesiologists physical status|마취 전 신체상태 분류`},
+
+{id:'test',name:'검사·진단',desc:'검사의 성능을 평가하는 용어와 영상·조직·내시경 검사 용어입니다.',rows:`
+sensitivity|민감도|질환이 있는 사람 중 양성으로 나오는 비율(배제에 유리)
+specificity|특이도|질환이 없는 사람 중 음성으로 나오는 비율(확진에 유리)
+PPV|양성예측도|양성 결과 중 실제 질환이 있는 비율(유병률에 영향)
+NPV|음성예측도|음성 결과 중 실제 질환이 없는 비율
+likelihood ratio|우도비|검사 결과가 진단 확률을 얼마나 바꾸는지
+ROC curve|수신자 조작 특성 곡선|민감도와 특이도의 균형을 보여 주는 곡선
+screening|선별검사|무증상 집단에서 질환을 조기 발견
+differential diagnosis|감별진단|비슷한 증상을 보이는 질환을 구별하는 과정
+gold standard|표준(참조) 검사|다른 검사를 평가할 때 기준이 되는 검사
+biopsy (core / FNA / excisional)|생검(굵은 바늘 / 가는 바늘 흡인 / 절제)|조직 또는 세포를 얻어 병리 진단
+cytology|세포진 검사|세포를 현미경으로 관찰
+histology|조직 검사|조직 구조를 현미경으로 관찰
+frozen section|동결절편 검사|수술 중 빠르게 병리 판독
+immunohistochemistry|면역조직화학|항체로 단백질 발현을 염색
+PCR|중합효소연쇄반응|유전물질을 증폭해 검출
+culture and sensitivity|배양 및 감수성 검사|원인균 동정과 항생제 반응 확인
+Gram stain|그람 염색|세균을 그람 양성·음성으로 분류
+MIC|최소억제농도|세균 성장을 억제하는 최소 항생제 농도
+contrast agent|조영제|영상에서 구조를 선명하게 하는 약제(요오드, 가돌리늄)
+Doppler|도플러|혈류 속도와 방향을 측정
+elastography|탄성 영상|조직의 경도를 평가(간 섬유화 등)
+fluoroscopy|투시 검사|X선으로 실시간 영상을 보며 시술
+scintigraphy|섬광 조영(핵의학 영상)|방사성 동위원소로 기능 영상
+DEXA|이중에너지 X선 흡수 계측|골밀도 검사
+TTE / TEE|경흉부 / 경식도 심초음파|
+stress test|부하 검사|운동·약물로 심장 허혈을 유발해 평가
+Holter monitoring|홀터 감시|24시간 이상 연속 심전도
+PFT (FEV1, FVC)|폐기능 검사(1초량, 노력성 폐활량)|폐쇄성·제한성 장애 구분
+polysomnography|수면다원검사|수면 중 호흡, 뇌파 등 기록
+endoscopy|내시경 검사|bronchoscopy 기관지경, cystoscopy 방광경, colposcopy 질확대경
+laparoscopy / thoracoscopy|복강경 / 흉강경|작은 절개로 내부를 관찰·수술
+angiography|혈관조영술|혈관 내 조영제 주입 후 촬영
+lumbar puncture|요추천자|뇌척수액 검사
+FOBT / FIT|분변잠혈검사 / 분변면역화학검사|대장암 선별
+Pap smear|자궁경부세포진검사|자궁경부암 선별
+HPV test|인유두종바이러스 검사|자궁경부암 위험 평가
+tumor marker|종양표지자|진단 보조·추적 용도(단독 진단 불가)`},
+
+{id:'pathology',name:'병태·임상',desc:'질병의 기전과 임상 경과를 설명하는 핵심 용어입니다.',rows:`
+etiology|병인(원인)|
+pathogenesis|병인론(발생 기전)|
+sign / symptom|징후 / 증상|징후는 관찰·측정 가능, 증상은 환자가 느끼는 것
+syndrome|증후군|함께 나타나는 증상·징후의 묶음
+acute / chronic|급성 / 만성|
+idiopathic|특발성|원인을 알 수 없음
+iatrogenic|의인성|의료 행위가 원인
+nosocomial|병원 획득성|
+prophylaxis|예방(요법)|
+comorbidity|동반질환|
+morbidity / mortality|이환율(합병증) / 사망률|
+incidence / prevalence|발생률 / 유병률|새로 생긴 환자 수 / 전체 환자 수
+prognosis|예후|
+remission / relapse|관해 / 재발|
+sequela|후유증|
+ischemia|허혈|혈류 부족
+infarction|경색|허혈로 조직이 괴사
+necrosis|괴사|병적 세포 사멸
+apoptosis|세포자멸사|프로그램된 세포 사멸
+hypoxia / hypoxemia|저산소증 / 저산소혈증|조직 / 혈액의 산소 부족
+hypercapnia|고탄산혈증|PaCO2 증가
+shock|쇼크|조직 관류 부전. 저혈량성, 심인성, 분배성(패혈성·아나필락시스·신경성), 폐쇄성
+sepsis|패혈증|감염에 대한 조절되지 않은 반응으로 인한 장기 기능 부전
+septic shock|패혈성 쇼크|수액에도 지속되는 저혈압으로 승압제 필요, 젖산 상승
+anaphylaxis|아나필락시스|급성 전신 과민반응(에피네프린이 1차 치료)
+edema|부종|조직 간질에 체액 축적
+effusion|삼출(액)|체강 내 액체 고임(흉수, 심낭삼출)
+ascites|복수|복강 내 액체
+embolism|색전증|혈류를 따라 이동한 물질이 혈관을 막음
+thrombosis|혈전증|혈관 내 응고물 형성(Virchow 삼징: 정체, 내피 손상, 과응고)
+hemorrhage / hematoma|출혈 / 혈종|
+aneurysm|동맥류|혈관 벽의 국소적 확장
+dissection|박리(해리)|혈관벽 층 사이로 혈액이 파고듦(대동맥박리)
+atherosclerosis|죽상경화증|동맥벽에 지질 플라크 축적
+fibrosis|섬유화|
+hypertrophy|비대|세포 크기 증가
+hyperplasia|과형성|세포 수 증가
+atrophy|위축|조직·세포 크기 감소
+metaplasia|화생|한 성숙 세포 유형이 다른 유형으로 바뀜
+dysplasia|이형성|세포의 비정상적 성숙·구조
+neoplasia|신생물 형성|
+benign / malignant|양성 / 악성|
+metastasis|전이|
+staging / grading|병기 / 등급|병기는 퍼진 정도, 등급은 세포의 분화도
+adjuvant / neoadjuvant|보조요법 / 선행요법|수술 후 / 수술 전 시행하는 치료
+palliative|고식적(증상 완화)|
+curative|근치적(완치 목적)|
+acidosis / alkalosis|산증 / 알칼리증|pH를 낮추거나 높이는 과정
+anion gap|음이온차|Na − (Cl + HCO3)
+hyponatremia / hypernatremia|저나트륨혈증 / 고나트륨혈증|
+hypokalemia / hyperkalemia|저칼륨혈증 / 고칼륨혈증|고칼륨혈증은 심전도 변화와 부정맥 위험
+hypoglycemia / hyperglycemia|저혈당 / 고혈당|
+SIADH|항이뇨호르몬 부적절 분비 증후군|저나트륨혈증의 원인
+autoimmunity|자가면역|면역계가 자기 조직을 공격
+immunosuppression|면역억제|
+GVHD|이식편대숙주병|이식된 면역세포가 수혜자 조직을 공격
+rejection|거부반응|초급성, 급성, 만성`},
+
+{id:'pharm',name:'약리',desc:'약이 몸에서 일으키는 일과 몸이 약에 하는 일을 나타내는 용어입니다.',rows:`
+pharmacokinetics (ADME)|약동학(흡수, 분포, 대사, 배설)|몸이 약에 하는 일
+pharmacodynamics|약력학|약이 몸에 하는 일
+bioavailability|생체이용률|전신순환에 도달하는 약물의 비율
+first-pass effect|초회통과효과|경구 약물이 간에서 대사되어 전신에 도달하는 양이 줄어듦
+half-life (t1/2)|반감기|혈중 농도가 절반이 되는 시간
+steady state|정상 상태|투여와 제거가 균형을 이룬 농도(보통 반감기의 4~5배 후)
+loading dose|부하용량|빠르게 목표 농도에 도달하기 위한 첫 용량
+maintenance dose|유지용량|
+therapeutic index|치료지수|유효 용량과 독성 용량의 간격
+narrow therapeutic index|좁은 치료역|와파린, 디곡신, 리튬, 타크로리무스, 아미노글리코시드 등
+agonist / antagonist|작용제 / 길항제|수용체를 활성화 / 차단
+prodrug|전구약물|체내에서 활성형으로 변환
+CYP450|사이토크롬 P450|약물 대사 효소군(약물 상호작용의 주요 원인)
+drug interaction|약물 상호작용|
+adverse drug reaction|이상약물반응|
+tolerance|내성|같은 용량의 효과 감소
+tachyphylaxis|급속내성|반복 투여로 빠르게 효과가 줄어듦
+dependence|의존|
+polypharmacy|다약제 복용|
+off-label|허가 외 사용|
+contraindication|금기|사용해서는 안 되는 상황
+indication|적응증|사용이 권고되는 상황
+antibiotic stewardship|항생제 적정 사용|내성 억제를 위한 관리
+empiric / definitive therapy|경험적 / 확정 치료|원인균 확인 전 / 후
+bactericidal / bacteriostatic|살균 / 정균|
+vasopressor|승압제|노르에피네프린, 바소프레신 등
+inotrope|강심제|심근 수축력 증가(도부타민 등)
+anticoagulant|항응고제|헤파린, 와파린, DOAC
+antiplatelet|항혈소판제|아스피린, 클로피도그렐
+thrombolytic|혈전용해제|alteplase, tenecteplase
+sedative / analgesic|진정제 / 진통제|
+neuromuscular blocker|신경근차단제|로큐로니움, 석시닐콜린
+local anesthetic|국소마취제|리도카인, 부피바카인
+immunosuppressant|면역억제제|타크로리무스, 미코페놀레이트, 스테로이드
+chemotherapy|화학요법(항암화학요법)|
+targeted therapy|표적치료|특정 분자 표적을 억제
+immunotherapy|면역치료|면역관문억제제 등`},
+
+{id:'score',name:'점수·분류',desc:'임상에서 위험도와 중증도를 정량화하는 대표 도구입니다. 정확한 기준은 원문을 확인하세요.',rows:`
+GCS|의식 수준|눈뜨기(E 1~4), 언어(V 1~5), 운동(M 1~6). 합 3~15
+AVPU|의식 간이 평가|Alert, Voice, Pain, Unresponsive
+NIHSS|뇌졸중 중증도|0~42점
+APGAR|출생 직후 신생아 상태|피부색, 심박수, 반사, 근긴장도, 호흡 각 0~2점. 1분·5분
+Mallampati|기도 난이도 예측|입을 벌렸을 때 보이는 구조 I~IV
+Cormack-Lehane|후두경 시야 등급|I~IV
+ASA 분류|마취 전 신체상태|I(건강)~VI(뇌사 장기기증자)
+RASS|진정·흥분 정도|−5(혼수)~+4(공격적)
+CAM-ICU|섬망 선별|
+Braden|욕창 위험도|
+BMI|체질량지수|체중(kg) / 신장(m)²
+NYHA|심부전 기능 분류|I~IV
+Killip|급성 심근경색 심부전 분류|I~IV
+TIMI|관상동맥 혈류 등급 / 위험 점수|혈류 0~3등급 / UA·NSTEMI 위험 점수
+CHA2DS2-VASc|심방세동 뇌졸중 위험|심부전, 고혈압, 나이, 당뇨, 뇌졸중, 혈관질환, 성별
+HAS-BLED|항응고 중 출혈 위험|
+Wells score|DVT·PE 사전 확률|
+CURB-65|폐렴 중증도|혼돈, BUN, 호흡수, 혈압, 65세 이상
+qSOFA / SOFA|패혈증 선별 / 장기부전 평가|호흡, 응고, 간, 심혈관, 신경, 신장
+APACHE II|ICU 중증도·예후|
+Child-Pugh|간경변 중증도(A~C)|빌리루빈, 알부민, PT, 복수, 간성뇌증
+MELD|말기 간질환 중증도·이식 우선순위|빌리루빈, INR, 크레아티닌(± Na)
+Forrest|소화성 궤양 출혈의 내시경 소견|Ia, Ib, IIa, IIb, IIc, III
+Glasgow-Blatchford|상부위장관 출혈 위험도|내시경 전 위험 층화
+Alvarado|충수염 가능성|
+Ranson / BISAP|급성 췌장염 중증도|
+Bishop|분만 유도 시 자궁경부 상태|
+TNM|암 병기|T 원발종양 크기·침범, N 림프절, M 원격전이
+ECOG / Karnofsky|암환자 수행도|ECOG 0~5 / Karnofsky 0~100
+Gleason|전립선암 조직학 등급|
+BCLC|간세포암 병기·치료 알고리즘|
+Clavien-Dindo|수술 후 합병증 등급|I~V
+TICI|뇌혈관 재개통 등급|기계적 혈전제거술 결과 판정
+Rockall|상부위장관 출혈 예후|`},
+
+{id:'procedure',name:'술기 분류',desc:'시술과 수술을 설명할 때 쓰는 구분과 개념입니다.',rows:`
+diagnostic / therapeutic|진단적 / 치료적|목적에 따른 구분(생검은 진단, 풍선확장은 치료)
+invasive / non-invasive|침습적 / 비침습적|조직을 관통하는지 여부
+open surgery|개복·개흉 수술|큰 절개로 직접 접근
+minimally invasive surgery|최소침습 수술|복강경, 흉강경, 로봇수술
+percutaneous|경피적|피부를 통과하는 바늘·카테터로 접근
+endovascular|혈관내|혈관 안에서 카테터로 시술
+endoscopic|내시경적|자연 개구부로 접근
+emergency / urgent / elective|응급 / 긴급 / 예정|수술 시급성에 따른 구분
+resection|절제|병변과 정상 경계를 포함해 제거
+anastomosis|문합|두 관 구조를 이음
+ostomy|조루(장루)|배벽에 새 개구를 만듦
+graft|이식편|autograft 자가, allograft 동종, xenograft 이종, isograft 동계
+transplantation|이식|장기·조직을 옮김
+embolization|색전술|혈관을 막아 출혈 또는 종양 영양을 차단
+ablation|소작·절제술(열·냉동·고주파)|부정맥, 종양 치료
+cauterization|소작|열·화학 물질로 조직을 응고
+aspiration|흡인|
+drainage|배액|농양, 체액을 몸 밖으로 뺌
+lavage / irrigation|세척|
+intubation|삽관|기관내관 등 관을 삽입
+ventilation|환기|invasive 침습적 / non-invasive 비침습적(NIV)
+dialysis|투석|혈액투석, 복막투석
+transfusion|수혈|
+general / regional / local anesthesia|전신 / 부위 / 국소 마취|부위는 척수, 경막외, 신경차단
+sedation|진정|
+asepsis|무균법|
+sterilization / disinfection|멸균 / 소독|
+informed consent|설명 후 동의|
+time-out|시술 전 확인 절차|환자, 부위, 시술명을 팀이 함께 확인
+WHO Surgical Safety Checklist|WHO 수술안전 체크리스트|마취 전 / 절개 전 / 퇴실 전 확인
+laparotomy|개복술|
+laparoscopy|복강경|
+thoracotomy / VATS|개흉술 / 비디오 흉강경|
+craniotomy|개두술|
+amputation|절단|
+debridement|변연절제|괴사·오염 조직 제거
+fasciotomy|근막절개|구획증후군에서 압력 감소
+tracheostomy|기관절개|장기 기계환기 또는 상기도 폐쇄
+cannulation|캐뉼라 삽입|혈관 접근`}
+];
+
+/* 파싱 */
+const ALL=[];
+for(const c of CATS){c.items=c.rows.trim().split('\n').filter(Boolean).map(l=>{const p=l.split('|');return{cat:c.id,t:(p[0]||'').trim(),m:(p[1]||'').trim(),n:(p[2]||'').trim()}});ALL.push(...c.items)}
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let cat='all',q='',hide=false;
+
+function renderChips(){
+  $('#chips').innerHTML=[`<button class="chip${cat==='all'?' on':''}" data-c="all">전체<em>${ALL.length}</em></button>`,...CATS.map(c=>`<button class="chip${cat===c.id?' on':''}" data-c="${c.id}">${esc(c.name)}<em>${c.items.length}</em></button>`)].join('');
+}
+function match(it){
+  if(cat!=='all'&&it.cat!==cat)return false;
+  if(!q)return true;
+  return (it.t+' '+it.m+' '+it.n).toLowerCase().includes(q);
+}
+function render(){
+  const list=ALL.filter(match);
+  const cur=CATS.find(c=>c.id===cat);
+  $('#desc').textContent=cur?cur.desc:'';
+  $('#count').textContent=`${list.length}개 용어`;
+  if(!list.length){$('#list').innerHTML='<div class="empty">검색 결과가 없습니다.</div>';return}
+  let html='',g='';
+  for(const it of list){
+    if(cat==='all'&&it.cat!==g){g=it.cat;html+=`<div class="grp">${esc(CATS.find(c=>c.id===g).name)}</div>`}
+    html+=`<div class="row"><div class="t">${esc(it.t)}</div><div class="m"><span class="mm">${esc(it.m)}${it.n?`<span class="n">${esc(it.n)}</span>`:''}</span></div></div>`;
+  }
+  $('#list').innerHTML=html;
+  $('#list').classList.toggle('hide',hide);
+}
+$('#chips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;cat=b.dataset.c;renderChips();render()});
+$('#q').addEventListener('input',e=>{q=e.target.value.trim().toLowerCase();render()});
+$('#hideBtn').addEventListener('click',e=>{hide=!hide;e.currentTarget.classList.toggle('on',hide);e.currentTarget.setAttribute('aria-pressed',hide);$('#list').classList.toggle('hide',hide)});
+$('#list').addEventListener('click',e=>{if(!hide)return;const r=e.target.closest('.row');if(r)r.classList.toggle('show')});
+renderChips();render();
+</script>
+</body>
+</html>
