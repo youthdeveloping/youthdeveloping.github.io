@@ -1,0 +1,14 @@
+{
+  "name": "medical-api",
+  "main": "worker.js",
+  "compatibility_date": "2026-11-01",
+  "triggers": { "crons": ["0 3 * * *"] },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "youthdeveloper-medical",
+      "database_id": "bd7a0301-8d9c-4a9d-bc03-63c55ac2ae77"
+    }
+  ],
+  "observability": { "enabled": true }
+}
