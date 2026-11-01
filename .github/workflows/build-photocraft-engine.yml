@@ -1,0 +1,78 @@
+name: Build PhotoCraft Web Engine
+
+on:
+  workflow_dispatch:
+    inputs:
+      upstream_ref:
+        description: "PhotoCraft upstream tag or commit"
+        required: true
+        default: "v0.18.0"
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: photocraft-engine-build
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout YouthDeveloper site
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout upstream PhotoCraft
+        uses: actions/checkout@v4
+        with:
+          repository: storytold/photocraft
+          ref: ${{ inputs.upstream_ref }}
+          path: upstream/photocraft
+
+      - name: Install Rust and WebAssembly target
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: upstream/photocraft
+
+      - name: Install Trunk
+        uses: cargo-bins/cargo-binstall@main
+
+      - name: Install Trunk binary
+        run: cargo binstall trunk --no-confirm
+
+      - name: Build PhotoCraft WebAssembly app
+        working-directory: upstream/photocraft/apps/photocraft-web
+        run: trunk build --release
+
+      - name: Install built engine into YouthCraft
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f upstream/photocraft/dist/web/index.html
+          mkdir -p youthcraft/photocraft-engine
+          rsync -a --delete upstream/photocraft/dist/web/ youthcraft/photocraft-engine/
+          printf 'Upstream: https://github.com/storytold/photocraft\nRef: %s\nBuilt: %s\n' \
+            "${{ inputs.upstream_ref }}" "$(date -u +%FT%TZ)" > youthcraft/photocraft-engine/UPSTREAM.txt
+          find youthcraft/photocraft-engine -type f -printf '%s %p\n' | sort -nr | head -20
+
+      - name: Commit engine build
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add youthcraft/photocraft-engine
+          if git diff --cached --quiet; then
+            echo "No engine changes to commit."
+            exit 0
+          fi
+          git commit -m "Build PhotoCraft WebAssembly engine"
+          git push
