@@ -151,11 +151,11 @@ footer{margin:50px 0 40px;padding-top:18px;border-top:1px solid var(--line);font
 
 <section id="dictionary" style="margin:42px 0">
 <div class="sec"><div class="eyebrow">03 / MEDICAL DICTIONARY</div><h2>의학 용어 사전 · Medical Terminology</h2></div>
-<p style="color:var(--muted);font-size:13px;margin:0 0 14px">병명, 의료 도구, 수술·시술, 검사, 약물, 해부학 용어를 한국어와 영어로 검색합니다.</p>
-<div class="tools"><input id="termQ" type="search" placeholder="한국어·영어·설명 검색" aria-label="의학 용어 검색"><select id="termType" aria-label="용어 분류"><option value="all">모든 분류</option><option>병명</option><option>도구</option><option>수술·시술</option><option>검사</option><option>약물</option><option>해부</option></select></div>
-<div class="count" id="termCount"></div><div id="termList"></div>
+<p style="color:var(--muted);font-size:13px;margin:0 0 14px">기존 한국어·영어 용어에 더해 미국 국립의학도서관(NLM)의 질환·ICD-10-CM·HCPCS·인체 표현형 데이터를 실시간 검색하고 매일 동기화합니다. 외부 자료는 영어 중심이며 한국어 번역이 제공되지 않는 항목은 별도로 표시합니다.</p>
+<div class="tools"><input id="termQ" type="search" placeholder="한국어·영어·설명 검색" aria-label="의학 용어 검색"><select id="termType" aria-label="용어 분류"><option value="all">모든 분류</option><option>병명</option><option>도구</option><option>수술·시술</option><option>검사</option><option>약물</option><option>해부</option><option>표현형</option><option>의료 코드</option></select></div>
+<div class="count" id="liveMedicalStatus">외부 의학 용어 데이터 연결 준비 중...</div><div class="count" id="termCount"></div><div id="termList"></div>
 </section>
-<footer>YouthDeveloper · 의학 술기 학습 · 교육용 요약 자료 · 최종 갱신 2026-11-01<br>내용은 일반적인 교과서·가이드라인 수준의 개요이며, 최신 지침과 소속 기관 프로토콜이 우선합니다.</footer>
+<footer>YouthDeveloper · 의학 술기 학습 · 교육용 요약 자료 · 의학 용어 데이터: NLM Clinical Tables<br>내용은 일반적인 교과서·가이드라인 수준의 개요이며, 최신 지침과 소속 기관 프로토콜이 우선합니다.</footer>
 </main>
 
 <script>
@@ -636,13 +636,54 @@ renderAll();
 const MED_TERMS=[["고혈압","Hypertension","병명","지속적으로 높은 동맥 혈압"],["저혈압","Hypotension","병명","비정상적으로 낮은 혈압"],["당뇨병","Diabetes mellitus","병명","혈당 조절에 이상이 생기는 대사질환"],["심근경색","Myocardial infarction","병명","심근 혈류 차단으로 심장근육이 손상되는 질환"],["협심증","Angina pectoris","병명","심근 산소 공급 부족으로 흉부 불편감이 발생하는 상태"],["심부전","Heart failure","병명","심장이 필요한 혈류를 충분히 공급하지 못하는 증후군"],["심방세동","Atrial fibrillation","병명","심방의 불규칙한 전기활동으로 생기는 부정맥"],["뇌졸중","Stroke","병명","뇌혈관 폐색 또는 파열로 뇌 기능 장애가 생기는 질환"],["뇌경색","Ischemic stroke","병명","혈관 폐색으로 뇌 조직에 혈류가 공급되지 않는 뇌졸중"],["뇌출혈","Intracerebral hemorrhage","병명","뇌 실질 내부에 출혈이 발생한 상태"],["폐렴","Pneumonia","병명","폐포와 폐 조직의 감염성 염증"],["천식","Asthma","병명","기도의 만성 염증과 가변적 기류 제한이 특징인 질환"],["폐색전증","Pulmonary embolism","병명","혈전 등이 폐동맥을 막는 질환"],["패혈증","Sepsis","병명","감염에 대한 조절되지 않은 반응으로 장기 기능 장애가 발생한 상태"],["만성콩팥병","Chronic kidney disease","병명","신장 구조 또는 기능 이상이 장기간 지속되는 상태"],["급성신손상","Acute kidney injury","병명","짧은 기간에 신장 기능이 저하되는 상태"],["간경변증","Liver cirrhosis","병명","만성 간 손상으로 섬유화와 재생결절이 생긴 상태"],["간세포암","Hepatocellular carcinoma","병명","간세포에서 발생하는 원발성 간암"],["위식도역류질환","Gastroesophageal reflux disease (GERD)","병명","위 내용물이 식도로 역류해 증상이나 합병증을 일으키는 질환"],["크론병","Crohn disease","병명","소화관 어디에서나 발생할 수 있는 만성 염증성 장질환"],["궤양성 대장염","Ulcerative colitis","병명","대장 점막에 만성 염증이 생기는 장질환"],["류마티스관절염","Rheumatoid arthritis","병명","관절에 만성 염증이 생기는 자가면역질환"],["골다공증","Osteoporosis","병명","골량과 골강도가 감소해 골절 위험이 증가하는 질환"],["빈혈","Anemia","병명","혈액의 산소 운반 능력이 감소한 상태"],["백혈병","Leukemia","병명","조혈 조직에서 비정상 혈액세포가 증식하는 악성 질환"],["림프종","Lymphoma","병명","림프구 계열 세포에서 발생하는 악성 종양"],["백내장","Cataract","병명","수정체 혼탁으로 시력이 저하되는 질환"],["녹내장","Glaucoma","병명","시신경 손상과 시야 결손이 진행할 수 있는 안과 질환"],["청진기","Stethoscope","도구","심장·폐·혈관 등의 소리를 듣는 진찰 도구"],["체온계","Thermometer","도구","체온을 측정하는 기구"],["혈압계","Sphygmomanometer","도구","혈압을 측정하는 기구"],["맥박산소측정기","Pulse oximeter","도구","말초 산소포화도와 맥박수를 측정하는 장치"],["후두경","Laryngoscope","도구","후두와 기도 구조를 관찰하는 기구"],["기관내관","Endotracheal tube","도구","기관 내 기도 확보에 사용하는 관"],["후두마스크 기도기","Laryngeal mask airway (LMA)","도구","성문 위에 위치시키는 기도유지기"],["인공호흡기","Mechanical ventilator","도구","호흡을 보조하거나 대신하는 의료기기"],["제세동기","Defibrillator","도구","전기 충격으로 특정 치명적 부정맥을 치료하는 장비"],["초음파 탐촉자","Ultrasound transducer","도구","초음파를 송수신해 신체 내부 영상을 얻는 장치"],["내시경","Endoscope","도구","체내 공간이나 장기 내부를 관찰하는 광학 기구"],["복강경","Laparoscope","도구","복강 내부를 관찰하는 내시경 기구"],["수술용 메스","Surgical scalpel","도구","조직 절개에 사용하는 수술 도구"],["겸자","Forceps","도구","조직이나 물체를 잡거나 고정하는 기구"],["지혈겸자","Hemostat","도구","혈관이나 조직을 집어 지혈하는 기구"],["견인기","Retractor","도구","수술 부위를 벌려 시야를 확보하는 기구"],["봉합침","Suture needle","도구","봉합사를 조직에 통과시키는 바늘"],["봉합사","Suture","도구","조직을 봉합하거나 결찰하는 실"],["주사기","Syringe","도구","액체를 흡인하거나 주입하는 기구"],["정맥 카테터","Intravenous catheter","도구","정맥 접근을 위한 가느다란 관"],["중심정맥관","Central venous catheter","도구","중심정맥에 위치시키는 혈관 접근 장치"],["도뇨관","Urinary catheter","도구","방광 소변을 배액하는 관"],["흉관","Chest tube","도구","흉강 내 공기나 액체를 배액하는 관"],["배액관","Drain","도구","수술 부위나 체강의 액체를 배출하는 장치"],["심박조율기","Cardiac pacemaker","도구","심장 박동을 전기적으로 조절하는 장치"],["투석기","Dialyzer","도구","혈액투석에서 노폐물과 과잉 수분을 제거하는 필터"],["봉합술","Suturing","수술·시술","상처나 수술 절개 부위를 봉합하는 처치"],["충수절제술","Appendectomy","수술·시술","충수를 제거하는 수술"],["담낭절제술","Cholecystectomy","수술·시술","담낭을 제거하는 수술"],["탈장교정술","Hernia repair","수술·시술","탈장된 조직을 복원하고 결손 부위를 보강하는 수술"],["제왕절개술","Cesarean section","수술·시술","복부와 자궁을 절개해 태아를 분만하는 수술"],["위절제술","Gastrectomy","수술·시술","위의 일부 또는 전체를 절제하는 수술"],["대장절제술","Colectomy","수술·시술","대장의 일부 또는 전체를 절제하는 수술"],["유방절제술","Mastectomy","수술·시술","유방 조직의 일부 또는 전체를 제거하는 수술"],["갑상선절제술","Thyroidectomy","수술·시술","갑상선의 일부 또는 전체를 제거하는 수술"],["관상동맥우회술","Coronary artery bypass grafting (CABG)","수술·시술","우회 혈관을 연결해 심근 혈류를 개선하는 수술"],["관상동맥중재술","Percutaneous coronary intervention (PCI)","수술·시술","카테터로 좁아진 관상동맥을 넓히는 시술"],["기관절개술","Tracheostomy","수술·시술","목 앞쪽에서 기관으로 통하는 통로를 만드는 수술"],["위내시경","Esophagogastroduodenoscopy (EGD)","수술·시술","식도·위·십이지장을 내시경으로 관찰하는 검사"],["대장내시경","Colonoscopy","수술·시술","대장 내부를 내시경으로 관찰하는 검사"],["역행성 담췌관조영술","Endoscopic retrograde cholangiopancreatography (ERCP)","수술·시술","내시경과 조영술로 담관·췌관을 평가·치료하는 시술"],["인공고관절치환술","Total hip arthroplasty (THA)","수술·시술","손상된 고관절을 인공 삽입물로 대체하는 수술"],["인공슬관절치환술","Total knee arthroplasty (TKA)","수술·시술","무릎 관절면을 인공 삽입물로 대체하는 수술"],["개두술","Craniotomy","수술·시술","두개골 일부를 열어 뇌에 접근하는 수술"],["동맥류 클리핑","Aneurysm clipping","수술·시술","동맥류에 클립을 적용해 혈류 유입을 차단하는 수술"],["혈관내 코일색전술","Endovascular coiling","수술·시술","카테터로 동맥류 내부에 코일을 배치하는 치료"],["척추궁절제술","Laminectomy","수술·시술","척추관 감압 등을 위해 척추궁 일부를 제거하는 수술"],["신장이식","Kidney transplantation","수술·시술","공여 신장을 수혜자에게 이식하는 수술"],["심폐소생술","Cardiopulmonary resuscitation (CPR)","수술·시술","심정지 환자의 순환과 산소 공급을 유지하기 위한 응급 처치"],["혈액투석","Hemodialysis","수술·시술","체외 순환 혈액을 투석막으로 여과하는 치료"],["생검","Biopsy","수술·시술","조직 일부를 채취해 병리학적으로 검사하는 절차"],["요추천자","Lumbar puncture","수술·시술","요추 부위에서 뇌척수액을 채취하는 시술"],["흉강천자","Thoracentesis","수술·시술","흉막강 액체를 채취하거나 배액하는 시술"],["복수천자","Paracentesis","수술·시술","복강 내 복수를 채취하거나 배액하는 시술"],["심전도","Electrocardiogram (ECG/EKG)","검사","심장의 전기적 활동을 기록하는 검사"],["심초음파","Echocardiography","검사","초음파로 심장 구조와 기능을 평가하는 검사"],["컴퓨터단층촬영","Computed tomography (CT)","검사","X선으로 신체 단면 영상을 얻는 검사"],["자기공명영상","Magnetic resonance imaging (MRI)","검사","자기장과 고주파로 신체 내부 영상을 얻는 검사"],["양전자방출단층촬영","Positron emission tomography (PET)","검사","방사성 추적자로 대사 활동을 영상화하는 검사"],["일반혈액검사","Complete blood count (CBC)","검사","적혈구·백혈구·혈소판 등 혈액 세포를 평가하는 검사"],["동맥혈가스분석","Arterial blood gas analysis (ABG)","검사","산소·이산화탄소와 산염기 상태를 평가하는 검사"],["소변검사","Urinalysis","검사","소변의 물리·화학적 특성과 침사를 평가하는 검사"],["조직병리검사","Histopathology","검사","조직의 현미경 소견을 분석하는 검사"],["배양검사","Culture test","검사","검체에서 미생물을 배양해 원인균을 확인하는 검사"],["항생제","Antibiotics","약물","세균 감염을 치료하거나 억제하는 약물군"],["진통제","Analgesics","약물","통증을 완화하는 약물군"],["마취제","Anesthetics","약물","감각 또는 의식을 일시적으로 차단하는 약물군"],["항응고제","Anticoagulants","약물","혈액 응고 과정을 억제하는 약물군"],["항혈소판제","Antiplatelet agents","약물","혈소판 활성과 응집을 억제하는 약물군"],["인슐린","Insulin","약물","혈당을 낮추는 호르몬 및 치료 약제"],["에피네프린","Epinephrine (Adrenaline)","약물","특정 응급상황에서 사용하는 심혈관·기관지 작용 약물"],["대동맥","Aorta","해부","좌심실에서 전신으로 혈액을 보내는 가장 큰 동맥"],["관상동맥","Coronary artery","해부","심장근육에 혈액을 공급하는 동맥"],["폐동맥","Pulmonary artery","해부","우심실에서 폐로 혈액을 운반하는 동맥"],["대정맥","Vena cava","해부","전신 정맥혈을 우심방으로 운반하는 큰 정맥"],["간문맥","Hepatic portal vein","해부","소화관 등에서 간으로 혈액을 운반하는 정맥"],["대뇌피질","Cerebral cortex","해부","대뇌 반구 바깥쪽의 회백질 층"],["소뇌","Cerebellum","해부","운동 조정과 균형 등에 관여하는 뇌 구조"],["해마","Hippocampus","해부","기억 형성과 공간 탐색에 중요한 뇌 구조"],["췌장","Pancreas","해부","소화효소와 혈당 조절 호르몬을 분비하는 기관"],["신장","Kidney","해부","혈액을 여과하고 체액·전해질 균형을 조절하는 기관"],["폐포","Alveolus","해부","폐에서 산소와 이산화탄소 교환이 일어나는 구조"],["복막","Peritoneum","해부","복강과 복부 장기의 일부를 덮는 장막"],["흉막","Pleura","해부","폐와 흉벽 안쪽을 덮는 두 겹의 장막"]];
 const tq=document.querySelector('#termQ'),tt=document.querySelector('#termType'),tc=document.querySelector('#termCount'),tl=document.querySelector('#termList');
 function termEscape(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+let REMOTE_MED_TERMS=[];
 function renderMedicalTerms(){
  const q=tq.value.trim().toLocaleLowerCase(),type=tt.value;
- const rows=MED_TERMS.filter(t=>(type==='all'||t[2]===type)&&(!q||t.join(' ').toLocaleLowerCase().includes(q)));
+ const remote=REMOTE_MED_TERMS.map(t=>[t.name_ko||'한국어 명칭 미등록',t.name_en,t.category,[(t.code?'코드 '+t.code+' · ':'')+(t.definition||''),'출처: '+t.source].filter(Boolean).join(' · ')]);
+ const combined=[...MED_TERMS,...remote];
+ const rows=combined.filter(t=>(type==='all'||t[2]===type||type==='의료 코드'&&t[2]==='수술·시술')&&(!q||t.join(' ').toLocaleLowerCase().includes(q)));
  tc.textContent=rows.length+' / '+MED_TERMS.length+'개 용어';
  tl.innerHTML=rows.length?rows.map(t=>'<article class="sk" style="padding:13px 16px"><div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap"><div style="flex:1;min-width:220px"><div style="font-weight:700">'+termEscape(t[0])+'</div><div style="font:12px var(--mono);color:var(--cyan);overflow-wrap:anywhere">'+termEscape(t[1])+'</div><div style="font-size:13px;color:#cfd8e2;margin-top:6px">'+termEscape(t[3])+'</div></div><span class="lv lv2">'+termEscape(t[2])+'</span></div></article>').join(''):'<div class="empty">검색 결과가 없습니다.</div>';
 }
 tq.addEventListener('input',renderMedicalTerms);tt.addEventListener('change',renderMedicalTerms);renderMedicalTerms();
+const MEDICAL_API='https://medical-api.youthdeveloper-github.workers.dev';
+const liveMedicalStatus=document.querySelector('#liveMedicalStatus');
+let liveMedicalTimer=null;
+async function loadMedicalApiStatus(){
+ try{
+  const r=await fetch(MEDICAL_API+'/api/medical/health');
+  if(!r.ok)throw new Error('status '+r.status);
+  const d=await r.json();
+  const last=d.lastSync&&d.lastSync.synced_at?new Date(d.lastSync.synced_at).toLocaleString('ko-KR'):'아직 첫 정기 동기화 전';
+  liveMedicalStatus.textContent='NLM 연동 정상 · 서버 저장 '+Number(d.total||0).toLocaleString()+'개 · 최근 동기화: '+last+' · 매일 12:00 KST 자동 갱신';
+ }catch(e){
+  liveMedicalStatus.textContent='외부 API 상태를 확인하지 못했습니다. 기본 사전은 계속 사용할 수 있습니다.';
+ }
+}
+async function searchLiveMedicalTerms(){
+ const q=tq.value.trim(),category=tt.value;
+ if(q.length<2){REMOTE_MED_TERMS=[];renderMedicalTerms();return;}
+ if(!['all','병명','수술·시술','표현형','의료 코드'].includes(category)){
+  REMOTE_MED_TERMS=[];liveMedicalStatus.textContent='이 분류는 현재 기본 사전에서 검색합니다.';renderMedicalTerms();return;
+ }
+ liveMedicalStatus.textContent='NLM 및 연계 의학 용어 데이터 검색 중...';
+ try{
+  const params=new URLSearchParams({q,category:category==='의료 코드'?'수술·시술':category});
+  const r=await fetch(MEDICAL_API+'/api/medical/search?'+params.toString());
+  const d=await r.json();
+  if(!r.ok)throw new Error(d.error||'API '+r.status);
+  REMOTE_MED_TERMS=Array.isArray(d.terms)?d.terms:[];
+  liveMedicalStatus.textContent='외부 검색 결과 '+REMOTE_MED_TERMS.length+'개 · '+(d.cached?'캐시':'최신 조회')+(d.partial?' · 일부 데이터 제공처 응답 지연':'')+' · 제공처: NLM Clinical Tables';
+  renderMedicalTerms();
+ }catch(e){
+  liveMedicalStatus.textContent='외부 검색을 일시적으로 사용할 수 없습니다. 기본 사전 결과를 표시합니다.';
+  REMOTE_MED_TERMS=[];renderMedicalTerms();
+ }
+}
+tq.addEventListener('input',()=>{clearTimeout(liveMedicalTimer);liveMedicalTimer=setTimeout(searchLiveMedicalTerms,450);});
+tt.addEventListener('change',searchLiveMedicalTerms);
+loadMedicalApiStatus();
+
 
 </script>
 </body>
