@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-25T07:26:07.052Z",
+  "updated": "2026-11-01T12:32:21.000Z",
   "apps": [
     {
       "id": "youthcraft",
@@ -10,6 +10,16 @@
       "status": "on",
       "group": "tool",
       "featured": true
+    },
+    {
+      "id": "medical",
+      "icon": "🩺",
+      "name": "의학 백과·용어 사전",
+      "desc": "의료기기, 의학 용어, 시술·술기를 검색하고 공부하는 학습 공간",
+      "url": "/medical/",
+      "status": "on",
+      "group": "tool",
+      "featured": false
     },
     {
       "id": "timer",
