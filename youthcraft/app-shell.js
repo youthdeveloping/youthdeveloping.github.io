@@ -11,7 +11,7 @@ body>header{flex:0 0 54px!important;height:54px!important;min-height:54px!import
 #yc-tool-nav a{white-space:nowrap!important}
 #yc-quick-actions{flex:0 0 38px!important;min-height:38px!important;padding:4px 10px!important;flex-wrap:nowrap!important;overflow-x:auto!important}
 #yc-quick-actions span{display:none!important}
-main{flex:1 1 auto!important;min-height:0!important;height:auto!important;max-height:none!important;width:100%!important;max-width:none!important;margin:0!important;padding:8px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}
+#yc-pro-menu,#yc-pro-context,.yc-pro-status{display:none!important}\nmain{flex:1 1 auto!important;min-height:0!important;height:auto!important;max-height:none!important;width:100%!important;max-width:none!important;margin:0!important;padding:8px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}
 main>.crumb,main>h1,main>.intro,main>.foot,main>.bottom-note{display:none!important}
 main>.layout{display:grid!important;grid-template-columns:minmax(230px,290px) minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr)!important;gap:10px!important;flex:1 1 auto!important;min-height:0!important;height:100%!important;margin:0!important;overflow:hidden!important}
 main>.layout>.panel{min-width:0!important;min-height:0!important;height:100%!important;overflow:auto!important;padding:10px!important}
