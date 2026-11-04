@@ -87,16 +87,16 @@ const rightGroup=$$('.group',right);if(rightGroup[1]){const layerTools=rightGrou
 const leftGroups=$$('.group',left);if(leftGroups[1])leftGroups[1].querySelector('.group-title').textContent='TYPE & SHAPES';
 if(leftGroups[2])leftGroups[2].querySelector('.group-title').textContent='IMAGE ADJUSTMENTS';
 
-// Extra editing features live in a dockable-style drawer, not below the canvas.
-const extDrawer=document.createElement('div');extDrawer.id='yc-ps-extra-drawer';extDrawer.style.cssText='display:none;position:fixed;z-index:11000;inset:0;background:#0009;justify-content:flex-end';
-extDrawer.innerHTML='<section style="width:min(650px,94vw);height:100%;overflow:auto;background:#252526;border-left:1px solid #555;padding:14px;box-shadow:-15px 0 40px #0009"><div style="display:flex;justify-content:space-between;align-items:center;position:sticky;top:-14px;background:#252526;padding:8px 0;z-index:3"><b>고급 편집 패널</b><button id="yc-ps-extra-close">닫기 ✕</button></div><div id="yc-ps-extra-content"></div></section>';
-document.body.append(extDrawer);
-const extContent=extDrawer.querySelector('#yc-ps-extra-content');
-['yc-advanced-v3','yc-suite-v4'].forEach(id=>{const node=document.getElementById(id);if(node)extContent.append(node)});
-function openExtras(){extDrawer.style.display='flex'}function closeExtras(){extDrawer.style.display='none'}
-extDrawer.querySelector('#yc-ps-extra-close').onclick=closeExtras;extDrawer.addEventListener('click',e=>{if(e.target===extDrawer)closeExtras()});
-const extraBtn=document.createElement('button');extraBtn.textContent='고급 기능 패널';extraBtn.onclick=openExtras;context.append(extraBtn);
-const extraMenu=menus.window;extraMenu.push(['고급 기능 패널',openExtras]);
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeExtras()});
+// Only create the extra drawer when real extension modules exist.
+const extNodes=['yc-advanced-v3','yc-suite-v4'].map(id=>document.getElementById(id)).filter(Boolean);
+if(extNodes.length){
+ const extDrawer=document.createElement('div');extDrawer.id='yc-ps-extra-drawer';extDrawer.style.cssText='display:none;position:fixed;z-index:11000;inset:0;background:#0009;justify-content:flex-end';
+ extDrawer.innerHTML='<section style="width:min(650px,94vw);height:100%;overflow:auto;background:#252526;border-left:1px solid #555;padding:14px;box-shadow:-15px 0 40px #0009"><div style="display:flex;justify-content:space-between;align-items:center;position:sticky;top:-14px;background:#252526;padding:8px 0;z-index:3"><b>고급 편집 패널</b><button id="yc-ps-extra-close">닫기 ✕</button></div><div id="yc-ps-extra-content"></div></section>';
+ document.body.append(extDrawer);const extContent=extDrawer.querySelector('#yc-ps-extra-content');extNodes.forEach(node=>extContent.append(node));
+ function openExtras(){extDrawer.style.display='flex'}function closeExtras(){extDrawer.style.display='none'}
+ extDrawer.querySelector('#yc-ps-extra-close').onclick=closeExtras;extDrawer.addEventListener('click',e=>{if(e.target===extDrawer)closeExtras()});
+ const extraBtn=document.createElement('button');extraBtn.textContent='고급 기능 패널';extraBtn.onclick=openExtras;context.append(extraBtn);menus.window.push(['고급 기능 패널',openExtras]);
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeExtras()});
+}
 setTimeout(fit,120);window.addEventListener('load',fit);
 })();
