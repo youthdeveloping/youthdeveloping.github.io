@@ -37,4 +37,23 @@ a{color:inherit}.wrap{width:min(1180px,calc(100% - 32px));margin:auto}.top{paddi
 <a class="card service-link" data-cat="game" href="/services/ranking.html"><div class="cardhead"><h2>🏆 간단 순위표</h2><span class="tag">GAME</span></div><div class="tool"><p>친구들 점수 저장</p><span class="tag">열기 →</span></div></a>
 <a class="card service-link" data-cat="game" href="/services/teams.html"><div class="cardhead"><h2>👥 팀 자동 나누기</h2><span class="tag">GAME</span></div><div class="tool"><p>이름을 랜덤 배정</p><span class="tag">열기 →</span></div></a>
 <a class="card service-link" data-cat="game" href="/services/lottery.html"><div class="cardhead"><h2>🎁 제비뽑기</h2><span class="tag">GAME</span></div><div class="tool"><p>당첨 개수 설정</p><span class="tag">열기 →</span></div></a>
-<a class="card service-link" data-cat="game" href="/services/bomb.html"><div class="cardhead"><h2>💣 폭탄 돌리기</h2><span class="tag">GAME</span></div><div class="tool"><p>랜덤 시간 게임</p><span class="tag">열기 →</span></div></a></section></main><footer class="footer"><div class="wrap">YouthDeveloper // services directory · 2026 · <a href="/about.html">프로젝트 소개</a> · <a href="/privacy.html">개인정보처리방침</a> · <a href="/contact.html">문의 및 오류 제보</a></div></footer><script>document.querySelectorAll('.filter').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');const f=b.dataset.filter;document.querySelectorAll('.service-link').forEach(c=>c.classList.toggle('hide',f!=='all'&&c.dataset.cat!==f));}));</script></body></html>
+<a class="card service-link" data-cat="game" href="/services/bomb.html"><div class="cardhead"><h2>💣 폭탄 돌리기</h2><span class="tag">GAME</span></div><div class="tool"><p>랜덤 시간 게임</p><span class="tag">열기 →</span></div></a></section></main><footer class="footer"><div class="wrap">YouthDeveloper // services directory · 2026 · <a href="/about.html">프로젝트 소개</a> · <a href="/privacy.html">개인정보처리방침</a> · <a href="/contact.html">문의 및 오류 제보</a></div></footer><script>document.querySelectorAll('.filter').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');const f=b.dataset.filter;document.querySelectorAll('.service-link').forEach(c=>c.classList.toggle('hide',f!=='all'&&c.dataset.cat!==f));}));</script><script>
+(async()=>{try{
+const r=await fetch('/data/apps.json',{cache:'no-store'});if(!r.ok)return;
+const data=await r.json(),grid=document.getElementById('grid');
+const known=new Set([...grid.querySelectorAll('a[href]')].map(a=>a.getAttribute('href')));
+(data.apps||[]).filter(a=>['api-studio','code-visualizer','database-studio','web-inspector','git-visualizer','project-hub','youth-wiki','dev-roadmap','open-source','coding-arena','file-converter','network-lab','design-system','markdown-studio','status-center'].includes(a.id)).forEach(a=>{
+if(known.has(a.url))return;
+const card=document.createElement('a');card.className='card service-link';card.dataset.cat='creative';card.href=a.url;
+const head=document.createElement('div');head.className='cardhead';
+const h=document.createElement('h2');h.textContent=(a.icon||'')+' '+a.name;
+const tag=document.createElement('span');tag.className='tag';tag.textContent='NEW';
+head.append(h,tag);
+const body=document.createElement('div');body.className='tool';
+const p=document.createElement('p');p.textContent=a.desc||'새로운 개발자 도구';
+const open=document.createElement('span');open.className='tag';open.textContent='열기 →';
+body.append(p,open);card.append(head,body);grid.append(card);
+});
+}catch(e){console.warn('새 서비스 목록 로드 실패',e)}})();
+</script>
+</body></html>
