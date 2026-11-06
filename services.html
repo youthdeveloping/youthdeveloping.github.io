@@ -56,4 +56,13 @@ body.append(p,open);card.append(head,body);grid.append(card);
 });
 }catch(e){console.warn('새 서비스 목록 로드 실패',e)}})();
 </script>
+<script>
+document.querySelectorAll(".filter").forEach(button=>button.addEventListener("click",()=>{
+ const category=button.dataset.filter;
+ document.querySelectorAll(".filter").forEach(item=>item.classList.toggle("active",item===button));
+ document.querySelectorAll("#grid .service-link").forEach(card=>{
+  card.hidden=category!=="all"&&card.dataset.cat!==category;
+ });
+}));
+</script>
 </body></html>
