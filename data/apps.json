@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-01T12:32:21.000Z",
+  "updated": "2026-11-06T07:20:00.000Z",
   "apps": [
     {
       "id": "youthcraft",
@@ -379,6 +379,156 @@
       "url": "/services/anonymous.html",
       "status": "on",
       "group": "server",
+      "featured": false
+    },
+    {
+      "id": "api-studio",
+      "icon": "⌁",
+      "name": "API Studio",
+      "desc": "HTTP API 요청과 응답 확인",
+      "url": "/services/api-studio.html",
+      "status": "on",
+      "group": "tool",
+      "featured": true
+    },
+    {
+      "id": "code-visualizer",
+      "icon": "⌘",
+      "name": "Code Visualizer",
+      "desc": "JavaScript 코드 줄별 구조 분석",
+      "url": "/services/code-visualizer.html",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "database-studio",
+      "icon": "▤",
+      "name": "Database Studio",
+      "desc": "브라우저 SQLite SQL 실습",
+      "url": "/services/database-studio.html",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "web-inspector",
+      "icon": "◎",
+      "name": "Web Inspector",
+      "desc": "URL 구조와 HTTPS 및 DNS 점검",
+      "url": "/services/web-inspector.html",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "git-visualizer",
+      "icon": "⑂",
+      "name": "Git Visualizer",
+      "desc": "Git add, commit, branch, merge 학습",
+      "url": "/services/git-visualizer.html",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "project-hub",
+      "icon": "▣",
+      "name": "Project Hub",
+      "desc": "개발 프로젝트 포트폴리오 관리",
+      "url": "/services/project-hub.html",
+      "status": "on",
+      "group": "tool",
+      "featured": true
+    },
+    {
+      "id": "youth-wiki",
+      "icon": "▤",
+      "name": "Youth Wiki",
+      "desc": "IT 지식 문서 작성과 검색",
+      "url": "/services/youth-wiki.html",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "dev-roadmap",
+      "icon": "⌁",
+      "name": "Dev Roadmap",
+      "desc": "개발 학습 단계와 진행률 관리",
+      "url": "/services/dev-roadmap.html",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "open-source",
+      "icon": "⑂",
+      "name": "Open Source Center",
+      "desc": "오픈소스 자료와 기여 계획",
+      "url": "/services/open-source.html",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "coding-arena",
+      "icon": "⌘",
+      "name": "Coding Arena",
+      "desc": "JavaScript 문제 풀이와 테스트",
+      "url": "/services/coding-arena.html",
+      "status": "on",
+      "group": "tool",
+      "featured": true
+    },
+    {
+      "id": "file-converter",
+      "icon": "⇄",
+      "name": "File Converter",
+      "desc": "JSON, CSV, 텍스트 변환",
+      "url": "/services/file-converter.html",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "network-lab",
+      "icon": "⌁",
+      "name": "Network Lab",
+      "desc": "공개 DNS 레코드 조회",
+      "url": "/services/network-lab.html",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "design-system",
+      "icon": "◈",
+      "name": "Design System",
+      "desc": "색상과 CSS 디자인 토큰 생성",
+      "url": "/services/design-system.html",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "markdown-studio",
+      "icon": "✎",
+      "name": "Markdown Studio",
+      "desc": "Markdown 편집과 HTML 내보내기",
+      "url": "/services/markdown-studio.html",
+      "status": "on",
+      "group": "tool",
+      "featured": false
+    },
+    {
+      "id": "status-center",
+      "icon": "●",
+      "name": "Status Center",
+      "desc": "공개 페이지 접속 상태 확인",
+      "url": "/services/status-center.html",
+      "status": "on",
+      "group": "tool",
       "featured": false
     }
   ]
