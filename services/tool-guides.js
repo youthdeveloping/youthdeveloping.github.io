@@ -15,7 +15,7 @@ const G={
 "design-system":["Design System 사용 안내","웹 프로젝트에서 반복해 사용할 색상 토큰과 CSS 변수를 정리하는 디자인 시스템 도구입니다.",["강조색과 배경색을 지정합니다.","미리보기에서 가독성을 확인합니다.","생성된 CSS 변수를 프로젝트에 복사합니다."],"색상 대비의 접근성 적합성을 자동 판정하지 않습니다. 실제 적용 전 텍스트 대비와 키보드 포커스, 색상 외 정보 전달 방식을 확인하세요.",["CSS가 사이트에 자동 적용되나요?|아니요. 결과를 직접 복사해 적용해야 합니다.","접근성 기준을 보장하나요?|아니요. 별도 대비 검사가 필요합니다."]],
 "markdown-studio":["Markdown Studio 사용 안내","제목과 강조, 문단을 Markdown으로 작성하고 간단한 HTML 미리보기를 확인하는 편집 도구입니다.",["편집 영역에 Markdown을 작성합니다.","미리보기에서 문서 구조를 확인합니다.","HTML 파일로 내보내고 결과를 검토합니다."],"현재 렌더러는 기본 문법 중심이며 전체 Markdown 표준을 지원하지 않습니다. 배포 전 생성된 HTML을 직접 확인하세요.",["GitHub Flavored Markdown을 지원하나요?|전체 표준은 지원하지 않으며 기본적인 문법만 처리합니다.","자동 저장되나요?|서버 저장이나 계정 동기화는 제공하지 않습니다."]]
 };
-const id=(document.querySelector('script[src="/services/new-tools.js"]')?.nextElementSibling?.textContent.match(/NewTools\.mount\(["']([^"']+)/)||[])[1];const g=G[id];if(!g)return;
+const id=location.pathname.split("/").pop().replace(".html","");const g=G[id];if(!g)return;
 const root=document.getElementById("tool");if(!root)return;
 const section=document.createElement("section");section.className="tool-editorial";
 const el=(tag,txt)=>{const n=document.createElement(tag);n.textContent=txt;return n;};
