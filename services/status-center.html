@@ -1,1 +1,30 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#05070a"><meta name="description" content="공개 페이지 접속 상태 확인"><title>Status Center // YouthDeveloper</title><link rel="stylesheet" href="/services/new-tools.css"></head><body><header><nav class="wrap"><a class="brand" href="/">Youth<b>Developer</b></a><a href="/services.html">← 모든 서비스</a></nav></header><main class="wrap"><div class="eyebrow">YOUTHDEVELOPER / DEVELOPER TOOLS</div><h1>● Status Center</h1><p class="lead">공개 페이지 접속 상태 확인</p><div id="tool" class="panel"></div></main><footer><div class="wrap">© 2026 YouthDeveloper · <a href="/">MAIN</a> · <a href="/contact.html">CONTACT</a></div></footer><script src="/services/new-tools.js"></script><script>NewTools.mount("status-center")</script></body></html>
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080613"><meta name="description" content="YouthDeveloper 서비스 상태 대시보드">
+<title>Service Status | YouthDeveloper</title>
+<link rel="stylesheet" href="/services/status-center.css">
+</head>
+<body>
+<header class="status-top status-shell">
+<a class="status-brand" href="/"><span class="status-mark">Y</span><span>YouthDeveloper<br><small style="font-weight:400;color:#aaa5b5">Service Status</small></span></a>
+<nav class="status-nav"><a href="#status">Status</a><a href="#incidents">Incidents</a><a href="#maintenances">Maintenances</a></nav>
+</header>
+<main class="status-shell">
+<section class="status-hero" id="status"><h1 id="overall">상태 확인 중</h1><p id="last-update">첫 점검을 준비하고 있습니다.</p><button id="check-now" type="button">지금 점검</button></section>
+<section class="status-summary" aria-label="요약">
+<div class="status-strip"><div class="status-metric">🌐 <strong id="monitor-count">3</strong> Monitors</div><div class="status-metric"><span style="color:#39c879">↑</span><strong id="up-count">0</strong> Up Monitors</div><div class="status-metric"><span style="color:#ff777b">↓</span><strong id="down-count">0</strong> Down Monitors</div></div>
+<div class="status-strip"><div class="status-metric">🔒 <strong id="ssl-count">확인 중</strong></div><div class="status-metric">인증서 만료일은 브라우저에서 직접 확인할 수 없습니다.</div></div>
+</section>
+<section class="status-main-grid">
+<article class="status-card uptime-card"><h2>관측 가동률</h2><div class="uptime-ring"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="track" cx="60" cy="60" r="50"/><circle class="value" id="ring-value" cx="60" cy="60" r="50"/></svg><div class="uptime-number" id="uptime-number">—</div></div><div class="uptime-caption">이 브라우저의 점검 기록 기준</div></article>
+<article class="status-card chart-card"><div class="chart-head"><div class="chart-stats"><div class="chart-stat"><b><span style="color:#39c879">●</span> <span id="min-time">—</span></b>Min Response Time</div><div class="chart-stat"><b><span style="color:#36c9e8">●</span> <span id="avg-time">—</span></b>Avg Response Time</div><div class="chart-stat"><b><span style="color:#ff6268">●</span> <span id="max-time">—</span></b>Max Response Time</div></div><div class="chart-tabs"><button class="active" data-mode="uptime">Uptime</button><button data-mode="ping">Ping</button></div></div><canvas class="status-chart" id="status-chart" aria-label="최근 서비스 점검 그래프"></canvas></article>
+</section>
+<section class="monitor-section status-section"><h2>Website</h2><div class="monitor-group"><div class="monitor-group-head"><span class="status-dot"></span><span>Live</span><span class="muted">Uptime Monitors</span></div><div class="monitor-list" id="monitor-list"></div></div><p class="status-note">점검은 이 브라우저에서 동일 출처의 공개 페이지에 요청을 보내는 방식입니다. 결과와 가동률은 이 브라우저에 저장되며, 전체 이용자의 서버 상태나 외부 네트워크를 보증하지 않습니다.</p></section>
+<section class="monitor-section status-section" id="incidents"><h2>Incidents</h2><div id="incident-list" class="status-empty">장애 기록을 불러오는 중입니다.</div></section>
+<section class="monitor-section status-section" id="maintenances"><h2>Maintenances</h2><div class="status-empty">등록된 예정 유지보수가 없습니다.</div></section>
+</main>
+<footer class="status-footer"><div class="status-shell">© 2026 YouthDeveloper · <a href="/">MAIN</a> · <a href="/services.html">SERVICES</a></div></footer>
+<script src="/services/status-center.js" defer></script>
+</body></html>
