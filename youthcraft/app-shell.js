@@ -1,5 +1,7 @@
 (()=>{'use strict';
 if(window.__YC_APP_SHELL_V2__)return;window.__YC_APP_SHELL_V2__=true;
+const ydDeviceScript=document.createElement('script');ydDeviceScript.src='/device-layout.js';ydDeviceScript.defer=true;document.head.append(ydDeviceScript);
+
 const app=(document.title.split('—')[0]||'').trim();if(app==='FilmCraft'||app==='PhotoCraft')return;
 const css=document.createElement('style');css.id='yc-app-shell-v2-style';css.textContent=`
 *{box-sizing:border-box}
