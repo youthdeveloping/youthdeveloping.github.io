@@ -83,3 +83,5 @@ $('#loginForm').onsubmit=async e=>{e.preventDefault();const btn=$('#loginButton'
 $('#logoutTop').onclick=logout;$('#sideLogout').onclick=logout;$('#refresh').onclick=()=>render().catch(e=>flash(e.message,true));
 if(token){hideLogin();render().catch(e=>{flash(e.message,true);if(!token)showLogin()})}else showLogin();
 })();
+/* Shared desktop / tablet / mobile layout */
+if(!document.querySelector('script[data-yd-device]')){const s=document.createElement('script');s.src='/device-layout.js';s.dataset.ydDevice='true';document.head.append(s);}
