@@ -333,3 +333,5 @@ function bombStart(){
 
 /* ---------- Per-page initialization ---------- */
 if($('timerSec'))timerRender();if($('swOut'))swRender();
+/* Shared desktop / tablet / mobile layout */
+if(!document.querySelector('script[data-yd-device]')){const s=document.createElement('script');s.src='/device-layout.js';s.dataset.ydDevice='true';document.head.append(s);}
