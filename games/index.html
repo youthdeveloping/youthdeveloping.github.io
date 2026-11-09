@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07130f">
+<meta name="description" content="YouthDeveloper 포커 — 가상 칩으로 즐기는 5장 드로 포커 카드 게임">
+<title>포커 | YouthDeveloper Games</title>
+<style>
+:root{color-scheme:dark;--bg:#07110e;--panel:#101d18;--line:#263b31;--text:#edf5ef;--muted:#91a69a;--green:#75e0a0;--gold:#e9c879;--red:#ef7c83}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% 0%,#173b2a 0,#0a1711 48%,#060c09 100%);color:var(--text);font-family:Inter,Pretendard,"Noto Sans KR",system-ui,sans-serif;min-height:100vh}
+button{font:inherit;cursor:pointer}.shell{width:min(1080px,calc(100% - 28px));margin:auto}
+header{height:66px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ffffff18;font:12px ui-monospace,monospace}
+.brand{font-weight:800;letter-spacing:.04em}.brand b{color:var(--green)}header a{color:var(--muted);text-decoration:none}
+.hero{padding:32px 0 22px;display:flex;align-items:end;justify-content:space-between;gap:16px}.eyebrow{color:var(--green);font:11px ui-monospace,monospace;letter-spacing:.16em}.hero h1{font-size:clamp(30px,6vw,48px);letter-spacing:-.05em;margin:8px 0}.hero p{color:var(--muted);margin:0;font-size:13px;line-height:1.6}
+.balance{border:1px solid #75e0a044;background:#10251a;padding:12px 16px;border-radius:12px;white-space:nowrap}.balance small{display:block;color:var(--muted);font-size:10px}.balance strong{color:var(--gold);font:700 22px ui-monospace,monospace}
+.table{background:linear-gradient(145deg,#16432d,#0d2a1c 65%,#10251b);border:8px solid #3b2c20;outline:1px solid #8a6845;border-radius:30px;padding:24px;box-shadow:0 24px 70px #0008,inset 0 0 0 1px #ffffff18;min-height:370px;position:relative}
+.table:before{content:"";position:absolute;inset:8px;border:1px solid #d9c28a33;border-radius:22px;pointer-events:none}
+.opponents{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;position:relative;z-index:1}
+.seat{min-width:0;text-align:center;padding:10px 7px;border:1px solid #ffffff18;background:#06150d66;border-radius:14px}.seat.active{border-color:var(--gold);box-shadow:0 0 0 1px #e9c87955}.seat-name{font-size:12px;font-weight:700}.seat-meta{font-size:10px;color:#c3d3c8;margin-top:4px}.cards{display:flex;justify-content:center;gap:5px;min-height:65px;margin-top:9px}
+.card{width:43px;height:60px;border-radius:6px;background:#f6f4ec;color:#18221c;display:flex;flex-direction:column;align-items:center;justify-content:center;font:700 18px Georgia,serif;box-shadow:0 2px 5px #0005;position:relative}.card small{font:10px Georgia,serif}.card.red{color:#c63842}.card.back{background:repeating-linear-gradient(45deg,#1b4d37,#1b4d37 4px,#e4d6ad 4px,#e4d6ad 6px);border:3px solid #f4eedc;color:transparent}
+.status{position:relative;z-index:1;text-align:center;color:#e3e9df;font-size:13px;margin:20px 0 14px;min-height:20px}
+.player-area{position:relative;z-index:1;text-align:center}.player-label{font-weight:700;font-size:13px}.player-cards{display:flex;justify-content:center;gap:8px;margin:12px 0}.player-cards .card{width:58px;height:82px;font-size:25px;border-radius:8px;cursor:pointer;transition:.15s}.player-cards .card.selected{transform:translateY(-10px);outline:2px solid var(--gold);box-shadow:0 8px 20px #0008}.player-cards .card small{font-size:13px}
+.controls{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin:18px 0}.btn{border:1px solid #ffffff25;background:#17251e;color:var(--text);padding:11px 17px;border-radius:9px;font-weight:700;font-size:12px}.btn:hover{border-color:var(--green)}.btn.primary{background:var(--green);color:#082013;border-color:var(--green)}.btn:disabled{opacity:.35;cursor:not-allowed}
+.message{min-height:24px;text-align:center;color:var(--gold);font-size:13px;font-weight:700}
+.info{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0 40px}.info section{border:1px solid var(--line);background:#0c1712;border-radius:12px;padding:16px}.info h2{font-size:12px;margin:0 0 8px;color:var(--green)}.info p,.info li{font-size:11px;color:var(--muted);line-height:1.7}.info ul{padding-left:18px;margin:0}
+@media(max-width:600px){.hero{align-items:start;flex-direction:column}.table{padding:18px 10px;border-width:5px;min-height:340px}.opponents{gap:6px}.seat{padding:8px 3px}.card{width:31px;height:46px;font-size:15px}.cards{gap:3px}.player-cards .card{width:52px;height:74px}.info{grid-template-columns:1fr}}
+</style>
+</head>
+<body><div class="shell">
+<header><div class="brand">YOUTH<b>DEVELOPER</b> / GAMES</div><a href="/">← 메인으로</a></header>
+<div class="hero"><div><div class="eyebrow">CARD GAME / 01</div><h1>5장 드로 포커</h1><p>카드를 받고 필요한 카드를 교환해 가장 높은 족보를 만들어 보세요.</p></div><div class="balance"><small>연습용 칩 · 현금 가치 없음</small><strong id="score">0승</strong></div></div>
+<main>
+<div class="table">
+ <div class="opponents" id="opponents">
+  <div class="seat" id="seat0"><div class="seat-name">봇 A</div><div class="seat-meta">대기 중</div><div class="cards" id="bot0"></div></div>
+  <div class="seat" id="seat1"><div class="seat-name">봇 B</div><div class="seat-meta">대기 중</div><div class="cards" id="bot1"></div></div>
+  <div class="seat" id="seat2"><div class="seat-name">봇 C</div><div class="seat-meta">대기 중</div><div class="cards" id="bot2"></div></div>
+ </div>
+ <div class="status" id="status">새 게임을 시작해 주세요.</div>
+ <div class="player-area"><div class="player-label">내 카드 <span style="color:#b4c9ba;font-weight:400">· 교환할 카드를 선택하세요</span></div><div class="player-cards" id="hand"></div></div>
+</div>
+<div class="controls"><button class="btn primary" id="start">새 게임</button><button class="btn" id="draw" disabled>선택한 카드 교환</button><button class="btn" id="hold" disabled>교환하지 않기</button></div>
+<div class="message" id="message" aria-live="polite">한 판에 최대 3장까지 교환할 수 있습니다.</div>
+<div class="info"><section><h2>게임 방법</h2><ul><li>새 게임을 누르면 나와 봇 3명에게 카드 5장씩 배분됩니다.</li><li>내 카드 중 교환할 카드를 선택하고 교환 버튼을 누르세요. 최대 3장까지 가능합니다.</li><li>교환이 끝나면 봇의 카드가 공개되고 족보를 비교합니다.</li></ul></section><section><h2>포커 족보 (높은 순)</h2><p>로열 플러시 → 스트레이트 플러시 → 포카드 → 풀하우스 → 플러시 → 스트레이트 → 트리플 → 투 페어 → 원 페어 → 하이 카드</p><p>이 게임의 점수는 기록용이며 구매·환전·현금 가치가 없습니다.</p></section></div>
+</main></div>
+<script>
+(()=>{
+const suits=['♠','♥','♦','♣'],ranks=[2,3,4,5,6,7,8,9,10,11,12,13,14],names={11:'J',12:'Q',13:'K',14:'A'};
+let deck=[],hands=[],selected=new Set(),phase='idle',wins=0;
+const $=id=>document.getElementById(id);
+function shuffle(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function makeDeck(){return shuffle(suits.flatMap(s=>ranks.map(r=>({s,r}))))}
+function rankName(r){return names[r]||String(r)}
+function cardHTML(c,back=false){if(back)return '<div class="card back" aria-label="뒷면">◆</div>';return '<div class="card '+('♥♦'.includes(c.s)?'red':'')+'"><span>'+rankName(c.r)+'</span><small>'+c.s+'</small></div>'}
+function render(){
+ $('hand').innerHTML=hands[0]?hands[0].map((c,i)=>'<div class="pick '+(selected.has(i)?'selected':'')+'" data-i="'+i+'">'+cardHTML(c)+'</div>').join(''):'';
+ $('hand').querySelectorAll('.pick').forEach(el=>{el.firstElementChild.classList.toggle('selected',selected.has(+el.dataset.i));el.onclick=()=>{if(phase!=='draw')return;let i=+el.dataset.i;selected.has(i)?selected.delete(i):selected.add(i);render()};});
+ for(let p=1;p<4;p++){$('bot'+(p-1)).innerHTML=hands[p]?(phase==='done'?hands[p].map(c=>cardHTML(c)).join(''):Array(5).fill(0).map(()=>cardHTML(null,true)).join('')):'';$('seat'+(p-1)).querySelector('.seat-meta').textContent=phase==='done'?evaluate(hands[p]).name:'카드 5장';}
+ $('score').textContent=wins+'승';
+}
+function evaluate(hand){
+ const rs=hand.map(c=>c.r).sort((a,b)=>b-a),counts={};rs.forEach(r=>counts[r]=(counts[r]||0)+1);
+ const groups=Object.entries(counts).map(([r,n])=>({r:+r,n})).sort((a,b)=>b.n-a.n||b.r-a.r);
+ const flush=hand.every(c=>c.s===hand[0].s),uniq=[...new Set(rs)].sort((a,b)=>a-b);
+ let straight=uniq.length===5&&uniq[4]-uniq[0]===4?uniq[4]:0;if(uniq.join(',')==='2,3,4,5,14')straight=5;
+ let score,name,tie=[];
+ if(flush&&straight===14){score=9;name='로열 플러시';tie=[14]}
+ else if(flush&&straight){score=8;name='스트레이트 플러시';tie=[straight]}
+ else if(groups[0].n===4){score=7;name='포카드';tie=[groups[0].r,groups[1].r]}
+ else if(groups[0].n===3&&groups[1].n===2){score=6;name='풀하우스';tie=groups.map(g=>g.r)}
+ else if(flush){score=5;name='플러시';tie=rs}
+ else if(straight){score=4;name='스트레이트';tie=[straight]}
+ else if(groups[0].n===3){score=3;name='트리플';tie=[groups[0].r,...groups.slice(1).map(g=>g.r)]}
+ else if(groups[0].n===2&&groups[1].n===2){score=2;name='투 페어';tie=[Math.max(groups[0].r,groups[1].r),Math.min(groups[0].r,groups[1].r),groups[2].r]}
+ else if(groups[0].n===2){score=1;name='원 페어';tie=[groups[0].r,...groups.slice(1).map(g=>g.r)]}
+ else{score=0;name='하이 카드';tie=rs}
+ return {score,name,tie};
+}
+function compare(a,b){let x=evaluate(a),y=evaluate(b);if(x.score!==y.score)return x.score-y.score;for(let i=0;i<Math.max(x.tie.length,y.tie.length);i++){if((x.tie[i]||0)!==(y.tie[i]||0))return (x.tie[i]||0)-(y.tie[i]||0)}return 0}
+function botDraw(hand){const ev=evaluate(hand);let keep=new Set();if(ev.score>=4)return hand;const freq={};hand.forEach((c,i)=>(freq[c.r]??=[]).push(i));Object.values(freq).filter(a=>a.length>=2).flat().forEach(i=>keep.add(i));if(ev.score===0){let high=hand.map((c,i)=>({c,i})).filter(x=>x.c.r>=12).sort((a,b)=>b.c.r-a.c.r).slice(0,1);high.forEach(x=>keep.add(x.i))}return hand.filter((_,i)=>!keep.has(i)).length}
+function newGame(){deck=makeDeck();hands=[0,1,2,3].map(()=>deck.splice(0,5));selected.clear();phase='draw';$('status').textContent='카드를 선택해 교환하거나 그대로 진행하세요.';$('message').textContent='최대 3장을 선택할 수 있습니다.';$('draw').disabled=false;$('hold').disabled=false;render()}
+function finish(n){phase='done';selected.clear();let results=hands.map((h,i)=>({i,...evaluate(h)}));let best=results.reduce((a,b)=>compare(hands[b.i],hands[a.i])>0?b:a);let winners=results.filter(x=>compare(hands[x.i],hands[best.i])===0);let mine=winners.some(x=>x.i===0);if(mine)wins++;$('status').textContent='결과 공개 · '+(mine?'승리하셨습니다!':winners.length>1?'무승부입니다.':'이번 판은 봇이 이겼습니다.');$('message').textContent='내 족보: '+evaluate(hands[0]).name+' · '+(mine?'승리 기록 +1':'다음 판에서 다시 도전해 보세요.');$('draw').disabled=true;$('hold').disabled=true;render()}
+function exchange(){if(phase!=='draw')return;let idx=[...selected].slice(0,3);idx.forEach(i=>hands[0][i]=deck.pop());for(let p=1;p<4;p++){let n=botDraw(hands[p]);let ids=shuffle([0,1,2,3,4]).slice(0,n);ids.forEach(i=>hands[p][i]=deck.pop())}phase='done';finish();$('status').textContent='결과 공개 · '+$('status').textContent; }
+$('start').onclick=newGame;$('draw').onclick=exchange;$('hold').onclick=()=>{selected.clear();exchange()};render();
+})();
+</script>
+</body></html>
