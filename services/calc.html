@@ -23,9 +23,26 @@ a{color:inherit}.wrap{width:min(1180px,calc(100% - 32px));margin:auto}.top{paddi
 <body>
 <header class="top"><div class="wrap nav"><a class="brand" href="/">Youth<span>Developer</span></a><a class="back" href="/services.html">← ALL SERVICES</a></div></header>
 <main class="wrap">
-<section class="hero"><div class="eyebrow">YOUTHDEVELOPER / TOOL</div><h1>🧮 계산기</h1><p>브라우저에서 바로 사용할 수 있는 계산기 도구입니다.</p></section>
+<section class="hero"><div class="eyebrow">YOUTHDEVELOPER / TOOL GUIDE</div><h1>계산기</h1><p>더하기·빼기·곱하기·나누기를 빠르게 계산하는 기본 사칙연산 계산기입니다.</p></section>
 <section class="grid" id="grid">
 <article class="card" data-cat="utility" id="calc"><div class="cardhead"><h2>🧮 계산기</h2><span class="tag">UTILITY</span></div><div class="tool"><input id="calcOut" readonly aria-label="계산 결과"><div class="keys"><button onclick="calcAdd('7')">7</button><button onclick="calcAdd('8')">8</button><button onclick="calcAdd('9')">9</button><button onclick="calcAdd('/')">÷</button><button onclick="calcAdd('4')">4</button><button onclick="calcAdd('5')">5</button><button onclick="calcAdd('6')">6</button><button onclick="calcAdd('*')">×</button><button onclick="calcAdd('1')">1</button><button onclick="calcAdd('2')">2</button><button onclick="calcAdd('3')">3</button><button onclick="calcAdd('-')">−</button><button onclick="calcAdd('0')">0</button><button onclick="calcAdd('.')">.</button><button onclick="calcRun()">=</button><button onclick="calcAdd('+')">+</button></div><button onclick="calcBack()">⌫</button><button onclick="calcClear()">CLEAR</button></div></article>
+</section>
+
+<section class="tool-documentation" aria-labelledby="tool-doc-title">
+<style>
+.tool-documentation{margin:28px 0 54px;padding:clamp(20px,4vw,34px);border:1px solid var(--line);border-radius:16px;background:var(--panel,#0c1016);line-height:1.85}
+.tool-documentation h2{font-size:22px;margin:0 0 18px}.tool-documentation h3{font-size:16px;margin:22px 0 7px;color:var(--green)}
+.tool-documentation p,.tool-documentation li{color:var(--muted);font-size:14px}.tool-documentation ol{padding-left:22px}.tool-documentation li{margin:5px 0}
+.tool-documentation .doc-example{padding:14px 16px;border-left:3px solid var(--green);background:rgba(97,255,154,.06);border-radius:0 10px 10px 0}
+.tool-documentation .doc-meta{font-size:12px;border-top:1px solid var(--line);padding-top:14px;margin-top:20px}
+</style>
+<h2 id="tool-doc-title">계산기 사용 안내</h2>
+<h3>어떤 상황에 사용할 수 있나요?</h3><p>간단한 예산 합계, 수량별 가격 계산, 학습 문제의 산술 확인에 사용할 수 있습니다.</p>
+<h3>사용 순서</h3><ol><li>숫자와 연산 버튼을 눌러 식을 입력합니다.</li><li>= 버튼으로 결과를 계산합니다.</li><li>⌫는 마지막 입력을 지우고 CLEAR는 식 전체를 비웁니다.</li></ol>
+<h3>사용 예시</h3><p class="doc-example">예: 1250 + 3 × 400을 입력하면 곱셈을 먼저 처리하는 일반적인 연산 우선순위에 따라 결과를 확인할 수 있습니다. 괄호와 고급 수학 함수는 현재 제공하지 않으므로 복잡한 식은 단계별로 나누어 계산하세요.</p>
+<h3>기능 범위와 주의사항</h3><p>이 도구는 기본 사칙연산용입니다. 과학·공학 계산기, 단위 변환, 통계 분석 기능은 제공하지 않습니다. 매우 큰 수나 소수 연산은 JavaScript 숫자 표현의 정밀도 한계에 영향을 받을 수 있습니다.</p>
+<h3>자주 묻는 질문</h3><p>계산 결과가 예상과 다르면 연산 순서를 확인하고 식을 작은 부분으로 나누어 검산하세요.</p>
+<p class="doc-meta">이 문서는 현재 페이지에 제공되는 기능 범위를 기준으로 작성했습니다. 기능이 변경되면 안내도 함께 수정합니다. 관련 문서: <a href="/guides/">개발 가이드</a> · <a href="/privacy.html">개인정보처리방침</a> · <a href="/contact.html">오류 제보</a></p>
 </section>
 </main>
 <footer class="footer"><div class="wrap">YouthDeveloper // client-side tools · 2026</div></footer>
