@@ -23,9 +23,26 @@ a{color:inherit}.wrap{width:min(1180px,calc(100% - 32px));margin:auto}.top{paddi
 <body>
 <header class="top"><div class="wrap nav"><a class="brand" href="/">Youth<span>Developer</span></a><a class="back" href="/services.html">← ALL SERVICES</a></div></header>
 <main class="wrap">
-<section class="hero"><div class="eyebrow">YOUTHDEVELOPER / TOOL</div><h1>🎨 색상 도구</h1><p>브라우저에서 바로 사용할 수 있는 색상 도구 도구입니다.</p></section>
+<section class="hero"><div class="eyebrow">YOUTHDEVELOPER / TOOL GUIDE</div><h1>색상 도구</h1><p>색상 선택기에서 고른 색의 HEX 및 RGB 표현을 확인하는 기초 디자인 도구입니다.</p></section>
 <section class="grid" id="grid">
 <article class="card" data-cat="creative" id="color"><div class="cardhead"><h2>🎨 색상 도구</h2><span class="tag">CREATIVE</span></div><div class="tool"><input id="colorIn" type="color" value="#61ff9a" aria-label="색상"><div class="out" id="colorOut">#61FF9A</div></div></article>
+</section>
+
+<section class="tool-documentation" aria-labelledby="tool-doc-title">
+<style>
+.tool-documentation{margin:28px 0 54px;padding:clamp(20px,4vw,34px);border:1px solid var(--line);border-radius:16px;background:var(--panel,#0c1016);line-height:1.85}
+.tool-documentation h2{font-size:22px;margin:0 0 18px}.tool-documentation h3{font-size:16px;margin:22px 0 7px;color:var(--green)}
+.tool-documentation p,.tool-documentation li{color:var(--muted);font-size:14px}.tool-documentation ol{padding-left:22px}.tool-documentation li{margin:5px 0}
+.tool-documentation .doc-example{padding:14px 16px;border-left:3px solid var(--green);background:rgba(97,255,154,.06);border-radius:0 10px 10px 0}
+.tool-documentation .doc-meta{font-size:12px;border-top:1px solid var(--line);padding-top:14px;margin-top:20px}
+</style>
+<h2 id="tool-doc-title">색상 도구 사용 안내</h2>
+<h3>어떤 상황에 사용할 수 있나요?</h3><p>웹사이트의 배경색, 버튼 강조색, 아이콘 색상을 정하고 CSS 색상값을 복사해 프로젝트에 적용할 때 활용할 수 있습니다.</p>
+<h3>사용 순서</h3><ol><li>색상 선택기를 눌러 색을 고릅니다.</li><li>표시된 HEX 및 RGB 값을 확인합니다.</li><li>필요한 값을 CSS에 복사해 적용합니다.</li></ol>
+<h3>사용 예시</h3><p class="doc-example">예: 색상 선택기에서 흰색을 고르면 HEX 값은 #FFFFFF, RGB 값은 rgb(255, 255, 255)입니다. CSS에서는 color: #FFFFFF;처럼 사용할 수 있습니다.</p>
+<h3>기능 범위와 주의사항</h3><p>색상값을 보여주는 도구이며 텍스트와 배경의 접근성 대비를 자동으로 검증하지 않습니다. 실제 페이지에서는 작은 글자, 버튼, 포커스 표시의 대비를 별도로 확인하세요.</p>
+<h3>자주 묻는 질문</h3><p>색상 코드가 적용되지 않으면 # 기호를 포함한 6자리 HEX 형식인지, CSS 속성에 올바르게 넣었는지 확인하세요.</p>
+<p class="doc-meta">이 문서는 현재 페이지에 제공되는 기능 범위를 기준으로 작성했습니다. 기능이 변경되면 안내도 함께 수정합니다. 관련 문서: <a href="/guides/">개발 가이드</a> · <a href="/privacy.html">개인정보처리방침</a> · <a href="/contact.html">오류 제보</a></p>
 </section>
 </main>
 <footer class="footer"><div class="wrap">YouthDeveloper // client-side tools · 2026</div></footer>
