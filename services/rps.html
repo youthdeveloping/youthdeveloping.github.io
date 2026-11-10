@@ -22,9 +22,26 @@ a{color:inherit}.wrap{width:min(1180px,calc(100% - 32px));margin:auto}.top{paddi
 <body>
 <header class="top"><div class="wrap nav"><a class="brand" href="/">Youth<span>Developer</span></a><a class="back" href="/services.html">← ALL SERVICES</a></div></header>
 <main class="wrap">
-<section class="hero"><div class="eyebrow">YOUTHDEVELOPER / TOOL</div><h1>✊ 가위바위보</h1><p>브라우저에서 바로 사용할 수 있는 가위바위보 도구입니다.</p></section>
+<section class="hero"><div class="eyebrow">YOUTHDEVELOPER / TOOL GUIDE</div><h1>가위바위보</h1><p>가위·바위·보 중 하나를 선택해 컴퓨터의 선택과 승패를 확인하는 미니게임입니다.</p></section>
 <section class="grid" id="grid">
 <article class="card" data-cat="game" id="rps"><div class="cardhead"><h2>✊ 가위바위보</h2><span class="tag">GAME</span></div><div class="tool"><button onclick="rps('가위')">✌️ 가위</button><button onclick="rps('바위')">✊ 바위</button><button onclick="rps('보')">🖐️ 보</button><div class="out" id="rpsOut">—</div></div></article>
+</section>
+
+<section class="tool-documentation" aria-labelledby="tool-doc-title">
+<style>
+.tool-documentation{margin:28px 0 54px;padding:clamp(20px,4vw,34px);border:1px solid var(--line);border-radius:16px;background:var(--panel,#0c1016);line-height:1.85}
+.tool-documentation h2{font-size:22px;margin:0 0 18px}.tool-documentation h3{font-size:16px;margin:22px 0 7px;color:var(--green)}
+.tool-documentation p,.tool-documentation li{color:var(--muted);font-size:14px}.tool-documentation ol{padding-left:22px}.tool-documentation li{margin:5px 0}
+.tool-documentation .doc-example{padding:14px 16px;border-left:3px solid var(--green);background:rgba(97,255,154,.06);border-radius:0 10px 10px 0}
+.tool-documentation .doc-meta{font-size:12px;border-top:1px solid var(--line);padding-top:14px;margin-top:20px}
+</style>
+<h2 id="tool-doc-title">가위바위보 사용 안내</h2>
+<h3>어떤 상황에 사용할 수 있나요?</h3><p>짧은 순서 정하기 게임이나 쉬는 시간의 간단한 대결에 활용할 수 있습니다.</p>
+<h3>사용 순서</h3><ol><li>가위, 바위, 보 중 하나를 누릅니다.</li><li>내 선택과 컴퓨터의 선택을 확인합니다.</li><li>승리·패배·무승부 결과를 확인하고 다시 플레이합니다.</li></ol>
+<h3>사용 예시</h3><p class="doc-example">가위를 선택하면 컴퓨터가 무작위로 낸 결과와 비교합니다. 가위는 보를 이기고, 바위는 가위를 이기며, 보는 바위를 이깁니다.</p>
+<h3>기능 범위와 주의사항</h3><p>현재는 한 번의 선택 결과를 보여 주는 간단한 게임입니다. 온라인 대전, 계정별 전적 저장, 승률 통계는 제공하지 않습니다.</p>
+<h3>자주 묻는 질문</h3><p>결과는 각 플레이에서 무작위로 결정되며 특정 선택이 다음 결과에 영향을 주지 않습니다.</p>
+<p class="doc-meta">이 문서는 현재 페이지에 제공되는 기능 범위를 기준으로 작성했습니다. 기능이 변경되면 안내도 함께 수정합니다. 관련 문서: <a href="/guides/">개발 가이드</a> · <a href="/privacy.html">개인정보처리방침</a> · <a href="/contact.html">오류 제보</a></p>
 </section>
 </main>
 <footer class="footer"><div class="wrap">YouthDeveloper // client-side tools · 2026</div></footer>
