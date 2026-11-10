@@ -22,11 +22,11 @@ a{color:inherit}.wrap{width:min(1180px,calc(100% - 32px));margin:auto}.top{paddi
 <body>
 <header class="top"><div class="wrap nav"><a class="brand" href="/">Youth<span>Developer</span></a><a class="back" href="/services.html">← ALL SERVICES</a></div></header>
 <main class="wrap">
-<section class="hero"><div class="eyebrow">YOUTHDEVELOPER / TOOL</div><h1>✅ 할 일 목록</h1><p>브라우저에서 바로 사용할 수 있는 할 일 목록 도구입니다.</p></section>
+<section class="hero"><div class="eyebrow">YOUTHDEVELOPER / TOOL GUIDE</div><h1>할 일 목록</h1><p>할 일을 추가하고 완료 여부를 표시하는 간단한 개인 체크리스트입니다.</p></section>
 <section class="grid" id="grid">
 <article class="card" data-cat="utility" id="todo"><div class="cardhead"><h2>✅ 할 일 목록</h2><span class="tag">UTILITY</span></div><div class="tool"><div class="row"><input id="todoText" placeholder="할 일"><button onclick="addTodo()">추가</button></div><div class="out" id="todoOut"></div></div></article>
 </section>
-</main>
+<section class="tool-documentation" aria-labelledby="tool-doc-title"><style>.tool-documentation{margin:28px 0 54px;padding:clamp(20px,4vw,34px);border:1px solid var(--line);border-radius:16px;background:var(--panel,#0c1016);line-height:1.85}.tool-documentation h2{font-size:22px;margin:0 0 18px}.tool-documentation h3{font-size:16px;margin:22px 0 7px;color:var(--green)}.tool-documentation p,.tool-documentation li{color:var(--muted);font-size:14px}.tool-documentation ol{padding-left:22px}.tool-documentation li{margin:5px 0}.tool-documentation .example{padding:14px 16px;border-left:3px solid var(--green);background:rgba(97,255,154,.06);border-radius:0 10px 10px 0}</style><h2 id="tool-doc-title">할 일 목록 사용 안내</h2><h3>활용 사례</h3><p>수업 준비, 프로젝트 작업, 행사 준비처럼 완료해야 할 일을 작은 단계로 나눠 관리할 수 있습니다.</p><h3>사용 순서</h3><ol><li>입력란에 할 일을 작성하고 추가를 누릅니다.</li><li>완료한 항목은 체크합니다.</li><li>필요 없는 항목은 삭제 버튼으로 정리합니다.</li></ol><h3>기능 범위와 주의사항</h3><p>현재는 간단한 목록 관리 기능이며 마감일 알림, 여러 사용자 공유, 계정 동기화, 자동 백업을 제공하지 않습니다.</p><h3>자주 묻는 질문</h3><p>목록은 현재 브라우저에 저장되며 브라우저 데이터 삭제나 다른 기기 사용 시 이어지지 않을 수 있습니다.</p><p class="example">관련 안내: <a href="/guides/">개발 가이드</a> · <a href="/privacy.html">개인정보처리방침</a> · <a href="/contact.html">오류 제보</a></p></section></main>
 <footer class="footer"><div class="wrap">YouthDeveloper // client-side tools · 2026</div></footer>
 <script src="/services/tools.js"></script>
 </body>
