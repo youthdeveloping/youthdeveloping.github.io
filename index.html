@@ -807,6 +807,17 @@
       </div>
     </section>
 
+            <section id="knowledge" aria-labelledby="knowledge-title" style="padding:64px 0;border-top:1px solid var(--line)">
+        <div class="section-head"><div><div class="section-kicker">05 / KNOWLEDGE BASE</div><h2 id="knowledge-title">직접 정리한 개발 가이드</h2></div><div class="section-note">ORIGINAL DOCUMENTATION</div></div>
+        <p style="max-width:760px;color:var(--muted);line-height:1.9">도구를 제공하는 것에서 그치지 않고, 웹 기술을 이해하고 안전하게 사용하는 데 필요한 내용을 실제 개발 과정에 맞춰 정리합니다. 각 문서는 개념, 적용 순서, 주의사항과 참고 자료를 함께 제공합니다.</p>
+        <div class="app-grid compact" style="margin-top:18px">
+          <a class="card" href="/guides/web-tool-data-safety.html"><span class="tile">🔐</span><div class="info"><h3 class="name">웹 도구의 데이터 처리와 개인정보 보호</h3><p class="desc">브라우저 저장소, 서버 전송, 외부 API와 공개 게시 기능의 차이</p></div><span class="chev">›</span></a>
+          <a class="card" href="/guides/github-pages-deploy.html"><span class="tile">🚀</span><div class="info"><h3 class="name">GitHub Pages 배포 가이드</h3><p class="desc">정적 사이트의 배포 구조와 경로 점검</p></div><span class="chev">›</span></a>
+          <a class="card" href="/guides/cloudflare-workers.html"><span class="tile">☁️</span><div class="info"><h3 class="name">Cloudflare Workers API</h3><p class="desc">서버리스 API 설계와 검증 원칙</p></div><span class="chev">›</span></a>
+        </div>
+        <p style="margin-top:18px"><a href="/guides/" style="color:var(--green)">모든 개발 가이드 보기 →</a></p>
+      </section>
+
       <section id="html-playground">
         <div class="section-head">
           <div>
@@ -859,29 +870,17 @@
               <div class="stack-item"><span>Database</span><span>D1 / KV</span></div>
               <div class="stack-item"><span>Storage</span><span>R2</span></div>
               <div class="stack-item"><span>Automation</span><span>GitHub Actions</span></div>
-              <div class="stack-item"><span>Network</span><span class="state">● ONLINE</span></div>
+              <div class="stack-item"><span>Hosting</span><span>Static site delivery</span></div>
             </div>
           </div>
 
           <div class="panel">
             <div class="section-kicker">SYSTEM</div>
-            <div class="metrics">
-              <div class="metric">
-                <small>EDGE</small>
-                <strong>ON</strong>
-              </div>
-              <div class="metric">
-                <small>API</small>
-                <strong>OK</strong>
-              </div>
-              <div class="metric">
-                <small>BUILD</small>
-                <strong>READY</strong>
-              </div>
-            </div>
-            <p style="color:var(--muted);font-size:13px;line-height:1.8;margin:22px 0 0;">
-              작게 시작하고, 빠르게 배포하고,<br>
-              필요한 만큼 확장합니다.
+            <p style="color:var(--muted);font-size:13px;line-height:1.9;margin:8px 0 0;">
+              이 사이트는 정적 웹 페이지를 GitHub Pages로 제공하며, 계정·채팅 등 서버 기능이 필요한 일부 서비스는 별도 API와 연결됩니다. 각 기능의 작동 여부는 해당 페이지에서 직접 확인할 수 있습니다. 이 영역은 실시간 장애 감시 결과가 아닙니다.
+            </p>
+            <p style="color:var(--muted);font-size:12px;line-height:1.8;margin:14px 0 0;">
+              도구별 처리 방식과 데이터 범위는 <a href="/privacy.html" style="color:var(--green)">개인정보처리방침</a> 및 개별 안내를 확인해 주세요.
             </p>
           </div>
         </div>
