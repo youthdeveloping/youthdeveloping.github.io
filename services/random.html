@@ -22,12 +22,29 @@ a{color:inherit}.wrap{width:min(1180px,calc(100% - 32px));margin:auto}.top{paddi
 <body>
 <header class="top"><div class="wrap nav"><a class="brand" href="/">Youth<span>Developer</span></a><a class="back" href="/services.html">← ALL SERVICES</a></div></header>
 <main class="wrap">
-<section class="hero"><div class="eyebrow">YOUTHDEVELOPER / TOOL</div><h1>🎲 랜덤 뽑기</h1><p>브라우저에서 바로 사용할 수 있는 랜덤 뽑기 도구입니다.</p></section>
+<section class="hero"><div class="eyebrow">YOUTHDEVELOPER / TOOL GUIDE</div><h1>랜덤 뽑기</h1><p>한 줄에 하나씩 입력한 항목 중 하나를 무작위로 선택하는 도구입니다.</p></section>
 <section class="grid" id="grid">
 <article class="card" data-cat="game" id="random"><div class="cardhead"><h2>🎲 랜덤 뽑기</h2><span class="tag">GAME</span></div><div class="tool"><textarea id="randomItems" aria-label="항목 (한 줄에 하나)">사과
 바나나
 포도
 딸기</textarea><button onclick="randomPick()">뽑기</button><div class="out" id="randomOut">—</div></div></article>
+</section>
+
+<section class="tool-documentation" aria-labelledby="tool-doc-title">
+<style>
+.tool-documentation{margin:28px 0 54px;padding:clamp(20px,4vw,34px);border:1px solid var(--line);border-radius:16px;background:var(--panel,#0c1016);line-height:1.85}
+.tool-documentation h2{font-size:22px;margin:0 0 18px}.tool-documentation h3{font-size:16px;margin:22px 0 7px;color:var(--green)}
+.tool-documentation p,.tool-documentation li{color:var(--muted);font-size:14px}.tool-documentation ol{padding-left:22px}.tool-documentation li{margin:5px 0}
+.tool-documentation .doc-example{padding:14px 16px;border-left:3px solid var(--green);background:rgba(97,255,154,.06);border-radius:0 10px 10px 0}
+.tool-documentation .doc-meta{font-size:12px;border-top:1px solid var(--line);padding-top:14px;margin-top:20px}
+</style>
+<h2 id="tool-doc-title">랜덤 뽑기 사용 안내</h2>
+<h3>어떤 상황에 사용할 수 있나요?</h3><p>모둠 발표 순서, 놀이 순서, 점심 메뉴 후보, 간단한 활동 주제를 정할 때 활용할 수 있습니다.</p>
+<h3>사용 순서</h3><ol><li>입력 칸에 후보를 한 줄에 하나씩 작성합니다.</li><li>중복 항목이 있다면 각각 별도 후보로 취급됩니다.</li><li>뽑기를 눌러 결과를 확인하고, 다시 뽑으려면 버튼을 한 번 더 누릅니다.</li></ol>
+<h3>사용 예시</h3><p class="doc-example">예: 사과, 바나나, 포도, 딸기를 각각 새 줄에 입력하고 뽑기를 누르면 목록 중 한 항목이 선택됩니다. 항목을 쉼표가 아닌 줄바꿈으로 구분해야 합니다.</p>
+<h3>기능 범위와 주의사항</h3><p>현재 결과를 자동으로 기록하거나 이미 뽑힌 항목을 제외하는 추첨 시스템은 아닙니다. 법적·금전적 이해관계가 있는 추첨이나 공정성 증명이 필요한 행사에는 검증 가능한 별도 추첨 절차를 사용하세요.</p>
+<h3>자주 묻는 질문</h3><p>입력한 항목은 현재 페이지의 브라우저에서 처리되며, 목록을 자동으로 서버에 게시하거나 다른 사람과 동기화하지 않습니다.</p>
+<p class="doc-meta">이 문서는 현재 페이지에 제공되는 기능 범위를 기준으로 작성했습니다. 기능이 변경되면 안내도 함께 수정합니다. 관련 문서: <a href="/guides/">개발 가이드</a> · <a href="/privacy.html">개인정보처리방침</a> · <a href="/contact.html">오류 제보</a></p>
 </section>
 </main>
 <footer class="footer"><div class="wrap">YouthDeveloper // client-side tools · 2026</div></footer>
