@@ -22,9 +22,26 @@ a{color:inherit}.wrap{width:min(1180px,calc(100% - 32px));margin:auto}.top{paddi
 <body>
 <header class="top"><div class="wrap nav"><a class="brand" href="/">Youth<span>Developer</span></a><a class="back" href="/services.html">← ALL SERVICES</a></div></header>
 <main class="wrap">
-<section class="hero"><div class="eyebrow">YOUTHDEVELOPER / TOOL</div><h1>🎡 룰렛</h1><p>브라우저에서 바로 사용할 수 있는 룰렛 도구입니다.</p></section>
+<section class="hero"><div class="eyebrow">YOUTHDEVELOPER / TOOL GUIDE</div><h1>룰렛</h1><p>쉼표로 구분한 후보 중 하나를 무작위로 선택하는 간단한 결정 도구입니다.</p></section>
 <section class="grid" id="grid">
 <article class="card" data-cat="game" id="roulette"><div class="cardhead"><h2>🎡 룰렛</h2><span class="tag">GAME</span></div><div class="tool"><input id="rouletteItems" value="A,B,C,D" aria-label="항목 (쉼표로 구분)"><button onclick="roulettePick()">돌리기</button><div class="out" id="rouletteOut">—</div></div></article>
+</section>
+
+<section class="tool-documentation" aria-labelledby="tool-doc-title">
+<style>
+.tool-documentation{margin:28px 0 54px;padding:clamp(20px,4vw,34px);border:1px solid var(--line);border-radius:16px;background:var(--panel,#0c1016);line-height:1.85}
+.tool-documentation h2{font-size:22px;margin:0 0 18px}.tool-documentation h3{font-size:16px;margin:22px 0 7px;color:var(--green)}
+.tool-documentation p,.tool-documentation li{color:var(--muted);font-size:14px}.tool-documentation ol{padding-left:22px}.tool-documentation li{margin:5px 0}
+.tool-documentation .doc-example{padding:14px 16px;border-left:3px solid var(--green);background:rgba(97,255,154,.06);border-radius:0 10px 10px 0}
+.tool-documentation .doc-meta{font-size:12px;border-top:1px solid var(--line);padding-top:14px;margin-top:20px}
+</style>
+<h2 id="tool-doc-title">룰렛 사용 안내</h2>
+<h3>어떤 상황에 사용할 수 있나요?</h3><p>간식 메뉴, 게임 역할, 발표 주제처럼 후보가 여러 개일 때 빠르게 하나를 고를 수 있습니다.</p>
+<h3>사용 순서</h3><ol><li>입력란에 후보를 쉼표로 구분해 적습니다.</li><li>후보 사이에 불필요한 쉼표가 없는지 확인합니다.</li><li>돌리기를 눌러 선택 결과를 확인합니다.</li></ol>
+<h3>사용 예시</h3><p class="doc-example">예: 국어, 수학, 과학, 영어를 입력하려면 국어,수학,과학,영어처럼 쉼표로 구분한 뒤 돌리기를 누릅니다.</p>
+<h3>기능 범위와 주의사항</h3><p>현재 도구는 결과 선택을 위한 간단한 무작위 기능이며 실제 회전 애니메이션, 참가자별 기록, 추첨 인증서는 제공하지 않습니다. 중요한 추첨은 절차와 결과를 별도로 기록하세요.</p>
+<h3>자주 묻는 질문</h3><p>같은 후보를 여러 번 적으면 별도 항목처럼 취급될 수 있으므로 입력 목록을 먼저 확인하세요.</p>
+<p class="doc-meta">이 문서는 현재 페이지에 제공되는 기능 범위를 기준으로 작성했습니다. 기능이 변경되면 안내도 함께 수정합니다. 관련 문서: <a href="/guides/">개발 가이드</a> · <a href="/privacy.html">개인정보처리방침</a> · <a href="/contact.html">오류 제보</a></p>
 </section>
 </main>
 <footer class="footer"><div class="wrap">YouthDeveloper // client-side tools · 2026</div></footer>
