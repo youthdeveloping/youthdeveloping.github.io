@@ -22,9 +22,26 @@ a{color:inherit}.wrap{width:min(1180px,calc(100% - 32px));margin:auto}.top{paddi
 <body>
 <header class="top"><div class="wrap nav"><a class="brand" href="/">Youth<span>Developer</span></a><a class="back" href="/services.html">← ALL SERVICES</a></div></header>
 <main class="wrap">
-<section class="hero"><div class="eyebrow">YOUTHDEVELOPER / TOOL</div><h1>🔄 단위 변환기</h1><p>브라우저에서 바로 사용할 수 있는 단위 변환기 도구입니다.</p></section>
+<section class="hero"><div class="eyebrow">YOUTHDEVELOPER / TOOL GUIDE</div><h1>단위 변환기</h1><p>길이·질량·온도 단위 사이의 값을 변환하는 기초 학습 도구입니다.</p></section>
 <section class="grid" id="grid">
 <article class="card" data-cat="utility" id="unit"><div class="cardhead"><h2>🔄 단위 변환기</h2><span class="tag">UTILITY</span></div><div class="tool"><input id="unitVal" type="number" value="1" aria-label="값"><select id="unitFrom" aria-label="변환 전 단위"><option value="m">m</option><option value="km">km</option><option value="cm">cm</option><option value="kg">kg</option><option value="g">g</option><option value="c">°C</option><option value="f">°F</option></select><select id="unitTo" aria-label="변환 후 단위"><option value="km">km</option><option value="m">m</option><option value="cm">cm</option><option value="kg">kg</option><option value="g">g</option><option value="f">°F</option><option value="c">°C</option></select><button onclick="convertUnit()">변환</button><div class="out" id="unitOut">—</div></div></article>
+</section>
+
+<section class="tool-documentation" aria-labelledby="tool-doc-title">
+<style>
+.tool-documentation{margin:28px 0 54px;padding:clamp(20px,4vw,34px);border:1px solid var(--line);border-radius:16px;background:var(--panel,#0c1016);line-height:1.85}
+.tool-documentation h2{font-size:22px;margin:0 0 18px}.tool-documentation h3{font-size:16px;margin:22px 0 7px;color:var(--green)}
+.tool-documentation p,.tool-documentation li{color:var(--muted);font-size:14px}.tool-documentation ol{padding-left:22px}.tool-documentation li{margin:5px 0}
+.tool-documentation .doc-example{padding:14px 16px;border-left:3px solid var(--green);background:rgba(97,255,154,.06);border-radius:0 10px 10px 0}
+.tool-documentation .doc-meta{font-size:12px;border-top:1px solid var(--line);padding-top:14px;margin-top:20px}
+</style>
+<h2 id="tool-doc-title">단위 변환기 사용 안내</h2>
+<h3>어떤 상황에 사용할 수 있나요?</h3><p>미터와 킬로미터의 관계, 그램과 킬로그램의 환산, 섭씨와 화씨 온도 변환을 연습할 수 있습니다.</p>
+<h3>사용 순서</h3><ol><li>숫자 값을 입력합니다.</li><li>변환 전 단위와 변환 후 단위를 선택합니다.</li><li>변환 버튼을 눌러 결과를 확인합니다.</li></ol>
+<h3>사용 예시</h3><p class="doc-example">예: 150cm를 m로 바꾸려면 값 150, 변환 전 cm, 변환 후 m를 선택합니다. 100cm가 1m이므로 결과는 1.5m입니다. 섭씨 0도는 화씨 32도입니다.</p>
+<h3>기능 범위와 주의사항</h3><p>현재 제공하는 단위는 m·km·cm, kg·g, °C·°F입니다. 부피·속도·압력·데이터 용량 단위는 지원하지 않습니다. 서로 다른 물리량을 변환할 수는 없습니다.</p>
+<h3>자주 묻는 질문</h3><p>변환 결과가 나오지 않으면 길이끼리, 질량끼리, 온도끼리 같은 종류의 단위를 선택했는지 확인하세요.</p>
+<p class="doc-meta">이 문서는 현재 페이지에 제공되는 기능 범위를 기준으로 작성했습니다. 기능이 변경되면 안내도 함께 수정합니다. 관련 문서: <a href="/guides/">개발 가이드</a> · <a href="/privacy.html">개인정보처리방침</a> · <a href="/contact.html">오류 제보</a></p>
 </section>
 </main>
 <footer class="footer"><div class="wrap">YouthDeveloper // client-side tools · 2026</div></footer>
