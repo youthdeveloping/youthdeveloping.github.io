@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="브라우저에서 실행되는 웹 도구를 공개하기 전 입력값, 오류, 모바일 화면, 접근성, 데이터 처리와 배포 상태를 직접 확인하는 실무 점검 가이드입니다.">
+<meta name="theme-color" content="#05070a">
+<link rel="canonical" href="https://youthdeveloping.github.io/guides/web-tool-release-checklist.html">
+<meta property="og:type" content="article"><meta property="og:site_name" content="YouthDeveloper">
+<meta property="og:title" content="웹 도구 출시 전 점검 체크리스트">
+<meta property="og:description" content="기능 구현 이후 실제 이용자가 안전하고 편리하게 사용할 수 있는지 확인하는 테스트 순서를 정리했습니다.">
+<title>웹 도구 출시 전 점검 체크리스트 · YouthDeveloper</title>
+<style>
+:root{color-scheme:dark;--bg:#05070a;--panel:#0c1016;--line:rgba(255,255,255,.1);--text:#edf2f7;--muted:#a0acb9;--green:#61ff9a;--cyan:#62e8ff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 0,rgba(98,232,255,.07),transparent 34rem),var(--bg);color:var(--text);font-family:Inter,Pretendard,"Noto Sans KR",system-ui,sans-serif;line-height:1.9}
+.wrap{width:min(900px,calc(100% - 34px));margin:auto}.top{padding:19px 0;border-bottom:1px solid var(--line)}
+a{color:var(--green);text-decoration:none}.hero{padding:48px 0 25px}.eyebrow{font:11px monospace;letter-spacing:.14em;color:var(--green)}
+h1{font-size:clamp(30px,5vw,48px);line-height:1.25;letter-spacing:-.04em;margin:10px 0 14px}h2{font-size:20px;margin:0 0 10px}
+.lead,.muted{color:var(--muted)}.meta{font:11px monospace;color:#81909e}
+.article{border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:clamp(18px,4vw,30px);margin:14px 0}
+.article h2{font-size:18px;margin:0 0 10px}.article p,.article li{margin:0;color:#b4bec8;font-size:14px;line-height:2}
+.article ul,.article ol{padding-left:22px}.article li{margin:6px 0}.example{padding:14px 16px;border-left:3px solid var(--green);background:rgba(97,255,154,.06);border-radius:0 10px 10px 0}
+.related{border-top:1px solid var(--line);padding-top:22px;margin-top:30px}.related a{display:block;padding:10px 0;border-bottom:1px solid var(--line)}
+.footer{padding:28px 0;margin-top:38px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+@media(max-width:650px){.hero{padding-top:34px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap"><a href="/">← YouthDeveloper</a> / <a href="/guides/">개발 가이드</a></div></header>
+<main class="wrap">
+<header class="hero"><div class="eyebrow">FIELD GUIDE / RELEASE QUALITY</div><h1>웹 도구 출시 전 점검 체크리스트</h1>
+<p class="lead">버튼이 눌리고 화면이 보인다는 것만으로 서비스가 완성된 것은 아닙니다. 입력값이 달라질 때의 동작, 오류 복구, 모바일 사용성, 데이터 처리와 배포 상태까지 확인하는 순서를 정리했습니다.</p>
+<p class="meta">YOUTHDEVELOPER EDITORIAL · 2026-11-13 · 실무 점검 자료</p></header>
+
+<section class="article"><h2>1. 먼저 도구가 해결할 일을 한 문장으로 정의합니다</h2>
+<p>테스트를 시작하기 전에 이 도구의 이용자가 누구이며, 어떤 입력을 하고, 어떤 결과를 기대하는지 정리합니다. 예를 들어 계산기는 숫자와 연산자를 입력해 결과를 확인하는 도구이고, QR 생성기는 텍스트나 주소를 이미지로 바꾸는 도구입니다. 기능의 목적을 짧게 정의하면 불필요한 기능을 늘리기보다 꼭 필요한 흐름을 우선 확인할 수 있습니다.</p>
+<p>화면의 제목과 설명은 실제 구현된 기능을 정확하게 설명해야 합니다. 지원하지 않는 공학 계산, 자동 저장, 온라인 동기화, 알림 기능을 제공하는 것처럼 표현하지 않습니다. 설명과 동작이 다르면 이용자는 기능을 신뢰하기 어렵습니다.</p></section>
+
+<section class="article"><h2>2. 정상 입력만 테스트하지 않습니다</h2>
+<p>입력형 도구는 일반적인 값뿐 아니라 빈 값, 공백만 있는 값, 아주 긴 문자열, 음수, 소수, 0, 잘못된 형식도 확인해야 합니다. 숫자 입력 도구라면 숫자가 아닌 문자가 들어왔을 때 어떻게 안내하는지, 나눗셈처럼 결과가 정의되지 않는 경우를 어떻게 처리하는지 살펴봅니다.</p>
+<ul><li>필수 입력을 비웠을 때 이용자가 다음 행동을 이해할 수 있나요?</li><li>최솟값·최댓값을 벗어난 입력을 막거나 명확히 안내하나요?</li><li>연속해서 버튼을 눌러도 중복 실행이나 중복 저장이 발생하지 않나요?</li><li>입력값이 길어져도 화면이 깨지거나 페이지 밖으로 밀려나지 않나요?</li></ul></section>
+
+<section class="article"><h2>3. 결과가 맞는지 독립적으로 검산합니다</h2>
+<p>도구가 결과를 표시하는 것과 결과가 정확한 것은 다른 문제입니다. 계산기는 손으로 확인할 수 있는 작은 값으로 검산하고, 단위 변환기는 기준 단위와 변환 공식을 확인합니다. 날짜와 시간 기능은 날짜 경계, 자정, 시간대, 일광 절약 시간처럼 환경에 따라 달라질 수 있는 조건을 점검합니다.</p>
+<p class="example">검산 예시: 150cm를 m로 바꾸는 기능이라면 100cm = 1m라는 기준을 사용해 1.5m가 나오는지 확인합니다. 변환 방향을 반대로 선택했을 때도 결과가 올바른지 확인합니다.</p>
+<p>무작위 선택 기능은 결과가 여러 후보 중 하나인지, 후보가 하나뿐일 때 오류가 없는지 확인합니다. 통계적 공정성이나 법적 추첨 인증이 필요한 용도로 사용할 수 있다고 과장해서는 안 됩니다.</p></section>
+
+<section class="article"><h2>4. 오류가 발생했을 때 복구할 수 있어야 합니다</h2>
+<p>네트워크 요청이 실패하거나 서버가 응답하지 않을 수 있습니다. 이때 무한 로딩 상태로 남기지 말고, 이용자가 이해할 수 있는 오류 안내와 다시 시도할 방법을 제공해야 합니다. 입력한 내용이 사라져도 되는지, 재시도하면 중복 등록이 발생하지 않는지도 함께 살펴봅니다.</p>
+<p>개발자 도구의 Console과 Network 탭은 오류를 구분하는 데 도움이 됩니다. Console에서는 JavaScript 예외를, Network에서는 요청 주소·상태 코드·응답 시간을 확인합니다. 오류 화면에는 내부 스택 추적, API 비밀 키, 관리자 토큰, 데이터베이스 접속 정보가 표시되지 않아야 합니다.</p></section>
+
+<section class="article"><h2>5. 저장 위치와 데이터 흐름을 확인합니다</h2>
+<p>입력값이 브라우저 안에서만 처리되는지, localStorage나 sessionStorage에 남는지, 서버나 외부 API로 전송되는지 기능별로 구분합니다. 개발자 도구의 Application 탭에서 브라우저 저장소를 살펴보고, Network 탭에서 외부 요청을 확인할 수 있습니다.</p>
+<p>서버 기능이 있다면 인증 여부뿐 아니라 이용자별 권한을 확인해야 합니다. 화면에서 버튼을 숨기는 것은 권한 보호가 아닙니다. 서버는 매 요청마다 요청자가 해당 데이터에 접근할 수 있는지 검사해야 합니다. 공개 게시판이나 공유 기능에는 개인정보와 인증 정보를 입력하지 말라는 안내, 신고·삭제 등 필요한 운영 절차도 마련해야 합니다.</p></section>
+
+<section class="article"><h2>6. 모바일과 키보드 환경에서 같은 작업을 해봅니다</h2>
+<p>데스크톱에서 정상이어도 휴대전화에서는 입력창이 가려지거나 버튼이 너무 작을 수 있습니다. 실제 모바일 브라우저에서 메뉴 열기, 입력, 제출, 결과 확인, 뒤로 가기를 순서대로 실행합니다. 가로 스크롤이 필요한 영역이 페이지 전체를 밀어내지 않는지도 확인합니다.</p>
+<p>마우스를 사용하지 않고 Tab, Shift+Tab, Enter, Space 키만으로 주요 기능을 사용할 수 있는지 확인합니다. 현재 포커스가 어디에 있는지 보여야 하고, 아이콘만 있는 버튼에는 기능을 설명하는 이름이 필요합니다. 오류와 성공 상태는 색상만으로 전달하지 말고 텍스트도 함께 표시합니다.</p></section>
+
+<section class="article"><h2>7. 링크, 제목, 안내 문서를 서로 맞춥니다</h2>
+<p>모든 메뉴와 카드가 실제 존재하는 페이지로 이동하는지 확인합니다. 페이지 제목과 본문 제목이 일치하고, 다른 페이지와 구분되는 설명을 갖추어야 합니다. 링크 이름은 '여기'처럼 모호하게 쓰기보다 이동할 문서나 기능을 알 수 있게 작성합니다.</p>
+<p>개인정보처리방침은 실제 데이터 처리와 일치해야 합니다. 브라우저 저장소, 서버 제출, 외부 서비스, 광고 쿠키에 관한 설명을 확인하고, 기능이 바뀌면 관련 문서도 함께 수정합니다. 존재하지 않는 고객센터, 실제로 제공하지 않는 보안 기능, 확인하지 않은 인증 상태를 표시하지 않습니다.</p></section>
+
+<section class="article"><h2>8. 배포 후 실제 주소에서 다시 확인합니다</h2>
+<p>개발 중 미리보기에서 성공한 것만으로 배포가 완료된 것은 아닙니다. 실제 공개 주소에서 페이지 직접 접속, 새로고침, 내부 링크, 이미지·CSS·JavaScript 로딩, 모바일 화면을 다시 확인합니다. 파일 이름을 바꾸거나 폴더를 이동했다면 이전 경로를 참조하는 링크가 남아 있지 않은지 검색합니다.</p>
+<p>GitHub Pages 배포가 완료됐는지 저장소의 Actions 또는 Pages 배포 상태를 확인하고, 브라우저 캐시 때문에 이전 파일이 보이는 상황과 실제 배포 실패를 구분합니다. 변경 목적을 설명하는 커밋 메시지를 남기고, 문제가 생겼을 때 마지막 정상 버전으로 되돌릴 수 있도록 관리합니다.</p></section>
+
+<section class="article"><h2>9. 출시 체크리스트</h2>
+<ul><li>페이지 설명이 실제 기능과 일치합니다.</li><li>정상 입력과 잘못된 입력을 모두 확인했습니다.</li><li>결과를 독립적인 방법으로 검산했습니다.</li><li>오류 발생 시 안내와 복구 방법이 있습니다.</li><li>저장 위치와 외부 전송 여부를 확인했습니다.</li><li>인증과 권한 검사를 서버에서 수행합니다.</li><li>모바일과 키보드로 주요 흐름을 완료할 수 있습니다.</li><li>링크, 페이지 제목, 개인정보 안내가 최신 상태입니다.</li><li>실제 배포 주소에서 새로고침과 하위 페이지 접속을 확인했습니다.</li></ul>
+<p>모든 항목을 체크했다고 해서 모든 환경에서 오류가 없다는 뜻은 아닙니다. 테스트한 브라우저와 기기, 발견된 제한 사항을 기록하고, 이용자 제보를 받아 개선하는 과정이 계속 필요합니다.</p></section>
+
+<section class="article"><h2>10. 참고 자료와 다음 학습</h2>
+<p>테스트와 접근성 기준은 공식 문서를 함께 확인하는 것이 좋습니다. <a href="https://developer.mozilla.org/ko/docs/Learn_web_development/Extensions/Testing" target="_blank" rel="noopener noreferrer">MDN 웹 테스트 학습 자료</a>, <a href="https://www.w3.org/WAI/test-evaluate/" target="_blank" rel="noopener noreferrer">W3C 접근성 평가 안내</a>, <a href="https://docs.github.com/en/pages" target="_blank" rel="noopener noreferrer">GitHub Pages 문서</a>를 참고할 수 있습니다. 기술과 정책은 바뀔 수 있으므로 오래된 안내를 그대로 적용하지 말고 공식 문서의 최신 내용을 확인하세요.</p>
+</section>
+
+<section class="related"><h2>함께 읽기</h2><a href="/guides/">개발 가이드 전체 목록 →</a><a href="/guides/web-tool-data-safety.html">웹 도구의 데이터 처리와 개인정보 보호 →</a><a href="/guides/responsive-accessibility.html">반응형 웹과 접근성 점검 →</a><a href="/services.html">브라우저 개발 도구 살펴보기 →</a></section>
+</main>
+<footer class="footer"><div class="wrap">© 2026 YouthDeveloper · <a href="/">홈</a> · <a href="/about.html">프로젝트 소개</a> · <a href="/privacy.html">개인정보처리방침</a> · <a href="/contact.html">문의</a></div></footer>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"웹 도구 출시 전 점검 체크리스트","description":"브라우저에서 실행되는 웹 도구를 공개하기 전 입력값, 오류, 모바일 화면, 접근성, 데이터 처리와 배포 상태를 직접 확인하는 실무 점검 가이드입니다.","datePublished":"2026-11-13","dateModified":"2026-11-13","author":{"@type":"Organization","name":"YouthDeveloper"},"publisher":{"@type":"Organization","name":"YouthDeveloper"},"mainEntityOfPage":"https://youthdeveloping.github.io/guides/web-tool-release-checklist.html"}</script>
+</body></html>
