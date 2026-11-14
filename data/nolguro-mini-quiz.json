@@ -1,6 +1,14 @@
 {
-  "updated": "2026-11-14T08:06:31.330Z",
+  "updated": "2026-11-14T08:07:36.107Z",
   "items": [
+    {
+      "id": "q_mwg4hvhn_11lj8",
+      "question": "삼대발견은 지역의 옛날 건물만 사진으로 찍는 활동이다.",
+      "answer": "x",
+      "difficulty": "보통",
+      "explanation": "",
+      "updatedAt": "2026-11-14T08:07:36.107Z"
+    },
     {
       "id": "q_mwg4ghia_4etjk",
       "question": "구로엔젤은 지역가게와 청소년을 연결하는 활동이다.",
