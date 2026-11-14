@@ -1,6 +1,14 @@
 {
-  "updated": "2026-11-14T08:05:23.171Z",
+  "updated": "2026-11-14T08:06:31.330Z",
   "items": [
+    {
+      "id": "q_mwg4ghia_4etjk",
+      "question": "구로엔젤은 지역가게와 청소년을 연결하는 활동이다.",
+      "answer": "0",
+      "difficulty": "보통",
+      "explanation": "",
+      "updatedAt": "2026-11-14T08:06:31.330Z"
+    },
     {
       "id": "q_mwg4f0wy_jjcg0",
       "question": "놀구로의 선생님들은 청소년들이 제안한 의경을 프로그램에 반영할수있다.",
