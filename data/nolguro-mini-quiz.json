@@ -1,6 +1,14 @@
 {
-  "updated": "2026-11-14T08:20:17.806Z",
+  "updated": "2026-11-14T08:22:16.923Z",
   "items": [
+    {
+      "id": "q_mwg50r4r_t4bry",
+      "question": "숨에 있는 쿠션 개수는?",
+      "answer": "3개",
+      "difficulty": "보통",
+      "explanation": "",
+      "updatedAt": "2026-11-14T08:22:16.923Z"
+    },
     {
       "id": "q_mwg4xlzf_h0hzn",
       "question": "심은송 선생님이 운영하는 동아리는?(1개만 맞아도 정답!!)",
@@ -12,10 +20,10 @@
     {
       "id": "q_mwg4su8j_lvwmh",
       "question": "놀고의 뜻은?",
-      "answer": "놀고 가다",
+      "answer": "놀고가다.",
       "difficulty": "어려움",
       "explanation": "",
-      "updatedAt": "2026-11-14T08:20:17.806Z"
+      "updatedAt": "2026-11-14T08:16:07.699Z"
     },
     {
       "id": "q_mwg4qz1n_umpda",
