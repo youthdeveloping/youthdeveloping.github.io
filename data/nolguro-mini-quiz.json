@@ -1,6 +1,46 @@
 {
-  "updated": "2026-11-14T08:11:22.291Z",
+  "updated": "2026-11-14T08:30:00.000Z",
   "items": [
+    {
+      "id": "q_nolguro_mini_20261114_01",
+      "question": "지구는 태양 주위를 돈다.",
+      "answer": "O",
+      "difficulty": "쉬움",
+      "explanation": "지구는 태양을 중심으로 공전합니다.",
+      "updatedAt": "2026-11-14T08:30:00.000Z"
+    },
+    {
+      "id": "q_nolguro_mini_20261114_02",
+      "question": "곤충의 다리는 모두 8개이다.",
+      "answer": "X",
+      "difficulty": "쉬움",
+      "explanation": "곤충은 일반적으로 다리가 6개입니다. 다리가 8개인 동물은 거미류입니다.",
+      "updatedAt": "2026-11-14T08:30:00.000Z"
+    },
+    {
+      "id": "q_nolguro_mini_20261114_03",
+      "question": "한글날은 매년 10월 9일이다.",
+      "answer": "O",
+      "difficulty": "쉬움",
+      "explanation": "한글날은 훈민정음 반포를 기념하는 날로 매년 10월 9일입니다.",
+      "updatedAt": "2026-11-14T08:30:00.000Z"
+    },
+    {
+      "id": "q_nolguro_mini_20261114_04",
+      "question": "표준 대기압에서 물은 약 100℃에 끓는다.",
+      "answer": "O",
+      "difficulty": "보통",
+      "explanation": "표준 대기압 조건에서 물의 끓는점은 약 100℃입니다.",
+      "updatedAt": "2026-11-14T08:30:00.000Z"
+    },
+    {
+      "id": "q_nolguro_mini_20261114_05",
+      "question": "천둥소리는 번개 빛보다 먼저 도착한다.",
+      "answer": "X",
+      "difficulty": "보통",
+      "explanation": "빛이 소리보다 훨씬 빠르기 때문에 번개를 먼저 보고 천둥소리를 나중에 듣습니다.",
+      "updatedAt": "2026-11-14T08:30:00.000Z"
+    },
     {
       "id": "q_mwg4mq0j_1enf4",
       "question": "놀구로에서는 즐겁게 노는것 뿐만 아니라 새로운 것을 배우고 도전할수 있다.",
