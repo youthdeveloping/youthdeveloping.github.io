@@ -59,4 +59,5 @@ function openDrawer(){drawer.classList.add('open')}
 drawer.querySelector('#yc-extra-close').onclick=()=>drawer.classList.remove('open');
 drawer.addEventListener('click',e=>{if(e.target===drawer)drawer.classList.remove('open')});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')drawer.classList.remove('open')});
+const ydPanels=document.createElement('script');ydPanels.src='/youthcraft/mobile-panel-access.js';ydPanels.defer=true;document.head.append(ydPanels);
 })();
