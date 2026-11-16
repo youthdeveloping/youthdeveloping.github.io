@@ -7,8 +7,8 @@ img,video,canvas,iframe,svg{max-width:100%}
 button,a,[role="button"],input[type="button"],input[type="submit"]{touch-action:manipulation}
 :focus-visible{outline:2px solid #70e8bd;outline-offset:2px}
 html[data-device="mobile"]{font-size:16px}
-html[data-device="mobile"] body{max-width:100%;overflow-x:auto}
-html[data-device="mobile"] button,html[data-device="mobile"] input:not([type=checkbox]):not([type=radio]),html[data-device="mobile"] select,html[data-device="mobile"] textarea{font-size:16px;min-height:var(--yd-touch-target)}
+html[data-device="mobile"] body{max-width:100%}
+html[data-device="mobile"] button,html[data-device="mobile"] input:not([type=checkbox]):not([type=radio]),html[data-device="mobile"] select,html[data-device="mobile"] textarea{font-size:16px;min-height:var(--yd-touch-target)}\nhtml[data-device="mobile"] a.btn,html[data-device="mobile"] nav a,html[data-device="mobile"] .nav-link,html[data-device="mobile"] .launch,html[data-device="mobile"] .filter,html[data-device="mobile"] .admin-link,html[data-device="mobile"] .section-link,html[data-device="mobile"] [role="button"]{min-height:var(--yd-touch-target);display:inline-flex;align-items:center;justify-content:center}
 html[data-device="mobile"] input[type=checkbox],html[data-device="mobile"] input[type=radio]{width:20px;height:20px;min-height:20px}
 html[data-device="mobile"] img,html[data-device="mobile"] video,html[data-device="mobile"] canvas,html[data-device="mobile"] iframe{max-width:100%}
 html[data-device="mobile"] table{display:block;max-width:100%;overflow-x:auto}
