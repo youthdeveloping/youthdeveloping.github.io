@@ -1,6 +1,6 @@
 (()=>{'use strict';if(window.__YD_MOBILE_PANELS__)return;window.__YD_MOBILE_PANELS__=true;const css=document.createElement('style');css.textContent=`
 @media(max-width:760px){
- .yd-mobile-panel,main>.layout>.panel.yd-mobile-panel,body>.layout>aside.yd-mobile-panel,body>.layout>.left.yd-mobile-panel,body>.layout>.right.yd-mobile-panel{display:block!important;position:fixed!important;z-index:10020!important;top:96px!important;bottom:64px!important;width:min(88vw,340px)!important;max-height:none!important;overflow:auto!important;background:#191b22!important;border:1px solid #454958!important;box-shadow:0 18px 55px #000b!important;transform:translateX(-110%);transition:transform .18s ease!important;padding:14px!important}
+ .yd-mobile-panel,main>.layout>.panel.yd-mobile-panel,body>.layout>aside.yd-mobile-panel,body>.layout>.left.yd-mobile-panel,body>.layout>.right.yd-mobile-panel{display:block!important;position:fixed!important;z-index:10020!important;top:130px!important;bottom:64px!important;left:0!important;right:auto!important;width:min(88vw,340px)!important;max-height:none!important;overflow:auto!important;background:#191b22!important;border:1px solid #454958!important;box-shadow:0 18px 55px #000b!important;transform:translateX(-110%);transition:transform .18s ease!important;padding:14px!important}
  .yd-mobile-panel.yd-panel-open{transform:translateX(0)!important}
  .yd-mobile-panel.yd-panel-right{left:auto!important;right:0!important;transform:translateX(110%)}
  .yd-mobile-panel.yd-panel-right.yd-panel-open{transform:translateX(0)!important}
