@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#05070a">
   <meta name="description" content="청소년 개발자가 웹 도구와 디지털 서비스를 만들고, 사용 과정과 개발 지식을 기록하는 프로젝트입니다.">
   <title>YouthDeveloper — 청소년 개발 프로젝트와 웹 도구</title>
@@ -637,7 +637,121 @@
 
   
     @media(max-width:760px){nav{height:auto;min-height:64px;padding:10px 0;align-items:flex-start}.nav-right{max-width:72%;flex-wrap:wrap;justify-content:flex-end;gap:7px}.coffee{display:none}.nav-status{display:none}.admin-link{font-size:10px;padding:6px 9px}}
-</style>
+
+    /* Persistent centered floating navigation */
+    body { padding-bottom: calc(116px + env(safe-area-inset-bottom, 0px)); }
+    #yd-floating-nav {
+      position: fixed;
+      z-index: 10000;
+      left: 50%;
+      bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      width: max-content;
+      max-width: calc(100vw - 28px);
+      padding: 8px;
+      border: 1px solid rgba(150, 177, 195, .2);
+      border-radius: 20px;
+      background: rgba(8, 12, 18, .88);
+      box-shadow: 0 14px 48px rgba(0,0,0,.48), 0 0 28px rgba(97,255,154,.07);
+      -webkit-backdrop-filter: blur(22px) saturate(145%);
+      backdrop-filter: blur(22px) saturate(145%);
+      font-family: var(--sans);
+    }
+    #yd-floating-nav a,
+    #yd-floating-nav summary {
+      min-width: 76px;
+      min-height: 54px;
+      padding: 7px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      border: 1px solid transparent;
+      border-radius: 13px;
+      color: #aab6c2;
+      text-decoration: none;
+      font-size: 11px;
+      font-weight: 650;
+      line-height: 1.2;
+      white-space: nowrap;
+      cursor: pointer;
+      list-style: none;
+      transition: color .18s ease, background .18s ease, border-color .18s ease;
+    }
+    #yd-floating-nav summary::-webkit-details-marker { display: none; }
+    #yd-floating-nav .yd-nav-icon { font-size: 19px; line-height: 1; }
+    #yd-floating-nav a:hover,
+    #yd-floating-nav summary:hover,
+    #yd-floating-nav a[aria-current="page"] {
+      color: var(--green);
+      border-color: rgba(97,255,154,.2);
+      background: rgba(97,255,154,.09);
+    }
+    #yd-floating-nav a:focus-visible,
+    #yd-floating-nav summary:focus-visible,
+    #yd-floating-nav .yd-more-links a:focus-visible {
+      outline: 2px solid var(--cyan);
+      outline-offset: 2px;
+    }
+    #yd-floating-nav details { position: relative; }
+    #yd-floating-nav .yd-more-links {
+      position: absolute;
+      right: 0;
+      bottom: calc(100% + 12px);
+      display: grid;
+      grid-template-columns: repeat(2, minmax(130px, 1fr));
+      gap: 5px;
+      width: min(310px, calc(100vw - 32px));
+      padding: 9px;
+      border: 1px solid rgba(150,177,195,.2);
+      border-radius: 16px;
+      background: rgba(8,12,18,.96);
+      box-shadow: 0 16px 48px rgba(0,0,0,.5);
+      -webkit-backdrop-filter: blur(22px);
+      backdrop-filter: blur(22px);
+    }
+    #yd-floating-nav .yd-more-links a {
+      min-width: 0;
+      min-height: 44px;
+      flex-direction: row;
+      justify-content: flex-start;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+    }
+    @media (max-width: 560px) {
+      body { padding-bottom: calc(104px + env(safe-area-inset-bottom, 0px)); }
+      #yd-floating-nav {
+        bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+        gap: 1px;
+        padding: 6px;
+        border-radius: 17px;
+        max-width: calc(100vw - 16px);
+      }
+      #yd-floating-nav > a,
+      #yd-floating-nav > details > summary {
+        min-width: 0;
+        min-height: 52px;
+        padding: 6px clamp(8px, 3vw, 13px);
+        font-size: 10px;
+      }
+      #yd-floating-nav .yd-nav-icon { font-size: 18px; }
+    }
+    @media (max-width: 360px) {
+      #yd-floating-nav > a,
+      #yd-floating-nav > details > summary { padding-inline: 7px; }
+      #yd-floating-nav { gap: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #yd-floating-nav a, #yd-floating-nav summary { transition: none; }
+    }
+
+  </style>
   <script src="/device-layout.js" defer></script>
 </head>
 
@@ -661,6 +775,24 @@
         <a class="admin-link" href="/sns/">SNS</a>
         <a class="admin-link" href="/admin/">ADMIN</a>
       </div>
+    </nav>
+
+    <nav id="yd-floating-nav" aria-label="빠른 이동">
+      <a href="/" aria-current="page"><span class="yd-nav-icon" aria-hidden="true">⌂</span><span>홈</span></a>
+      <a href="/youthcraft/"><span class="yd-nav-icon" aria-hidden="true">✳</span><span>YouthCraft</span></a>
+      <a href="/services.html"><span class="yd-nav-icon" aria-hidden="true">▦</span><span>웹 도구</span></a>
+      <a href="/server-tools/"><span class="yd-nav-icon" aria-hidden="true">⌘</span><span>서버 도구</span></a>
+      <details>
+        <summary><span class="yd-nav-icon" aria-hidden="true">•••</span><span>더보기</span></summary>
+        <div class="yd-more-links">
+          <a href="/guides/">📚 개발 가이드</a>
+          <a href="/sns/">◎ SNS</a>
+          <a href="/notices/">▤ 공지사항</a>
+          <a href="/account/">◉ 계정</a>
+          <a href="/about.html">ⓘ 프로젝트 소개</a>
+          <a href="/contact.html">✉ 문의하기</a>
+        </div>
+      </details>
     </nav>
 
     <main>
