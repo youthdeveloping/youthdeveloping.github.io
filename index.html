@@ -1078,5 +1078,9 @@
  if(window.YDAccount){const accountBox=document.getElementById('homeAccount');if(accountBox){try{const user=await window.YDAccount.me();accountBox.textContent=user?('로그인됨: '+user.nickname+(user.role==='admin'?' · 관리자':'')):'로그인되지 않았습니다. 통합 계정에서 로그인해 주세요.';}catch{accountBox.textContent='계정 상태를 확인할 수 없습니다.';}}}
 })();
 </script>
+
+<script>
+if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navigator.serviceWorker.register("/yd-global-nav-sw.js", { scope: "/" }).catch(() => {}); }); }
+</script>
 </body>
 </html>
