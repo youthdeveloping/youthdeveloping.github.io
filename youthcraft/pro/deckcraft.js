@@ -158,6 +158,7 @@ function wrapLines(ctx,text,w){const out=[];for(const para of String(text).split
 async function drawSlide(ctx,s,k){
   const t=T();ctx.save();ctx.scale(k,k);ctx.fillStyle=s.bg||t.bg;ctx.fillRect(0,0,SW,SH);
   for(const e of s.els){
+    ctx.save();ctx.translate(e.x+e.w/2,e.y+e.h/2);ctx.rotate((e.rotation||0)*Math.PI/180);ctx.translate(-e.x-e.w/2,-e.y-e.h/2);
     if(e.type==='rect'){ctx.fillStyle=e.fill||t.acc;ctx.fillRect(e.x,e.y,e.w,e.h)}
     else if(e.type==='ellipse'){ctx.fillStyle=e.fill||t.acc;ctx.beginPath();ctx.ellipse(e.x+e.w/2,e.y+e.h/2,e.w/2,e.h/2,0,0,7);ctx.fill()}
     else if(e.type==='line'){ctx.fillStyle=e.fill||t.fg;ctx.fillRect(e.x,e.y,e.w,Math.max(2,e.h))}
@@ -166,6 +167,7 @@ async function drawSlide(ctx,s,k){
       ctx.fillStyle=e.color||t.fg;ctx.font=`${e.italic?'italic ':''}${e.bold?'700':'400'} ${e.size}px '${e.font}',sans-serif`;ctx.textBaseline='top';
       ctx.textAlign={left:'left',center:'center',right:'right'}[e.align];const lines=wrapLines(ctx,e.text,e.w-8),ax=e.align==='left'?e.x+4:e.align==='center'?e.x+e.w/2:e.x+e.w-4;
       lines.forEach((l,i)=>{const y=e.y+2+i*e.size*1.3;if(y<e.y+e.h)ctx.fillText(l,ax,y)})}
+    ctx.restore();
   }
   ctx.restore();
 }
