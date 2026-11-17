@@ -12,7 +12,7 @@ const FONTS=['Noto Sans KR','Noto Serif KR','Arial','Georgia','Courier New'];
 let deck={theme:'night',slides:[]},cur=0,selId=null,ver=0;
 const uid=()=>YC.uid();
 const T=()=>THEMES[deck.theme]||THEMES.night;
-const mk=(type,o={})=>({id:uid(),type,x:80,y:80,w:300,h:80,text:'',size:28,color:null,fill:null,bold:false,italic:false,align:'left',font:'Noto Sans KR',...o});
+const mk=(type,o={})=>({id:uid(),type,x:80,y:80,w:300,h:80,text:'',size:28,color:null,fill:null,bold:false,italic:false,align:'left',font:'Noto Sans KR',rotation:0,...o});
 function layoutSlide(kind){
   const t=T();
   if(kind==='title')return[mk('text',{x:80,y:170,w:800,h:120,text:'발표 제목',size:60,bold:true,align:'center'}),mk('text',{x:80,y:310,w:800,h:60,text:'부제목 또는 발표자',size:28,align:'center',color:t.acc})];
@@ -28,7 +28,7 @@ const S=()=>deck.slides[cur],E=()=>S().els.find(e=>e.id===selId);
 /* ---------- 요소 DOM 그리기 ---------- */
 function elNode(e,t){
   const d=document.createElement('div');d.className='dk-el';d.dataset.id=e.id;
-  d.style.cssText=`left:${e.x}px;top:${e.y}px;width:${e.w}px;height:${e.h}px;`;
+  d.style.cssText=`left:${e.x}px;top:${e.y}px;width:${e.w}px;height:${e.h}px;transform:rotate(${e.rotation||0}deg);transform-origin:center;`;
   if(e.type==='rect'||e.type==='ellipse'){d.style.background=e.fill||t.acc;if(e.type==='ellipse')d.style.borderRadius='50%'}
   else if(e.type==='line'){d.style.background=e.fill||t.fg;d.style.height=Math.max(2,e.h)+'px'}
   else if(e.type==='image'){const i=document.createElement('img');i.src=e.src;i.alt=e.text||'이미지';i.draggable=false;i.style.cssText='width:100%;height:100%;object-fit:contain;pointer-events:none';d.append(i)}
@@ -95,7 +95,7 @@ function renderIns(){
   if(e.type!=='image'){const f=el('input',{type:'color',value:e.fill||(e.type==='text'?'#000000':T().acc),'aria-label':'채우기 색'});f.addEventListener('input',()=>{e.fill=f.value;renderStage();renderList()});f.addEventListener('change',commit);ins.append(row('채우기',f));
     if(e.type==='text'&&e.fill)ins.append(YC.btn('채우기 없애기',()=>{e.fill=null;commit();all()}))}
   else{const a=el('input',{type:'text',value:e.text||'','aria-label':'대체 텍스트'});a.addEventListener('input',()=>{e.text=a.value});a.addEventListener('change',commit);ins.append(row('대체 텍스트',a))}
-  ins.append(row('X',num('x',-2000,3000)),row('Y',num('y',-2000,3000)),row('너비',num('w',4,3000)),row('높이',num('h',2,3000)));
+  ins.append(row('X',num('x',-2000,3000)),row('Y',num('y',-2000,3000)),row('너비',num('w',4,3000)),row('높이',num('h',2,3000)),row('회전(°)',num('rotation',-360,360)));
   ins.append(YC.row(YC.btn('앞으로',()=>zmove(1)),YC.btn('뒤로',()=>zmove(-1)),YC.btn('복제',dup),YC.btn('삭제',del)),YC.row(YC.btn('가로 가운데',()=>{e.x=(SW-e.w)/2;commit();all()}),YC.btn('세로 가운데',()=>{e.y=(SH-e.h)/2;commit();all()})));
 }
 function all(){renderStage();renderList();renderIns();stat.textContent='슬라이드 '+(cur+1)+' / '+deck.slides.length;}
@@ -185,7 +185,7 @@ async function exportPptx(){
   const k=12192000/SW; // 슬라이드 폭 960 -> 12192000 EMU
   const em=v=>Math.round(v*k);const files=[];const rels=[],media=[];let mi=0;
   const slideXml=(s,idx)=>{let sp='',rid=1,rel='<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" Target="../slideLayouts/slideLayout1.xml"/>';let id=2;const t=T();
-    for(const e of s.els){const xf=`<a:xfrm><a:off x="${em(e.x)}" y="${em(e.y)}"/><a:ext cx="${em(e.w)}" cy="${em(Math.max(e.h,2))}"/></a:xfrm>`;
+    for(const e of s.els){const xf=`<a:xfrm rot="${Math.round((e.rotation||0)*60000)}"><a:off x="${em(e.x)}" y="${em(e.y)}"/><a:ext cx="${em(e.w)}" cy="${em(Math.max(e.h,2))}"/></a:xfrm>`;
       if(e.type==='image'){const m=/^data:image\/(png|jpe?g|gif|webp);base64,(.*)$/.exec(e.src);if(!m||m[1]==='webp')continue;const ext=m[1]==='jpeg'?'jpg':m[1];const name='image'+(++mi)+'.'+ext;media.push({name:'ppt/media/'+name,data:Uint8Array.from(atob(m[2]),c=>c.charCodeAt(0))});rid++;rel+=`<Relationship Id="rId${rid}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${name}"/>`;
         sp+=`<p:pic><p:nvPicPr><p:cNvPr id="${++id}" name="Picture ${id}" descr="${x(e.text||'')}"/><p:cNvPicPr/><p:nvPr/></p:nvPicPr><p:blipFill><a:blip r:embed="rId${rid}"/><a:stretch><a:fillRect/></a:stretch></p:blipFill><p:spPr>${xf}<a:prstGeom prst="rect"><a:avLst/></a:prstGeom></p:spPr></p:pic>`;continue}
       const geom=e.type==='ellipse'?'ellipse':'rect';const fill=e.type==='text'?(e.fill?`<a:solidFill><a:srgbClr val="${hex(e.fill)}"/></a:solidFill>`:'<a:noFill/>'):`<a:solidFill><a:srgbClr val="${hex(e.fill||(e.type==='line'?t.fg:t.acc))}"/></a:solidFill>`;
