@@ -153,6 +153,8 @@ function encodeWav(d,sr,bits=16){
   return new Blob([buf],{type:'audio/wav'});
 }
 function exportWav(bits){if(!need())return;const[a,b]=sel?sel:[0,len()],blob=encodeWav(data.map(c=>c.subarray(a,b)),rate,bits||+bitSel.value);YC.download(blob,name+(sel?'-선택':'')+'.wav');say('WAV('+(bits||bitSel.value)+'비트)로 저장했습니다 ('+YC.fmtBytes(blob.size)+'). MP3와 OGG 인코딩은 지원하지 않습니다.')}
+async function loadMp3Encoder(){if(window.lamejs)return window.lamejs;if(window.__ycLamePromise)return window.__ycLamePromise;window.__ycLamePromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js';s.onload=()=>window.lamejs?resolve(window.lamejs):reject(new Error('MP3 인코더를 찾을 수 없습니다.'));s.onerror=()=>reject(new Error('MP3 인코더 다운로드에 실패했습니다.'));document.head.append(s)});return window.__ycLamePromise}
+async function exportMp3(){if(!need())return;const[a,b]=sel?sel:[0,len()];if(b-a>rate*60*20){say('MP3 변환은 한 번에 20분 이하로 해 주세요.',true);return}try{say('MP3 인코더를 준비하고 있습니다…');const lib=await loadMp3Encoder(),channels=Math.min(2,data.length),kbps=192,encoder=new lib.Mp3Encoder(channels,rate,kbps),chunk=1152,parts=[];const pcm=data.slice(0,channels).map(ch=>{const out=new Int16Array(b-a);for(let i=a;i<b;i++){const v=Math.max(-1,Math.min(1,ch[i]));out[i-a]=v<0?v*32768:v*32767}return out});for(let i=0;i<pcm[0].length;i+=chunk){const l=pcm[0].subarray(i,i+chunk),buf=channels===2?encoder.encodeBuffer(l,pcm[1].subarray(i,i+chunk)):encoder.encodeBuffer(l);if(buf.length)parts.push(new Uint8Array(buf));if(i%(chunk*200)===0)await new Promise(r=>setTimeout(r,0))}const tail=encoder.flush();if(tail.length)parts.push(new Uint8Array(tail));const blob=new Blob(parts,{type:'audio/mpeg'});YC.download(blob,name+(sel?'-선택':'')+'.mp3');say('MP3 192 kbps로 저장했습니다 ('+YC.fmtBytes(blob.size)+').')}catch(e){say('MP3 변환 실패: '+e.message,true)}}
 YC.quickExport(()=>exportWav(16));
 async function record(){
   if(rec){rec.stop();return}
@@ -185,9 +187,9 @@ const row2=el('div',{class:'sc-bar',role:'toolbar','aria-label':'효과'},
   B('음량 +3 dB',()=>gainDb(3)),B('음량 −3 dB',()=>gainDb(-3)),B('정규화 −1 dB',()=>normalize(-1)),B('페이드 인',()=>fade(true)),B('페이드 아웃',()=>fade(false)),B('뒤집기',reverse),B('위상 반전',invert),B('구간 무음',silence),B('직류 제거',removeDC),B('앞뒤 무음 제거',trimSilence),
   B('노이즈 게이트',gate),B('컴프레서',compressor),B('에코',echo),B('리버브',reverb),B('저역 통과',lowpass),B('고역 통과',highpass),B('모노로',toMono),B('샘플레이트',changeRate),B('배속',speed));
 const eqBox=el('div',{class:'sc-grid'},bass.w,mid.w,treb.w,el('div',null,YC.btn('이퀄라이저 적용',eq)));
-const row3=el('div',{class:'sc-bar'},el('label',null,'내보내기 ',bitSel),YC.btn('WAV로 저장',()=>exportWav(),{primary:true}));
+const row3=el('div',{class:'sc-bar'},el('label',null,'WAV 비트 ',bitSel),YC.btn('WAV로 저장',()=>exportWav(),{primary:true}),YC.btn('MP3로 저장',exportMp3));
 const st=YC._status;for(const n of[row1,row2,cv,spec,info,el('b',null,'이퀄라이저'),eqBox,row3])root.insertBefore(n,st);
-root.insertBefore(el('p',{class:'ycp-note'},'사용법: 파형을 끌어 구간을 선택하고, 스페이스로 재생·정지, Delete로 삭제, Ctrl+C/X/V로 복사·잘라내기·붙여넣기, 마우스 휠로 확대합니다. 효과는 선택한 구간(없으면 전체)에 적용됩니다. 최대 30분, 최대 2채널. 저장은 WAV만 지원하며 MP3·OGG 인코딩과 다중 트랙은 없습니다.'),st);
+root.insertBefore(el('p',{class:'ycp-note'},'사용법: 파형을 끌어 구간을 선택하고, 스페이스로 재생·정지, Delete로 삭제, Ctrl+C/X/V로 복사·잘라내기·붙여넣기, 마우스 휠로 확대합니다. 효과는 선택한 구간(없으면 전체)에 적용됩니다. 최대 30분, 최대 2채널. 저장은 WAV와 MP3 내보내기를 지원합니다. OGG 인코딩과 다중 트랙은 지원하지 않습니다.'),st);
 addEventListener('resize',YC.debounce(()=>{resize();draw()},120));
 resize();draw();upd();stack.push(null);idx=0;
 window.__soundcraft={get data(){return data},get rate(){return rate},get sel(){return sel},set sel(v){sel=v},get markers(){return markers},setData(d,r){data=d;rate=r;fitAll();commit();draw();upd()},cut,copy,paste,trimTo,gainDb,normalize,fade,reverse,undo,redo,encodeWav,exportWav,eq,compressor,reverb,echo,toMono,trimSilence,peakDb,speed,eqSet(b,m,t){bassI.value=b;midI.value=m;trebI.value=t}};
