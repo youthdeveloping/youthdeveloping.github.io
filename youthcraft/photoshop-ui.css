@@ -1,0 +1,110 @@
+/* YouthCraft Photoshop-inspired workspace skin. Shared visual layer only; editor behavior is untouched. */
+:root{
+  color-scheme:dark;
+  --yc-bg:#17191c;--yc-panel:#202327;--yc-panel-2:#262a2f;--yc-line:#3a3f45;
+  --yc-text:#e8eaed;--yc-muted:#9da4ac;--yc-accent:#72c7a5;--yc-accent-strong:#8bdfbb;
+  --yc-input:#171a1d;--yc-shadow:0 12px 36px #0006;
+}
+*{box-sizing:border-box}
+html,body{background:var(--yc-bg)!important;color:var(--yc-text)!important}
+button,.btn,input,textarea,select{font:inherit}
+button,.btn{border-radius:2px!important;box-shadow:none!important}
+button{background:#30353a!important;color:#e5e8eb!important;border:1px solid #4a5057!important}
+button:hover,.btn:hover{background:#3a4147!important;border-color:#7a858e!important}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:1px solid var(--yc-accent-strong)!important;outline-offset:1px}
+input,textarea,select{border-radius:2px!important;background:var(--yc-input)!important;color:var(--yc-text)!important;border:1px solid #454b52!important}
+a{color:inherit}
+header,.top,#titlebar{background:#202327!important;border-color:#3a3f45!important}
+.brand,#appmark{color:#f0f2f4!important}
+.primary,.launch,button.primary{background:#477f69!important;color:#fff!important;border-color:#609b81!important}
+.primary:hover,.launch:hover,button.primary:hover{background:#579477!important}
+.panel,.side,#left,#right,aside,.right{background:#202327!important;border-color:#3a3f45!important;border-radius:0!important;box-shadow:none!important}
+.panel h2,.sect,.panehead,.label,.title{color:#aeb6be!important}
+.layout{gap:0!important}
+.stage,.viewport,.preview,.canvasarea{border-radius:0!important;box-shadow:none!important}
+.stage{background:#34383d!important;border:1px solid #444a50!important}
+.status{background:#1a1d20!important;color:#aeb6be!important;border-color:#3a3f45!important}
+.hint,.info,.foot{color:#9da5ad!important}
+.field{color:#b5bdc5!important}
+.layer,.item,.stat,.page{border-radius:2px!important;background:#292e33!important;border-color:#454c53!important}
+.layer.active,.page.active{border-color:var(--yc-accent)!important;background:#293a33!important}
+.output{border-radius:0!important;box-shadow:var(--yc-shadow)}
+/* Compact Photoshop-like tool shell */
+body:has(.layout) header{height:44px!important;min-height:44px!important;padding:0 12px!important}
+body:has(.layout) main{max-width:none!important;width:100%!important;margin:0!important;padding:0!important}
+body:has(.layout) main>.crumb,body:has(.layout) main>h1,body:has(.layout) main>.intro,body:has(.layout) main>.foot{display:none!important}
+body:has(.layout) main>.layout{margin:0!important;gap:0!important;height:calc(100dvh - 44px)!important;min-height:0!important}
+body:has(.layout) main>.layout>.panel{border-radius:0!important;padding:12px!important}
+body:has(.layout) main>.layout>.panel:first-child{border-right:1px solid var(--yc-line)!important}
+body:has(.layout) main>.layout>.panel:nth-child(2){border:0!important}
+body:has(.layout) .stage{min-height:0!important;border:1px solid #454b51!important}
+body:has(.layout) .panel h2{font-size:10px!important;letter-spacing:.12em!important;text-transform:uppercase}
+body:has(.layout) .actions{gap:4px!important}
+body:has(.layout) .actions button{padding:6px 9px!important;font-size:11px!important}
+/* Sound / Deck / Grid studio pages */
+body:has(#stage) header{height:44px!important;min-height:44px!important}
+body:has(#stage) main{max-width:none!important;width:100%!important;margin:0!important;padding:0!important}
+body:has(#stage) main>.crumb,body:has(#stage) main>h1,body:has(#stage) main>.intro,body:has(#stage) main>.foot{display:none!important}
+body:has(#stage) main>.layout{margin:0!important;gap:0!important;height:calc(100dvh - 44px)!important;min-height:0!important}
+body:has(#stage) main>.layout>.panel{border-radius:0!important;padding:12px!important}
+body:has(#stage) main>.layout>.panel:first-child{border-right:1px solid var(--yc-line)!important}
+body:has(#stage) main>.layout>.panel:nth-child(2){border:0!important}
+body:has(#stage) #stage{border-radius:0!important;background:#34383d!important;border:1px solid #454b51!important}
+#yc-advanced-v3,#yc-suite-v4{border-radius:0!important}
+/* PPTCraft — replace the unrelated light Office palette with one consistent dark workspace */
+#titlebar{height:38px!important;background:#202327!important;border-color:#3a3f45!important}
+#appmark{color:var(--yc-accent-strong)!important}
+#docname,#saveState{color:#b5bdc5!important}
+#titlebar button{color:#e5e8eb!important;border-radius:2px!important}
+#titlebar .share{background:#477f69!important}
+#tabs{height:34px!important;background:#24282c!important;border-color:#3a3f45!important}
+#tabs button{color:#b9c0c7!important;border-radius:0!important}
+#tabs button.active{background:#30363b!important;color:#fff!important;border-bottom-color:var(--yc-accent)!important}
+#ribbon{height:104px!important;background:#202327!important;border-color:#3a3f45!important}
+.rg{border-color:#41474e!important}
+.rgname,.rctl{color:#aeb6be!important}
+.rb{color:#e3e6e9!important;border-radius:2px!important}
+.rb:hover,.rb.active{background:#343b40!important;border-color:#59636b!important}
+.rstack button,.rctl input,.rctl select{background:#171a1d!important;color:#e8eaed!important;border-color:#454b52!important;border-radius:2px!important}
+#workspace{height:calc(100dvh - 176px)!important;grid-template-columns:205px minmax(300px,1fr) 220px!important}
+#left,#right{background:#202327!important;border-color:#3a3f45!important}
+.panehead{color:#aeb6be!important}
+.thumb{background:#292e33!important;border-color:#4a5057!important;border-radius:2px!important}
+.thumb.active{border-color:var(--yc-accent)!important}
+.addslide{background:#292e33!important;color:#e8eaed!important;border-color:#596168!important;border-radius:2px!important}
+#center{background:#171a1d!important}
+.stage{background:#30353a!important}
+#slide{box-shadow:0 10px 35px #0009!important}
+.prop input,.prop select,.prop textarea{background:#171a1d!important;color:#e8eaed!important;border-color:#454b52!important;border-radius:2px!important}
+#status{background:#1a1d20!important;color:#aeb6be!important;border-color:#3a3f45!important}
+/* HWPCraft */
+body:has(.ribbon) .ribbon{background:#202327!important;border-color:#3a3f45!important}
+body:has(.ribbon) .tabs{background:#24282c!important;border-color:#3a3f45!important}
+body:has(.ribbon) .tabs button{border-radius:0!important;background:transparent!important}
+body:has(.ribbon) .tabs button.active{background:#30363b!important;color:var(--yc-accent-strong)!important;border-bottom:2px solid var(--yc-accent)!important}
+body:has(.ribbon) .shell{grid-template-columns:minmax(0,1fr) 220px!important}
+body:has(.ribbon) .right{background:#202327!important;border-color:#3a3f45!important}
+body:has(.ribbon) .workspace{background-color:#171a1d!important;background-image:radial-gradient(#353b41 1px,transparent 1px)!important}
+body:has(.ribbon) .page{box-shadow:0 12px 38px #0009!important}
+/* PDF and CAD toolbars/panels */
+body:has(#pages) .toolbar,body:has(#bar){background:#202327!important;border-color:#3a3f45!important}
+body:has(#pages) aside{background:#202327!important;border-color:#3a3f45!important}
+body:has(#pages) .preview{background:#30353a!important}
+body:has(#pages) .page{background:#292e33!important;border-color:#454b52!important}
+body:has(#pages) .page.active{background:#293a33!important;border-color:var(--yc-accent)!important}
+body:has(#pages) .stat{background:#292e33!important;border-color:#454b52!important;border-radius:2px!important}
+body:has(#canvas) header{background:#202327!important;border-color:#3a3f45!important}
+body:has(#canvas) .toolbar{background:#262b30!important;border-color:#3a3f45!important}
+body:has(#canvas) .side{background:#202327!important;border-color:#3a3f45!important}
+body:has(#canvas) .viewport{background:#171a1d!important}
+body:has(#canvas) .layer{background:#292e33!important;border-color:#454b52!important;border-radius:2px!important}
+/* App launcher */
+.yc-home{background:#17191c!important}
+@media(max-width:850px){
+ #workspace{grid-template-columns:170px minmax(0,1fr) 190px!important}
+}
+@media(max-width:650px){
+ body:has(.layout) main>.layout,body:has(#stage) main>.layout{height:calc(100dvh - 44px)!important}
+ #workspace{grid-template-columns:125px minmax(0,1fr)!important}
+ #right{display:none!important}
+}
