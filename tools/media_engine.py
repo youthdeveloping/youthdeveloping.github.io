@@ -71,7 +71,9 @@ def parse_feed(name: str, url: str, category: str) -> list[dict]:
     for entry in root.findall(".//a:entry", ns):
         title = text_of(entry.find("a:title", ns))
         summary = text_of(entry.find("a:summary", ns)) or text_of(entry.find("a:content", ns))
-        link_node = entry.find("a:link[@rel='alternate']", ns) or entry.find("a:link", ns)
+        link_node = entry.find("a:link[@rel='alternate']", ns)
+        if link_node is None:
+            link_node = entry.find("a:link", ns)
         link = link_node.get("href", "") if link_node is not None else ""
         published = text_of(entry.find("a:published", ns)) or text_of(entry.find("a:updated", ns))
         if title and link.startswith("http"):
