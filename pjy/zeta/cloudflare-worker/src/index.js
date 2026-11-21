@@ -364,6 +364,27 @@ async function callGemini({
 }
 
 
+// Per-account chat quota. KV is eventually consistent, so this is a best-effort
+// abuse guard; authenticated sessions and bounded request sizes are enforced separately.
+async function consumeChatRateLimit(env, username) {
+  const now = Math.floor(Date.now() / 1000);
+  const windows = [
+    { name: "minute", bucket: Math.floor(now / 60), limit: 15, ttl: 120 },
+    { name: "hour", bucket: Math.floor(now / 3600), limit: 100, ttl: 7200 }
+  ];
+
+  for (const window of windows) {
+    const key = `ratelimit:chat:${username}:${window.name}:${window.bucket}`;
+    const current = Number(await env.ZETA_USERS.get(key) || 0);
+    if (current >= window.limit) return false;
+    await env.ZETA_USERS.put(key, String(current + 1), {
+      expirationTtl: window.ttl
+    });
+  }
+  return true;
+}
+
+
 // ============================================================
 // CHAT
 // ============================================================
@@ -386,12 +407,47 @@ async function handleChat(
     );
   }
 
+  if (!env.ZETA_USERS) {
+    return json(
+      { error: "사용자 저장소가 연결되지 않았습니다." },
+      500,
+      origin
+    );
+  }
+
+  // Every paid Gemini request must belong to an active signed-in account.
+  const auth = await requireChatUser(request, env, origin);
+  if (auth.error) return auth.error;
+
+  if (!await consumeChatRateLimit(env, auth.user.username)) {
+    return json(
+      { error: "요청이 너무 많습니다. 잠시 후 다시 시도해주세요." },
+      429,
+      origin
+    );
+  }
+
+  const contentLength = Number(request.headers.get("Content-Length") || 0);
+  if (contentLength > 24000) {
+    return json(
+      { error: "요청 데이터가 너무 큽니다." },
+      413,
+      origin
+    );
+  }
 
   let body;
 
   try {
-
-    body = await request.json();
+    const rawBody = await request.text();
+    if (new TextEncoder().encode(rawBody).byteLength > 24000) {
+      return json(
+        { error: "요청 데이터가 너무 큽니다." },
+        413,
+        origin
+      );
+    }
+    body = JSON.parse(rawBody);
 
   } catch {
 
@@ -435,36 +491,30 @@ async function handleChat(
 
 
   const character =
-    body.character || {};
+    body.character && typeof body.character === "object"
+      ? body.character
+      : {};
 
+  // Clamp user-controlled prompt fields before composing the system prompt.
+  const characterName = String(
+    character.name || body.characterName || "AI 캐릭터"
+  ).trim().slice(0, 80);
 
-  const characterName =
-    String(
-      character.name ||
-      body.characterName ||
-      "AI 캐릭터"
-    );
+  const personality = String(
+    character.personality ||
+    body.personality ||
+    "친근하고 자연스럽게 대화하는 캐릭터"
+  ).trim().slice(0, 1500);
 
-  const personality =
-    String(
-      character.personality ||
-      body.personality ||
-      "친근하고 자연스럽게 대화하는 캐릭터"
-    );
+  const scenario = String(
+    character.scenario ||
+    body.scenario ||
+    "사용자와 자유롭게 대화한다."
+  ).trim().slice(0, 1500);
 
-  const scenario =
-    String(
-      character.scenario ||
-      body.scenario ||
-      "사용자와 자유롭게 대화한다."
-    );
-
-  const firstMessage =
-    String(
-      character.firstMessage ||
-      body.firstMessage ||
-      ""
-    );
+  const firstMessage = String(
+    character.firstMessage || body.firstMessage || ""
+  ).trim().slice(0, 1000);
 
 
   const systemPrompt = `
