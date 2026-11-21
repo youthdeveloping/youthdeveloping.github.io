@@ -2,45 +2,34 @@
 
 ## What it does
 
-- Runs once per day at 09:00 Korea Standard Time (00:00 UTC) through GitHub Actions.
-- Collects recent items from public technology RSS/Atom feeds.
-- Uses the OpenAI API to write one original Korean IT article with source links.
-- Publishes the article to the static YouthDeveloper site by committing generated HTML and updating `media/articles/index.json`.
-- Creates a separate HTML draft under `media/naver-drafts/` for review and manual publishing to Naver Blog.
+- Runs daily at 09:00 Korea Standard Time through GitHub Actions.
+- Collects public RSS/Atom items from technology publishers.
+- Builds a Korean daily IT briefing from feed titles and summaries.
+- Publishes generated HTML to the YouthDeveloper website and updates the article index.
+- Creates a separate Naver-ready HTML draft for a person to review and publish.
 
-## Required repository secret
+## Cost and requirements
 
-The workflow requires an Actions secret named `OPENAI_API_KEY`.
-
-Set it in the repository:
-1. Open **Settings**.
-2. Open **Secrets and variables → Actions**.
-3. Choose **New repository secret**.
-4. Name: `OPENAI_API_KEY`.
-5. Value: an API key managed by the account owner.
-
-API usage may incur charges. A billing-authorized adult or account administrator should review and manage the API account and spending limits. Do not put the key in source files, commits, or chat messages.
-
-The model can be changed in `.github/workflows/media-daily.yml` using the `OPENAI_MODEL` environment variable.
+This workflow does not call OpenAI or any other paid AI API. It requires no API key, billing account, repository secret, or external AI service. It uses Python's standard library and GitHub Actions. GitHub Actions usage remains subject to the account's included minutes and usage limits; check the repository/account usage page for current limits.
 
 ## Naver Blog limitation
 
-Naver officially retired its external Blog post-writing Open API on 2020-05-06. Naver's help center also identifies posts submitted through unauthorized automated tools such as macros or bots as abnormal service use. This project therefore does not automate Naver login, browser interaction, or posting through unofficial methods. It generates a Naver-ready HTML draft; a person must review and publish it in Naver Blog.
+Naver's external Blog post-writing API was retired. This project does not automate Naver login or use unofficial macros/bots to publish. It creates a ready-to-paste draft; a person must review and publish it in Naver Blog.
 
 ## Run and monitor
 
 - Daily run: GitHub Actions → **YouthDeveloper Media Daily**.
 - Manual run: GitHub Actions → **YouthDeveloper Media Daily** → **Run workflow**.
 - Output articles: `media/articles/`.
-- Naver-ready drafts: `media/naver-drafts/`.
+- Naver drafts: `media/naver-drafts/`.
 - Dashboard: `/media/`.
 
-The scheduled workflow is active only after this branch is merged into the repository's default branch and the required secret is configured. The first run should be started manually and checked in the Actions log before relying on the daily schedule.
+The scheduled workflow becomes active after this branch is merged into the repository's default branch. No API secret setup is needed.
 
-## Editorial safeguards
+## Editorial safeguards and limitations
 
-The generator refuses to publish when no source feeds are reachable or no source links are included. It asks the model not to invent tests, benchmarks, interviews, quotes, dates, prices, or product experiences. Generated articles still require editorial review; automated text generation cannot guarantee factual accuracy.
+The generator requires at least three source feed items and includes source links. It only uses titles and summaries supplied by those feeds; it does not claim to have independently tested products or verified details absent from the feeds. Some publishers provide short or incomplete feed summaries, so the result is a daily briefing rather than a deeply researched feature article. Review original sources before republishing, especially for security, compatibility, release dates, and product specifications.
 
 ## Automated checks
 
-The daily workflow runs `python -m unittest discover -s tests -v` before generating an article. The tests cover Atom feed link selection and the requirement for source references. If a test fails, the workflow stops before publishing.
+The workflow runs `python -m unittest discover -s tests -v` before generating an article. A failed test stops publication.
