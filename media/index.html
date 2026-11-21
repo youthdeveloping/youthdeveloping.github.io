@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="청소년개발자의 전문 IT 미디어. 개발, 컴퓨터, 인터넷, 보안과 기술 분석을 다룹니다.">
+<title>YouthDeveloper Media</title>
+<style>
+:root{color-scheme:dark;--bg:#070a0e;--panel:#101720;--line:#27323e;--text:#edf2f7;--muted:#95a3b2;--green:#72f0ad;--cyan:#68dff2}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 85% 0,rgba(104,223,242,.08),transparent 32rem),var(--bg);color:var(--text);font:15px/1.7 Inter,Pretendard,"Noto Sans KR",sans-serif}
+.shell{width:min(1120px,calc(100% - 36px));margin:auto}header{border-bottom:1px solid var(--line)}.nav{height:68px;display:flex;align-items:center;justify-content:space-between;font:700 13px ui-monospace,monospace;letter-spacing:.08em}.brand{color:var(--green);text-decoration:none}.back{color:var(--muted);text-decoration:none}
+.hero{padding:76px 0 46px}.eyebrow{font:11px ui-monospace,monospace;letter-spacing:.16em;color:var(--cyan)}h1{font-size:clamp(42px,8vw,78px);line-height:1;letter-spacing:-.07em;margin:16px 0}.hero p{max-width:690px;color:var(--muted);font-size:16px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:22px 0 44px}.stat{border:1px solid var(--line);background:var(--panel);padding:17px}.stat small{display:block;color:var(--muted);font:10px ui-monospace,monospace}.stat strong{display:block;margin-top:6px;font:700 23px ui-monospace,monospace}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:32px 0 14px}.toolbar h2{margin:0;font-size:23px}.hint{color:var(--muted);font-size:12px}
+.articles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.article{display:flex;flex-direction:column;min-height:220px;padding:22px;border:1px solid var(--line);background:linear-gradient(145deg,#111923,#0b1016);text-decoration:none;color:inherit;transition:.18s}.article:hover{border-color:rgba(114,240,173,.45);transform:translateY(-2px)}.meta{font:10px ui-monospace,monospace;color:var(--green);letter-spacing:.08em}.article h3{font-size:20px;line-height:1.35;margin:15px 0 8px}.article p{color:var(--muted);font-size:13px;margin:0 0 20px}.open{margin-top:auto;color:var(--cyan);font:11px ui-monospace,monospace}
+.note{margin:30px 0 60px;padding:18px;border:1px solid var(--line);background:var(--panel);color:var(--muted);font-size:13px}.note strong{color:var(--text)}footer{border-top:1px solid var(--line);padding:24px 0 36px;color:var(--muted);font-size:12px}
+@media(max-width:650px){.stats{grid-template-columns:1fr}.articles{grid-template-columns:1fr}.hero{padding:58px 0 30px}.toolbar{display:block}.hint{margin-top:6px}}
+</style>
+</head>
+<body>
+<header><div class="shell nav"><a class="brand" href="/media/">YOUTHDEVELOPER / MEDIA</a><a class="back" href="/">← 메인 홈페이지</a></div></header>
+<main class="shell">
+<section class="hero"><div class="eyebrow">INDEPENDENT IT PUBLICATION</div><h1>Technology.<br>Explained.</h1><p>개발과 컴퓨터 기술을 직접 이해하고, 공개된 자료를 바탕으로 정확하게 분석합니다. 매일 새로운 IT 콘텐츠를 발행합니다.</p></section>
+<div class="stats"><div class="stat"><small>PUBLICATION</small><strong>DAILY</strong></div><div class="stat"><small>ARTICLES</small><strong id="count">0</strong></div><div class="stat"><small>EDITORIAL</small><strong>YOUTH DEV</strong></div></div>
+<div class="toolbar"><h2>최신 콘텐츠</h2><div class="hint">개발 · 컴퓨터 · 보안 · 기술 분석</div></div>
+<div class="articles" id="articles"><div class="note">콘텐츠 목록을 불러오는 중입니다.</div></div>
+<div class="note"><strong>편집 정책</strong><br>각 글은 참고 자료를 바탕으로 자체 작성하며, 원문을 그대로 복제하지 않습니다. 기술적 사실과 해석을 구분하고, 참고 자료를 글 하단에 표시합니다. 자동 생성 결과는 출처와 정확성을 확인한 뒤 공개합니다.</div>
+</main>
+<footer><div class="shell">© 2026 YouthDeveloper · <a href="/editorial-policy.html" style="color:var(--green)">편집 정책</a> · <a href="/" style="color:var(--green)">홈페이지</a></div></footer>
+<script>
+(async()=>{
+ const box=document.getElementById('articles');
+ try{
+  const response=await fetch('/media/articles/index.json',{cache:'no-store'});
+  if(!response.ok)throw new Error('index unavailable');
+  const data=await response.json(),items=Array.isArray(data.items)?data.items:[];
+  document.getElementById('count').textContent=items.length;
+  box.replaceChildren();
+  if(!items.length){const p=document.createElement('div');p.className='note';p.textContent='첫 번째 콘텐츠가 아직 발행되지 않았습니다.';box.append(p);return;}
+  for(const item of items){
+   const a=document.createElement('a');a.className='article';a.href=item.url;
+   const meta=document.createElement('div');meta.className='meta';meta.textContent=(item.date||'')+' · '+(item.category||'IT');
+   const h=document.createElement('h3');h.textContent=item.title||'제목 없음';
+   const p=document.createElement('p');p.textContent=item.summary||'';
+   const open=document.createElement('span');open.className='open';open.textContent='READ ARTICLE →';
+   a.append(meta,h,p,open);box.append(a);
+  }
+ }catch(e){box.textContent='콘텐츠 목록을 불러오지 못했습니다.';}
+})();
+</script>
+</body></html>
