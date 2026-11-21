@@ -2,16 +2,16 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "zeta-ai",
   "main": "src/index.js",
-  "compatibility_date": "2026-10-05",
+  "compatibility_date": "2026-11-21",
   "workers_dev": true,
   "kv_namespaces": [
     {
       "binding": "ZETA_USERS",
-      "id": "92ada44ddb56469aa037a2028d9af3b7"
+      "id": "f9b988779507466687327c26ba1c7c92"
     },
     {
       "binding": "ZETA_CHARACTERS",
-      "id": "fabc823c0df24c919ef31da7839d4fa1"
+      "id": "3309306e00d84f2da96e46e22c828787"
     }
   ]
 }
