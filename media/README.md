@@ -2,11 +2,11 @@
 
 ## What it does
 
-- Runs once per day at 09:00 Asia/Seoul through GitHub Actions.
-- Collects recent items from a small set of public technology RSS/Atom feeds.
+- Runs once per day at 09:00 Korea Standard Time (00:00 UTC) through GitHub Actions.
+- Collects recent items from public technology RSS/Atom feeds.
 - Uses the OpenAI API to write one original Korean IT article with source links.
 - Publishes the article to the static YouthDeveloper site by committing generated HTML and updating `media/articles/index.json`.
-- Creates a separate HTML draft under `media/naver-drafts/` that can be reviewed and pasted into Naver Blog.
+- Creates a separate HTML draft under `media/naver-drafts/` for review and manual publishing to Naver Blog.
 
 ## Required repository secret
 
@@ -25,7 +25,7 @@ The model can be changed in `.github/workflows/media-daily.yml` using the `OPENA
 
 ## Naver Blog limitation
 
-Naver officially retired its external Blog post-writing Open API on 2020-05-06. This project does not automate Naver login, browser interaction, or posting through unofficial methods. It generates a Naver-ready HTML draft and links it from the media dashboard; a person must review and publish it in Naver Blog.
+Naver officially retired its external Blog post-writing Open API on 2020-05-06. Naver's help center also identifies posts submitted through unauthorized automated tools such as macros or bots as abnormal service use. This project therefore does not automate Naver login, browser interaction, or posting through unofficial methods. It generates a Naver-ready HTML draft; a person must review and publish it in Naver Blog.
 
 ## Run and monitor
 
@@ -39,4 +39,4 @@ The scheduled workflow is active only after this branch is merged into the repos
 
 ## Editorial safeguards
 
-The generator refuses to publish when no source feeds are reachable or no source links are included. It asks the model not to invent tests, benchmarks, interviews, quotes, dates, prices, or product experiences. Generated articles still require periodic editorial review; automated text generation cannot guarantee factual accuracy.
+The generator refuses to publish when no source feeds are reachable or no source links are included. It asks the model not to invent tests, benchmarks, interviews, quotes, dates, prices, or product experiences. Generated articles still require editorial review; automated text generation cannot guarantee factual accuracy.
