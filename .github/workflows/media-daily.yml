@@ -26,6 +26,9 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Run generator tests
+        run: python -m unittest discover -s tests -v
+
       - name: Generate original IT article and Naver-ready draft
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
