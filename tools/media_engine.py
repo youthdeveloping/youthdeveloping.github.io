@@ -80,58 +80,38 @@ def parse_feed(name: str, url: str, category: str) -> list[dict]:
             found.append({"source": name, "title": title, "url": link, "summary": summary[:1200], "published": published, "feed_category": category})
     return found[:8]
 
-def call_model(items: list[dict], category: str, today: str) -> dict:
-    api_key = os.environ.get("OPENAI_API_KEY", "").strip()
-    if not api_key:
-        raise RuntimeError("OPENAI_API_KEY secret is missing. Add it in GitHub repository Settings > Secrets and variables > Actions.")
-    model = os.environ.get("OPENAI_MODEL", "gpt-4.1-mini")
-    prompt = {
-        "date": today,
-        "target_category": category,
-        "source_material": items[:18],
-        "requirements": [
-            "Write a genuinely useful Korean-language IT media article, not a short news rewrite.",
-            "Use original explanation, context, practical implications and balanced analysis.",
-            "Only state facts supported by the supplied source material or stable general knowledge.",
-            "Do not invent hands-on tests, benchmarks, interviews, quotes, dates, prices or product experiences.",
-            "Clearly distinguish source-confirmed facts from analysis.",
-            "Use source URLs as inline references and include a sources array with title and url.",
-            "Do not copy source wording. Summarize in original language.",
-            "Do not create fake urgency, keyword stuffing, fabricated statistics or repetitive filler.",
-            "If the available sources do not support a useful article in the target category, choose the closest relevant category and explain the scope honestly.",
-            "Return valid JSON only with keys: title, category, summary, intro, sections, conclusion, tags, sources.",
-            "sections must be an array of 4 to 6 objects, each with heading and paragraphs (array of strings).",
-            "Target a substantive article of roughly 1200-2200 Korean characters, excluding source list.",
-            "Use a precise title, useful headings, and a concise summary. No markdown or HTML in text fields.",
-            "Avoid medical, legal, financial or safety advice. This is a general IT publication."
+def build_article(items: list[dict], category: str, today: str) -> dict:
+    """Create a source-grounded daily briefing without a paid AI API."""
+    ranked = sorted(items, key=lambda item: (bool(item.get('summary', '').strip()), item.get('published', '')), reverse=True)
+    selected = ranked[:5]
+    sections = []
+    sources = []
+    for item in selected:
+        raw = re.sub(r'<[^>]+>', ' ', item.get('summary', ''))
+        summary = html.unescape(' '.join(raw.split()))[:900]
+        if not summary:
+            summary = '이 피드 항목은 제목과 원문 링크만 제공하므로 세부 내용은 원문에서 확인해야 합니다.'
+        paragraphs = [
+            f"공식 피드에 공개된 제목은 ‘{item['title']}’입니다. {item['source']}가 제공한 피드 정보를 바탕으로 정리했습니다.",
+            summary,
+            '실제 적용 여부를 판단할 때는 발표 주체, 적용 대상, 제공 시점, 지원 조건을 원문에서 확인해야 합니다. 피드 요약에 없는 사양이나 성능 수치는 추정하지 않습니다.'
         ]
+        if item.get('published'):
+            paragraphs.insert(1, '피드 게시 시각: ' + item['published'])
+        sections.append({'heading': item['title'], 'paragraphs': paragraphs})
+        sources.append({'title': item['title'], 'url': item['url'], 'publisher': item['source']})
+    if len(sections) < 3:
+        raise RuntimeError('Fewer than three usable source items; refusing to publish a thin article.')
+    return {
+        'title': f'{today} 오늘의 IT 브리핑: 주요 기술 소식 {len(sections)}선',
+        'category': 'IT 뉴스·기술 브리핑',
+        'summary': f'공개 기술 RSS·Atom 피드에서 수집한 {len(sections)}개 소식을 출처와 함께 정리했습니다. 세부 사실과 적용 조건은 각 원문에서 확인할 수 있습니다.',
+        'intro': 'YouthDeveloper가 기술 기업과 개발 커뮤니티의 공개 피드를 모아 오늘의 주요 소식을 정리했습니다. 이 브리핑은 피드에 제공된 제목과 요약을 기반으로 하며, 원문에 없는 테스트 결과나 세부 사실을 만들어내지 않습니다.',
+        'sections': sections,
+        'conclusion': '이번 브리핑은 공개 피드에서 확인할 수 있는 정보의 범위 안에서 작성했습니다. 제품 지원 여부, 배포 일정, 보안 영향, 기술 사양 등 중요한 사항은 연결된 공식 원문과 후속 공지를 기준으로 확인해 주세요.',
+        'tags': ['IT뉴스', '기술브리핑', '개발', 'YouthDeveloper'],
+        'sources': sources,
     }
-    body = json.dumps({
-        "model": model,
-        "temperature": 0.45,
-        "response_format": {"type": "json_object"},
-        "messages": [
-            {"role": "system", "content": "You are the editorial desk of YouthDeveloper, a careful Korean IT publication. Accuracy and source transparency are more important than novelty."},
-            {"role": "user", "content": json.dumps(prompt, ensure_ascii=False)}
-        ]
-    }).encode("utf-8")
-    req = urllib.request.Request(
-        "https://api.openai.com/v1/chat/completions",
-        data=body,
-        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
-        method="POST",
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=90) as response:
-            result = json.loads(response.read().decode("utf-8"))
-    except urllib.error.HTTPError as exc:
-        detail = exc.read().decode("utf-8", "replace")[:1000]
-        raise RuntimeError(f"OpenAI API error {exc.code}: {detail}") from exc
-    content = result["choices"][0]["message"]["content"]
-    article = json.loads(content)
-    validate_article(article)
-    return article
-
 def validate_article(article: dict) -> None:
     required = ["title", "category", "summary", "intro", "sections", "conclusion", "tags", "sources"]
     missing = [key for key in required if key not in article]
@@ -218,11 +198,11 @@ def main() -> int:
         entries.extend(parse_feed(*feed))
     # De-duplicate by URL and prefer recently published entries.
     unique = {entry["url"]: entry for entry in entries}
-    entries = list(unique.values())[:24]
+    entries = list(unique.values())
     if not entries:
         raise RuntimeError("No source feeds were reachable. Refusing to publish an unsourced article.")
 
-    article = call_model(entries, category, date)
+    article = build_article(entries, category, date)
     title = re.sub(r"[^0-9a-zA-Z가-힣]+", "-", article["title"]).strip("-").lower()[:65] or "it-article"
     slug = f"{date}-{title}"
     article_path = ARTICLE_DIR / f"{slug}.html"
