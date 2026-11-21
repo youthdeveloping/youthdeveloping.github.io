@@ -1429,7 +1429,7 @@ function formatRoleplayMessage(text) {
       const char = currentChatCharacter;
 
       // ZETA는 Cloudflare Worker + Gemini만 사용합니다.
-      const workerUrl = 'https://zeta-ai.pjy-server.workers.dev/chat';
+      const workerUrl = 'https://zeta-ai.youthdeveloper-github.workers.dev/chat';
 
       const payload = {
         message: String(userQuery || '').trim(),
@@ -1446,9 +1446,13 @@ function formatRoleplayMessage(text) {
         }))
       };
 
+      const token = localStorage.getItem('zeta_session');
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers.Authorization = 'Bearer ' + token;
+
       const res = await fetch(workerUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(payload)
       });
 
@@ -1597,7 +1601,7 @@ async function regenerateResponse(index) {
     }
 
     async function publishCharacterOnline(character) {
-      const workerUrl = 'https://zeta-ai.pjy-server.workers.dev/characters';
+      const workerUrl = 'https://zeta-ai.youthdeveloper-github.workers.dev/characters';
       const token = localStorage.getItem('zeta_session');
 
       if (!token) {
@@ -1619,7 +1623,7 @@ async function regenerateResponse(index) {
 
     async function loadOnlineCharacters() {
       try {
-        const res = await fetch('https://zeta-ai.pjy-server.workers.dev/characters', {
+        const res = await fetch('https://zeta-ai.youthdeveloper-github.workers.dev/characters', {
           method: 'GET',
           cache: 'no-store'
         });
@@ -1717,7 +1721,7 @@ async function regenerateResponse(index) {
     }
   
     // ===== ZETA AUTH =====
-    const AUTH_BASE_URL = 'https://zeta-ai.pjy-server.workers.dev';
+    const AUTH_BASE_URL = 'https://zeta-ai.youthdeveloper-github.workers.dev';
     let currentUser = null;
 
     function setAuthMessage(message, isError = true) {
@@ -1870,7 +1874,7 @@ async function regenerateResponse(index) {
 </style>
 <script>
 (function(){
-  const ZETA_API = 'https://zeta-ai.pjy-server.workers.dev';
+  const ZETA_API = 'https://zeta-ai.youthdeveloper-github.workers.dev';
 
   function zetaToken(){ return localStorage.getItem('zeta_session') || ''; }
 
@@ -2109,7 +2113,7 @@ async function regenerateResponse(index) {
 (function(){
   if(window.__zetaFinalSyncPatch)return;
   window.__zetaFinalSyncPatch=true;
-  const API='https://zeta-ai.pjy-server.workers.dev';
+  const API='https://zeta-ai.youthdeveloper-github.workers.dev';
   const token=()=>localStorage.getItem('zeta_session')||'';
   async function api(path,options={}){
     const headers=Object.assign({'Content-Type':'application/json'},options.headers||{});
