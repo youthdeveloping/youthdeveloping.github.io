@@ -1208,7 +1208,7 @@ tr:last-child td {
 ============================================================ */
 
 const WORKER =
-  "https://zeta-ai.pjy-server.workers.dev";
+  "https://zeta-ai.youthdeveloper-github.workers.dev";
 
 const token =
   localStorage.getItem(
@@ -2727,7 +2727,7 @@ init();
 <!-- ZETA ADMIN ENHANCEMENT -->
 <script>
 (function(){
-  const WORKER='https://zeta-ai.pjy-server.workers.dev';
+  const WORKER='https://zeta-ai.youthdeveloper-github.workers.dev';
   const token=localStorage.getItem('zeta_session');
 
   function adminApi(path, options={}){
@@ -2851,7 +2851,7 @@ init();
 (function(){
   if(window.__zetaSecurityAdminPatch)return;
   window.__zetaSecurityAdminPatch=true;
-  const WORKER='https://zeta-ai.pjy-server.workers.dev';
+  const WORKER='https://zeta-ai.youthdeveloper-github.workers.dev';
   const token=localStorage.getItem('zeta_session');
   const api2=(path,options={})=>fetch(WORKER+path,{...options,headers:{'Content-Type':'application/json',Authorization:'Bearer '+token}}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||('요청 실패 '+r.status));return d;});
 
