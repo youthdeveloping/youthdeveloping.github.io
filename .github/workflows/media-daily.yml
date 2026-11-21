@@ -29,10 +29,7 @@ jobs:
       - name: Run generator tests
         run: python -m unittest discover -s tests -v
 
-      - name: Generate original IT article and Naver-ready draft
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_MODEL: gpt-4.1-mini
+      - name: Generate source-based IT briefing and Naver-ready draft
         run: python tools/media_engine.py
 
       - name: Commit and publish website article
