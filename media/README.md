@@ -40,3 +40,7 @@ The scheduled workflow is active only after this branch is merged into the repos
 ## Editorial safeguards
 
 The generator refuses to publish when no source feeds are reachable or no source links are included. It asks the model not to invent tests, benchmarks, interviews, quotes, dates, prices, or product experiences. Generated articles still require editorial review; automated text generation cannot guarantee factual accuracy.
+
+## Automated checks
+
+The daily workflow runs `python -m unittest discover -s tests -v` before generating an article. The tests cover Atom feed link selection and the requirement for source references. If a test fails, the workflow stops before publishing.
