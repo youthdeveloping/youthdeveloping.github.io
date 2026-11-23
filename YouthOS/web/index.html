@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101827">
+  <meta name="description" content="YouthOS Web Experience - 브라우저에서 만나는 YouthOS 체험판">
+  <title>YouthOS Web Experience</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div id="boot" class="boot-screen" aria-label="YouthOS 시작 중">
+    <div class="boot-brand"><div class="brand-mark"><i></i><i></i><i></i><i></i></div><span>YouthOS</span></div>
+    <div class="boot-progress"><span></span></div>
+    <p>나만의 개발 환경을 준비하고 있어요</p>
+  </div>
+
+  <main id="desktop" class="desktop hidden">
+    <div class="desktop-shade"></div>
+    <header class="topbar">
+      <div class="top-brand"><span class="mini-mark">Y</span><strong>YouthOS</strong><span class="edition">WEB EXPERIENCE</span></div>
+      <div class="top-center" id="topDate">YouthOS 체험판</div>
+      <div class="top-actions"><button class="icon-button" id="quickToggle" title="빠른 설정">◈</button><span class="wifi">◔</span><span id="clock">16:11</span></div>
+    </header>
+
+    <section class="welcome-card">
+      <div class="welcome-copy"><span class="eyebrow">WELCOME TO YOUR DESKTOP</span><h1>상상을 코드로,<br><em>가능성을 현실로.</em></h1><p>YouthOS Web Experience에 오신 걸 환영해.<br>청소년 개발자를 위한 새로운 데스크톱을 둘러봐.</p><button class="primary-button" data-open="explorer">체험 시작하기 <b>→</b></button></div>
+      <div class="welcome-art"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="glow-core"><div class="brand-mark large"><i></i><i></i><i></i><i></i></div></div><span class="art-caption">BUILD · CREATE · EXPLORE</span></div>
+    </section>
+
+    <div class="desktop-shortcuts">
+      <button class="shortcut" data-open="explorer"><span class="shortcut-icon folder-icon">▰</span><span>파일</span></button>
+      <button class="shortcut" data-open="terminal"><span class="shortcut-icon terminal-icon">⌘</span><span>터미널</span></button>
+      <button class="shortcut" data-open="editor"><span class="shortcut-icon editor-icon">&lt;/&gt;</span><span>코드 편집기</span></button>
+      <button class="shortcut" data-open="settings"><span class="shortcut-icon settings-icon">⚙</span><span>설정</span></button>
+    </div>
+
+    <section class="window hidden" id="appWindow" aria-label="앱 창">
+      <div class="window-titlebar" id="windowDrag"><div class="window-app-icon" id="windowIcon">▰</div><strong id="windowTitle">파일</strong><div class="window-controls"><button id="minimize" title="최소화">−</button><button id="maximize" title="최대화">□</button><button id="close" title="닫기">×</button></div></div>
+      <div id="windowContent" class="window-content"></div>
+    </section>
+
+    <aside id="quickPanel" class="quick-panel hidden"><div class="panel-heading"><strong>빠른 설정</strong><span>체험판</span></div><div class="quick-grid"><button class="quick-tile active">◉<small>Wi-Fi</small></button><button class="quick-tile active">☾<small>집중 모드</small></button><button class="quick-tile">◐<small>다크 테마</small></button><button class="quick-tile">⌁<small>블루투스</small></button></div><div class="brightness"><span>화면 밝기</span><input type="range" min="20" max="100" value="85"></div></aside>
+
+    <nav class="dock" aria-label="앱 메뉴">
+      <button class="dock-launcher" id="launcher" title="앱 메뉴"><span class="mini-mark">Y</span></button>
+      <span class="dock-divider"></span>
+      <button class="dock-app" data-open="explorer" title="파일">▰</button>
+      <button class="dock-app" data-open="editor" title="코드 편집기">&lt;/&gt;</button>
+      <button class="dock-app" data-open="terminal" title="터미널">⌘</button>
+      <button class="dock-app" data-open="settings" title="설정">⚙</button>
+      <span class="dock-spacer"></span><span class="dock-status">WEB</span>
+    </nav>
+
+    <section class="launcher-panel hidden" id="launcherPanel">
+      <div class="launcher-head"><div><span class="eyebrow">YOUTHOS</span><h2>무엇을 시작할까?</h2></div><span class="user-avatar">Y</span></div>
+      <div class="launcher-search">⌕ <input id="appSearch" placeholder="앱 검색..." autocomplete="off"></div>
+      <div class="launcher-label">고정된 앱</div>
+      <div class="app-grid">
+        <button data-open="explorer"><b class="app-symbol folder-icon">▰</b>파일</button>
+        <button data-open="editor"><b class="app-symbol editor-icon">&lt;/&gt;</b>코드 편집기</button>
+        <button data-open="terminal"><b class="app-symbol terminal-icon">⌘</b>터미널</button>
+        <button data-open="settings"><b class="app-symbol settings-icon">⚙</b>설정</button>
+        <button data-open="about"><b class="app-symbol about-icon">Y</b>YouthOS 정보</button>
+        <button data-open="calculator"><b class="app-symbol calc-icon">＋</b>계산기</button>
+      </div>
+      <div class="launcher-footer"><span>청소년개발자 제작</span><button id="powerButton">⏻ 전원</button></div>
+    </section>
+
+    <div class="toast" id="toast" role="status"></div>
+    <div class="demo-note">YouthOS Web은 실제 Debian OS가 아닌 브라우저 체험판이야.</div>
+  </main>
+  <script src="./script.js"></script>
+</body>
+</html>
