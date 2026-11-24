@@ -8,7 +8,7 @@
   let activeApp = null, toastTimer = null, drag = null;
 
   const apps = {
-    explorer: {name:"파일",icon:"▰",html:()=>`<div class="content-heading"><h3>내 파일</h3><span class="muted">홈 / 사용자</span></div><div class="file-list"><div class="file-row">📁 <b>문서</b><span>폴더</span></div><div class="file-row">📁 <b>다운로드</b><span>폴더</span></div><div class="file-row">📁 <b>프로젝트</b><span>폴더</span></div><div class="file-row">🖼️ <b>배경화면.png</b><span>이미지</span></div><div class="file-row">📄 <b>환영합니다.txt</b><span>텍스트</span></div></div><p class="muted" style="margin-top:18px;font-size:11px">이 화면은 웹 체험판의 예시 파일 시스템이야.</p>`},
+    explorer: {name:"파일",icon:"▰",html:()=>renderExplorer("홈")},
     terminal: {name:"터미널",icon:"⌘",html:()=>`<div class="terminal"><div><span class="green">youth@os</span>:<span style="color:#91baff">~</span>$ neofetch</div><pre style="color:#8fb5ff">   __   __          _   _  ____  ____
    \\ \\ / /__  _   _| |_| |/ ___||  _ \\ 
     \\ V / _ \\| | | | __| |\\___ \\| |_) |
@@ -38,7 +38,56 @@ hello()</textarea></div>`},
     launcherPanel.classList.add("hidden"); quickPanel.classList.add("hidden");
     bindApp(key);
   }
+  function renderExplorer(path) {
+    const folders = {
+      "홈": [
+        ["folder","문서","폴더"],["folder","다운로드","폴더"],["folder","프로젝트","폴더"],
+        ["image","배경화면.png","이미지"],["text","환영합니다.txt","텍스트"]
+      ],
+      "문서": [["text","환영합니다.txt","텍스트"],["text","YouthOS 소개.txt","텍스트"]],
+      "다운로드": [["image","배경화면.png","이미지"]],
+      "프로젝트": [["folder","첫 번째 프로젝트","폴더"],["text","README.txt","텍스트"]],
+      "첫 번째 프로젝트": [["text","README.txt","텍스트"]]
+    };
+    const items = folders[path] || [];
+    const rows = items.map(item => {
+      const symbol = item[0] === "folder" ? "📁" : item[0] === "image" ? "🖼️" : "📄";
+      return '<button class="file-row file-item" data-kind="' + item[0] + '" data-name="' + item[1] + '"><b class="file-symbol">' + symbol + '</b><b>' + item[1] + '</b><span>' + item[2] + '</span><span class="file-chevron">›</span></button>';
+    }).join("");
+    return '<div class="content-heading"><div class="file-heading-left">' +
+      (path === "홈" ? "" : '<button class="file-back" data-file-back>← 뒤로</button>') +
+      '<h3>' + path + '</h3></div><span class="muted">홈 / 사용자 / ' + path + '</span></div>' +
+      '<div class="file-list">' + (rows || '<p class="muted">이 폴더는 비어 있어.</p>') + '</div>' +
+      '<p class="muted file-hint">파일이나 폴더를 클릭해서 열어 봐.</p>';
+  }
+  function openDemoFile(kind, name) {
+    if (kind === "folder") {
+      content.innerHTML = renderExplorer(name);
+      return;
+    }
+    if (kind === "image") {
+      content.innerHTML = '<div class="viewer-toolbar"><button data-viewer-back>← 파일 목록</button><strong>' + name + '</strong><span>PNG 이미지 미리보기</span></div>' +
+        '<div class="wallpaper-preview"><div class="wallpaper-orb"></div><div class="wallpaper-logo">Y</div><div class="wallpaper-caption">YOUTHOS</div></div>' +
+        '<p class="muted file-hint">YouthOS 기본 배경화면 미리보기</p>';
+      return;
+    }
+    const docs = {
+      "환영합니다.txt": "YouthOS에 오신 걸 환영해!\\n\\n이곳은 청소년 개발자를 위한 운영체제 프로젝트야.\\n\\n파일, 터미널, 코드 편집기를 둘러보고\\n나만의 개발 환경을 만들어 봐.\\n\\n— 청소년개발자 팀",
+      "YouthOS 소개.txt": "YouthOS는 청소년 개발자를 위한 Debian 기반 운영체제 프로젝트야.\\n웹 체험판에서는 데스크톱의 기본 기능을 미리 경험할 수 있어.",
+      "README.txt": "첫 번째 프로젝트\\n\\n여기에 프로젝트 파일과 설명을 정리해 봐!"
+    };
+    const text = docs[name] || "이 파일에는 아직 내용이 없어.";
+    content.innerHTML = '<div class="viewer-toolbar"><button data-viewer-back>← 파일 목록</button><strong>' + name + '</strong><span>텍스트 문서</span></div><article class="text-file-view"><div class="text-file-icon">📄</div><h2>' + name + '</h2><pre>' + text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;") + '</pre></article>';
+  }
   function bindApp(key) {
+    if (key === "explorer") {
+      content.addEventListener("click", e => {
+        const back = e.target.closest("[data-file-back], [data-viewer-back]");
+        if (back) { content.innerHTML = renderExplorer("홈"); return; }
+        const item = e.target.closest("[data-kind]");
+        if (item) openDemoFile(item.dataset.kind, item.dataset.name);
+      });
+    }
     if (key === "terminal") {
       const input = $("terminalInput");
       input?.addEventListener("keydown", e => {
