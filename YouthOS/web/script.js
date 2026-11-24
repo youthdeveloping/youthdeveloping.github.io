@@ -80,13 +80,14 @@ hello()</textarea></div>`},
     content.innerHTML = '<div class="viewer-toolbar"><button data-viewer-back>← 파일 목록</button><strong>' + name + '</strong><span>텍스트 문서</span></div><article class="text-file-view"><div class="text-file-icon">📄</div><h2>' + name + '</h2><pre>' + text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;") + '</pre></article>';
   }
   function bindApp(key) {
+    content.onclick = null;
     if (key === "explorer") {
-      content.addEventListener("click", e => {
+      content.onclick = e => {
         const back = e.target.closest("[data-file-back], [data-viewer-back]");
         if (back) { content.innerHTML = renderExplorer("홈"); return; }
         const item = e.target.closest("[data-kind]");
         if (item) openDemoFile(item.dataset.kind, item.dataset.name);
-      });
+      };
     }
     if (key === "terminal") {
       const input = $("terminalInput");
