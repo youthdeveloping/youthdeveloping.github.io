@@ -5,7 +5,7 @@
   const launcher = $("launcher"), launcherPanel = $("launcherPanel"), quickPanel = $("quickPanel");
   const title = $("windowTitle"), icon = $("windowIcon"), content = $("windowContent");
   const toast = $("toast");
-  let activeApp = null, toastTimer = null, drag = null;
+  let activeApp = null, toastTimer = null, drag = null, explorerPath = "홈";
 
   const apps = {
     explorer: {name:"파일",icon:"▰",html:()=>renderExplorer("홈")},
@@ -39,6 +39,7 @@ hello()</textarea></div>`},
     bindApp(key);
   }
   function renderExplorer(path) {
+    explorerPath = path;
     const folders = {
       "홈": [
         ["folder","문서","폴더"],["folder","다운로드","폴더"],["folder","프로젝트","폴더"],
@@ -80,15 +81,6 @@ hello()</textarea></div>`},
     content.innerHTML = '<div class="viewer-toolbar"><button data-viewer-back>← 파일 목록</button><strong>' + name + '</strong><span>텍스트 문서</span></div><article class="text-file-view"><div class="text-file-icon">📄</div><h2>' + name + '</h2><pre>' + text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;") + '</pre></article>';
   }
   function bindApp(key) {
-    content.onclick = null;
-    if (key === "explorer") {
-      content.onclick = e => {
-        const back = e.target.closest("[data-file-back], [data-viewer-back]");
-        if (back) { content.innerHTML = renderExplorer("홈"); return; }
-        const item = e.target.closest("[data-kind]");
-        if (item) openDemoFile(item.dataset.kind, item.dataset.name);
-      };
-    }
     if (key === "terminal") {
       const input = $("terminalInput");
       input?.addEventListener("keydown", e => {
@@ -113,6 +105,19 @@ hello()</textarea></div>`},
       catch { $("calcResult").textContent = "수식을 확인해 줘."; }
     });
   }
+  // File manager event delegation — - by ChatGPT AI
+  content.addEventListener("click", e => {
+    const back = e.target.closest("[data-file-back], [data-viewer-back]");
+    if (back) {
+      const parent = explorerPath === "첫 번째 프로젝트" ? "프로젝트" : "홈";
+      content.innerHTML = renderExplorer(parent);
+      return;
+    }
+    const item = e.target.closest("button[data-kind]");
+    if (!item) return;
+    e.preventDefault();
+    openDemoFile(item.dataset.kind, item.dataset.name);
+  });
   document.querySelectorAll("[data-open]").forEach(button => button.addEventListener("click", () => openApp(button.dataset.open)));
   launcher.addEventListener("click", () => { launcherPanel.classList.toggle("hidden"); quickPanel.classList.add("hidden"); });
   $("quickToggle").addEventListener("click", () => { quickPanel.classList.toggle("hidden"); launcherPanel.classList.add("hidden"); });
