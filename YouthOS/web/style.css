@@ -21,3 +21,30 @@
 
 /* Official YouthOS identity — - by ChatGPT AI */
 .youthos-logo{display:block;object-fit:contain;flex:none}.top-logo{width:26px;height:26px}.boot-logo{width:54px;height:54px}.hero-logo{width:84px;height:84px;filter:drop-shadow(0 8px 24px rgba(70,130,255,.28))}.dock-logo{width:29px;height:29px}.avatar-logo{width:28px;height:28px}.boot-brand{gap:15px}.glow-core{overflow:visible}.dock-launcher{display:grid;place-items:center}.user-avatar{overflow:hidden;background:transparent!important;border:1px solid #9bbdff44;box-shadow:0 4px 18px #0004}
+
+
+/* Interactive file manager and preview windows — - by ChatGPT AI */
+.file-row.file-item{width:100%;text-align:left;color:inherit;border:0;cursor:pointer;display:flex;align-items:center;gap:13px;padding:15px 17px;border-radius:12px;background:#ffffff08;transition:background .16s,transform .16s}
+.file-row.file-item:hover{background:#ffffff14;transform:translateX(3px)}
+.file-row.file-item:focus-visible,.file-back:focus-visible,.viewer-toolbar button:focus-visible{outline:2px solid #8db5ff;outline-offset:2px}
+.file-row.file-item>span:first-of-type{margin-left:auto}
+.file-row .file-symbol{font-size:18px;font-weight:400}
+.file-chevron{font-size:21px!important;color:#8195b4!important;margin-left:4px}
+.file-heading-left{display:flex;align-items:center;gap:12px}
+.file-heading-left h3{margin:0}
+.file-back,.viewer-toolbar button{border:1px solid #ffffff18;background:#ffffff0b;color:#dce7f8;padding:7px 11px;border-radius:7px;font-size:11px}
+.file-back:hover,.viewer-toolbar button:hover{background:#ffffff18}
+.file-hint{font-size:11px;margin-top:17px}
+.viewer-toolbar{display:flex;align-items:center;gap:12px;padding-bottom:14px;border-bottom:1px solid #ffffff16}
+.viewer-toolbar strong{font-size:13px}
+.viewer-toolbar span{margin-left:auto;color:#8295b2;font-size:10px}
+.wallpaper-preview{height:min(310px,48vh);min-height:190px;margin:18px auto 0;max-width:620px;position:relative;overflow:hidden;border-radius:12px;border:1px solid #b7d0ff35;background:radial-gradient(ellipse at 72% 38%,rgba(54,116,196,.65),transparent 34%),radial-gradient(ellipse at 22% 80%,rgba(44,78,145,.5),transparent 38%),linear-gradient(135deg,#101a2d,#0b1424 52%,#172d4b)}
+.wallpaper-preview:before{content:"";position:absolute;inset:0;background-image:linear-gradient(#b4d0ff0b 1px,transparent 1px),linear-gradient(90deg,#b4d0ff0b 1px,transparent 1px);background-size:35px 35px}
+.wallpaper-orb{position:absolute;width:210px;height:210px;border:1px solid #a5c7ff55;border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%);box-shadow:0 0 75px #5a9bff55,inset 0 0 55px #5a9bff22}
+.wallpaper-logo{position:absolute;left:50%;top:47%;transform:translate(-50%,-50%);font-size:72px;font-weight:900;color:#a9caff;text-shadow:0 0 35px #6ca2ff}
+.wallpaper-caption{position:absolute;left:0;right:0;bottom:25px;text-align:center;letter-spacing:8px;font-size:11px;color:#c0d8ff}
+.text-file-view{max-width:620px;margin:20px auto;padding:25px;border-radius:12px;background:#ffffff08;border:1px solid #ffffff12}
+.text-file-icon{font-size:30px}
+.text-file-view h2{font-size:18px;margin:10px 0 18px}
+.text-file-view pre{white-space:pre-wrap;overflow-wrap:anywhere;font:13px/2 "Pretendard","Noto Sans KR",sans-serif;color:#d2deef;margin:0}
+@media(max-width:650px){.viewer-toolbar{flex-wrap:wrap}.viewer-toolbar span{margin-left:0}.file-row.file-item{padding:13px 12px}.text-file-view{padding:17px}}
