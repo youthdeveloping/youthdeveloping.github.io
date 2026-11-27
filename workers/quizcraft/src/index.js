@@ -113,7 +113,7 @@ export class QuizRoom {
    sender.answeredAt=Date.now();
    const answered=[...this.sessions.values()].filter(p=>p.role==="player"&&p.answered).length;
    const total=this.players().length;
-   this.broadcast({type:"answered",count:answered,total});
+   this.broadcast({type:"answered",count:answered,total,players:this.players()});
    if(total>0&&answered>=total)await this.reveal(room,false);
    return;
   }
@@ -124,7 +124,7 @@ export class QuizRoom {
    room.deadline=Date.now()+(room.quiz.timeLimit||20)*1000;
    for(const p of this.sessions.values()){p.answered=false;p.lastCorrect=false}
    await this.state.storage.put("room",room);await this.state.storage.setAlarm(Date.now()+1000);
-   this.broadcast({type:"started",index:0,total:room.quiz.questions.length,question:room.quiz.questions[0],timeLimit:room.quiz.timeLimit||20});
+   this.broadcast({type:"started",index:0,total:room.quiz.questions.length,question:room.quiz.questions[0],timeLimit:room.quiz.timeLimit||20,players:this.players()});
   }
   if(m.type==="reveal")await this.reveal(room,false);
   if(m.type==="leaderboard"&&room.revealed){const sorted=this.leaderboard();const scores=[...new Set(sorted.map(p=>p.score))];const ranked=sorted.map(p=>({...p,rank:scores.indexOf(p.score)+1}));this.broadcast({type:"leaderboard",leaderboard:ranked.filter(p=>p.rank<=5),last:room.index===room.quiz.questions.length-1});}
@@ -138,7 +138,7 @@ export class QuizRoom {
    room.deadline=Date.now()+(room.quiz.timeLimit||20)*1000;
    for(const p of this.sessions.values()){p.answered=false;p.lastCorrect=false}
    await this.state.storage.put("room",room);await this.state.storage.setAlarm(Date.now()+1000);
-   this.broadcast({type:"question",index:room.index,total:room.quiz.questions.length,question:room.quiz.questions[room.index],timeLimit:room.quiz.timeLimit||20});
+   this.broadcast({type:"question",index:room.index,total:room.quiz.questions.length,question:room.quiz.questions[room.index],timeLimit:room.quiz.timeLimit||20,players:this.players()});
   }
  }
 }
