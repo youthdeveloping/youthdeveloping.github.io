@@ -28,6 +28,18 @@ export default {
    if(!r.ok)return json({error:"방을 만들지 못했어."},500);
    return json({code,hostToken});
   }
+  if(url.pathname==="/api/library"&&request.method==="POST"){
+   let body;try{body=await request.json()}catch{return json({error:"Invalid JSON"},400)}
+   const quiz=body.quiz,invalid=!quiz||!Array.isArray(quiz.questions)||quiz.questions.length<1||quiz.questions.length>30||quiz.questions.some(q=>typeof q.q!=="string"||!q.q.trim()||q.q.length>180||!Array.isArray(q.a)||q.a.length!==4||q.a.some(a=>typeof a!=="string"||!a.trim()||a.length>70)||!Number.isInteger(q.correct)||q.correct<0||q.correct>3);
+   if(invalid)return json({error:"퀴즈 형식이 올바르지 않아."},400);
+   quiz.title=String(quiz.title||"QuizCraft 퀴즈").slice(0,80);quiz.timeLimit=clamp(quiz.timeLimit,5,120);
+   const alphabet="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let code="";for(let i=0;i<8;i++)code+=alphabet[crypto.getRandomValues(new Uint8Array(1))[0]%alphabet.length];
+   const stub=env.ROOMS.get(env.ROOMS.idFromName("library:"+code));
+   const saved=await stub.fetch("https://library.internal/library/save",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({quiz,createdAt:Date.now()})});
+   if(!saved.ok)return json({error:"퀴즈 공유 저장에 실패했어."},500);return json({code});
+  }
+  const libraryMatch=url.pathname.match(/^\/api\/library\/([A-Z0-9]{8})$/);
+  if(libraryMatch&&request.method==="GET"){const stub=env.ROOMS.get(env.ROOMS.idFromName("library:"+libraryMatch[1]));return stub.fetch("https://library.internal/library/load")}
   const match=url.pathname.match(/^\/api\/rooms\/(\d{6})$/);
   if(match){const roomId=env.ROOMS.idFromName(match[1]);return env.ROOMS.get(roomId).fetch(request)}
   return json({error:"Not found"},404);
@@ -39,6 +51,8 @@ export class QuizRoom {
  async room(){return this.data||await this.state.storage.get("room")}
  async fetch(request){
   const url=new URL(request.url);
+  if(url.pathname==="/library/save"&&request.method==="POST"){let data;try{data=await request.json()}catch{return new Response("Invalid JSON",{status:400})}await this.state.storage.put("sharedQuiz",data);return new Response("ok")}
+  if(url.pathname==="/library/load"&&request.method==="GET"){const data=await this.state.storage.get("sharedQuiz");if(!data)return new Response(JSON.stringify({error:"공유 코드를 찾을 수 없어."}),{status:404,headers:{"Content-Type":"application/json","Access-Control-Allow-Origin":"*"}});return new Response(JSON.stringify({quiz:data.quiz}),{headers:{"Content-Type":"application/json","Access-Control-Allow-Origin":"*"}})}
   if(url.pathname==="/create"&&request.method==="POST"){
    const d=await request.json();await this.state.storage.put("room",d);this.data=d;return new Response("ok");
   }
