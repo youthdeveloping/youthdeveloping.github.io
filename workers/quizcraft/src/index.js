@@ -6,6 +6,8 @@ const cors = {
 };
 const json = (data,status=200)=>new Response(JSON.stringify(data),{status,headers:{...cors,"Content-Type":"application/json"}});
 const clamp=(n,min,max)=>Math.max(min,Math.min(max,Number(n)||min));
+const validMedia=(v,kind)=>{if(v==null||v==="")return true;if(typeof v!=="string"||v.length>300000)return false;const re=kind==="image"?/^data:image\\/(png|jpeg|webp|gif);base64,[A-Za-z0-9+/=]+$/:/^data:audio\\/(mpeg|mp3|ogg|wav|webm|mp4);base64,[A-Za-z0-9+/=]+$/;return re.test(v)};
+const validQuestionMedia=q=>validMedia(q.image,"image")&&validMedia(q.audio,"audio")&&(!q.aMedia||Array.isArray(q.aMedia)&&q.aMedia.length===4&&q.aMedia.every(m=>m&&validMedia(m.image,"image")&&validMedia(m.audio,"audio")));
 
 export default {
  async fetch(request,env){
@@ -17,8 +19,9 @@ export default {
    const quiz=body.quiz;
    if(!quiz||!Array.isArray(quiz.questions)||quiz.questions.length<1||quiz.questions.length>30)return json({error:"퀴즈는 1~30문제가 필요해."},400);
    for(const q of quiz.questions){
-    if(typeof q.q!=="string"||!q.q.trim()||q.q.length>180||!Array.isArray(q.a)||q.a.length!==4||q.a.some(a=>typeof a!=="string"||!a.trim()||a.length>70)||!Number.isInteger(q.correct)||q.correct<0||q.correct>3)return json({error:"문제 형식이 올바르지 않아."},400);
+    if(typeof q.q!=="string"||!q.q.trim()||q.q.length>180||!Array.isArray(q.a)||q.a.length!==4||q.a.some(a=>typeof a!=="string"||!a.trim()||a.length>70)||!Number.isInteger(q.correct)||q.correct<0||q.correct>3||!validQuestionMedia(q))return json({error:"문제 형식 또는 첨부 미디어가 올바르지 않아."},400);
    }
+   if(JSON.stringify(quiz).length>1100000)return json({error:"퀴즈와 첨부 파일 전체 용량은 850KB 이하로 맞춰 줘."},413);
    quiz.title=String(quiz.title||"QuizCraft 퀴즈").slice(0,80);
    quiz.timeLimit=clamp(quiz.timeLimit,5,120);
    const code=String(Math.floor(100000+Math.random()*900000));
@@ -30,9 +33,9 @@ export default {
   }
   if(url.pathname==="/api/library"&&request.method==="POST"){
    let body;try{body=await request.json()}catch{return json({error:"Invalid JSON"},400)}
-   const quiz=body.quiz,invalid=!quiz||!Array.isArray(quiz.questions)||quiz.questions.length<1||quiz.questions.length>30||quiz.questions.some(q=>typeof q.q!=="string"||!q.q.trim()||q.q.length>180||!Array.isArray(q.a)||q.a.length!==4||q.a.some(a=>typeof a!=="string"||!a.trim()||a.length>70)||!Number.isInteger(q.correct)||q.correct<0||q.correct>3);
+   const quiz=body.quiz,invalid=!quiz||!Array.isArray(quiz.questions)||quiz.questions.length<1||quiz.questions.length>30||quiz.questions.some(q=>typeof q.q!=="string"||!q.q.trim()||q.q.length>180||!Array.isArray(q.a)||q.a.length!==4||q.a.some(a=>typeof a!=="string"||!a.trim()||a.length>70)||!Number.isInteger(q.correct)||q.correct<0||q.correct>3||!validQuestionMedia(q));
    if(invalid)return json({error:"퀴즈 형식이 올바르지 않아."},400);
-   quiz.title=String(quiz.title||"QuizCraft 퀴즈").slice(0,80);quiz.timeLimit=clamp(quiz.timeLimit,5,120);
+   if(JSON.stringify(quiz).length>1100000)return json({error:"퀴즈와 첨부 파일 전체 용량은 850KB 이하로 맞춰 줘."},413);quiz.title=String(quiz.title||"QuizCraft 퀴즈").slice(0,80);quiz.timeLimit=clamp(quiz.timeLimit,5,120);
    const alphabet="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let code="";for(let i=0;i<8;i++)code+=alphabet[crypto.getRandomValues(new Uint8Array(1))[0]%alphabet.length];
    const stub=env.ROOMS.get(env.ROOMS.idFromName("library:"+code));
    const saved=await stub.fetch("https://library.internal/library/save",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({quiz,createdAt:Date.now()})});
@@ -87,7 +90,7 @@ export class QuizRoom {
   stat.total=this.players().length;stat.averageSeconds=stat.responseTimes.length?Math.round(stat.responseTimes.reduce((a,b)=>a+b,0)/stat.responseTimes.length/100)/10:0;
   room.stats=room.stats||[];room.stats[room.index]=stat;
   await this.state.storage.put("room",room);await this.state.storage.deleteAlarm();
-  this.broadcast({type:"reveal",answerText:q.a[q.correct],leaderboard:this.leaderboard(),last:room.index===room.quiz.questions.length-1,automatic});
+  this.broadcast({type:"reveal",answerText:q.a[q.correct],correctIndex:q.correct,answerCounts:stat.answerCounts||[0,0,0,0],leaderboard:this.leaderboard(),last:room.index===room.quiz.questions.length-1,automatic});
  }
  async alarm(){
   const room=await this.room();if(!room||!room.started||room.revealed)return;
@@ -121,9 +124,10 @@ export class QuizRoom {
    room.deadline=Date.now()+(room.quiz.timeLimit||20)*1000;
    for(const p of this.sessions.values()){p.answered=false;p.lastCorrect=false}
    await this.state.storage.put("room",room);await this.state.storage.setAlarm(Date.now()+1000);
-   this.broadcast({type:"started",index:0,total:room.quiz.questions.length,question:{q:room.quiz.questions[0].q,a:room.quiz.questions[0].a},timeLimit:room.quiz.timeLimit||20});
+   this.broadcast({type:"started",index:0,total:room.quiz.questions.length,question:room.quiz.questions[0],timeLimit:room.quiz.timeLimit||20});
   }
   if(m.type==="reveal")await this.reveal(room,false);
+  if(m.type==="leaderboard"&&room.revealed){const sorted=this.leaderboard();const scores=[...new Set(sorted.map(p=>p.score))];const ranked=sorted.map(p=>({...p,rank:scores.indexOf(p.score)+1}));this.broadcast({type:"leaderboard",leaderboard:ranked.filter(p=>p.rank<=5),last:room.index===room.quiz.questions.length-1});}
   if(m.type==="next"){
    if(!room.revealed)return;
    if(room.index+1>=room.quiz.questions.length){
@@ -134,7 +138,7 @@ export class QuizRoom {
    room.deadline=Date.now()+(room.quiz.timeLimit||20)*1000;
    for(const p of this.sessions.values()){p.answered=false;p.lastCorrect=false}
    await this.state.storage.put("room",room);await this.state.storage.setAlarm(Date.now()+1000);
-   this.broadcast({type:"question",index:room.index,total:room.quiz.questions.length,question:{q:room.quiz.questions[room.index].q,a:room.quiz.questions[room.index].a},timeLimit:room.quiz.timeLimit||20});
+   this.broadcast({type:"question",index:room.index,total:room.quiz.questions.length,question:room.quiz.questions[room.index],timeLimit:room.quiz.timeLimit||20});
   }
  }
 }
