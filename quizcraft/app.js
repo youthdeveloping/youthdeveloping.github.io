@@ -1,7 +1,12 @@
 /* - by ChatGPT Ai */
 const API = "https://quizcraft-realtime.youthdeveloper-github.workers.dev";
 const $ = s => document.querySelector(s);
-const $$ = s => [...document.querySelectorAll(s)];
+const $ = s => [...document.querySelectorAll(s)];
+/* - by ChatGPT Ai: persistent QuizCraft appearance themes */
+const themeSelect=$("#site-theme");
+function applySiteTheme(theme){const allowed=["midnight","aurora","paper"];const value=allowed.includes(theme)?theme:"midnight";document.body.dataset.theme=value;if(themeSelect)themeSelect.value=value;try{localStorage.setItem("quizcraft.theme",value)}catch{}}
+applySiteTheme(localStorage.getItem("quizcraft.theme")||"midnight");
+if(themeSelect)themeSelect.addEventListener("change",()=>applySiteTheme(themeSelect.value));
 const sample = {title:"기본 상식 퀴즈",questions:[
 {q:"대한민국의 수도는 어디일까?",a:["서울","부산","인천","대전"],correct:0},
 {q:"물의 화학식은 무엇일까?",a:["CO₂","H₂O","O₂","NaCl"],correct:1},
