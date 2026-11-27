@@ -1,7 +1,7 @@
 /* - by ChatGPT Ai */
 const API = "https://quizcraft-realtime.youthdeveloper-github.workers.dev";
 const $ = s => document.querySelector(s);
-const $ = s => [...document.querySelectorAll(s)];
+const $$ = s => [...document.querySelectorAll(s)];
 /* - by ChatGPT Ai: persistent QuizCraft appearance themes */
 const themeSelect=$("#site-theme");
 function applySiteTheme(theme){const allowed=["midnight","aurora","paper"];const value=allowed.includes(theme)?theme:"midnight";document.body.dataset.theme=value;if(themeSelect)themeSelect.value=value;try{localStorage.setItem("quizcraft.theme",value)}catch{}}
