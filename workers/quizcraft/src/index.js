@@ -6,7 +6,7 @@ const cors = {
 };
 const json = (data,status=200)=>new Response(JSON.stringify(data),{status,headers:{...cors,"Content-Type":"application/json"}});
 const clamp=(n,min,max)=>Math.max(min,Math.min(max,Number(n)||min));
-const validMedia=(v,kind)=>{if(v==null||v==="")return true;if(typeof v!=="string"||v.length>300000)return false;const re=kind==="image"?/^data:image\\/(png|jpeg|webp|gif);base64,[A-Za-z0-9+/=]+$/:/^data:audio\\/(mpeg|mp3|ogg|wav|webm|mp4);base64,[A-Za-z0-9+/=]+$/;return re.test(v)};
+const validMedia=(v,kind)=>{if(v==null||v==="")return true;if(typeof v!=="string"||v.length>300000)return false;const re=kind==="image"?/^data:image\/(png|jpeg|webp|gif);base64,[A-Za-z0-9+/=]+$/:/^data:audio\/(mpeg|mp3|ogg|wav|webm|mp4);base64,[A-Za-z0-9+/=]+$/;return re.test(v)};
 const validQuestionMedia=q=>validMedia(q.image,"image")&&validMedia(q.audio,"audio")&&(!q.aMedia||Array.isArray(q.aMedia)&&q.aMedia.length===4&&q.aMedia.every(m=>m&&validMedia(m.image,"image")&&validMedia(m.audio,"audio")));
 
 export default {
