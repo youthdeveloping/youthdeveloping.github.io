@@ -82,8 +82,11 @@ export class QuizRoom {
  leaderboard(){return [...this.sessions.values()].filter(p=>p.role==="player").sort((a,b)=>b.score-a.score).map(p=>({name:p.name,score:p.score,lastCorrect:p.lastCorrect}))}
  async reveal(room,automatic=false){
   if(!room.started||room.revealed)return;
-  room.revealed=true;await this.state.storage.put("room",room);await this.state.storage.deleteAlarm();
-  const q=room.quiz.questions[room.index];
+  room.revealed=true;
+  const q=room.quiz.questions[room.index],stat=room.stats?.[room.index]||{question:q.q,correct:0,answered:0,total:this.players().length,answerCounts:[0,0,0,0],responseTimes:[]};
+  stat.total=this.players().length;stat.averageSeconds=stat.responseTimes.length?Math.round(stat.responseTimes.reduce((a,b)=>a+b,0)/stat.responseTimes.length/100)/10:0;
+  room.stats=room.stats||[];room.stats[room.index]=stat;
+  await this.state.storage.put("room",room);await this.state.storage.deleteAlarm();
   this.broadcast({type:"reveal",answerText:q.a[q.correct],leaderboard:this.leaderboard(),last:room.index===room.quiz.questions.length-1,automatic});
  }
  async alarm(){
@@ -100,6 +103,8 @@ export class QuizRoom {
   if(sender.role==="player"&&m.type==="answer"){
    if(!room.started||room.revealed||sender.answered||!Number.isInteger(m.answer)||m.answer<0||m.answer>3)return;
    sender.answered=true;sender.lastCorrect=m.answer===room.quiz.questions[room.index].correct;
+   room.stats=room.stats||[];const qstat=room.stats[room.index]||(room.stats[room.index]={question:room.quiz.questions[room.index].q,correct:0,answered:0,total:this.players().length,answerCounts:[0,0,0,0],responseTimes:[]});
+   qstat.answered++;qstat.answerCounts[m.answer]++;if(sender.lastCorrect)qstat.correct++;qstat.responseTimes.push(Date.now()-room.questionStartedAt);
    const elapsed=Date.now()-room.questionStartedAt;
    sender.score+=sender.lastCorrect?Math.max(100,Math.round(1000-900*Math.min(1,elapsed/(room.quiz.timeLimit*1000)))):0;
    sender.answeredAt=Date.now();
@@ -112,7 +117,7 @@ export class QuizRoom {
   if(!this.host(pid))return;
   if(m.type==="start"){
    if(room.started)return;
-   room.started=true;room.index=0;room.revealed=false;room.questionStartedAt=Date.now();
+   room.started=true;room.index=0;room.revealed=false;room.stats=[];room.questionStartedAt=Date.now();
    room.deadline=Date.now()+(room.quiz.timeLimit||20)*1000;
    for(const p of this.sessions.values()){p.answered=false;p.lastCorrect=false}
    await this.state.storage.put("room",room);await this.state.storage.setAlarm(Date.now()+1000);
@@ -123,7 +128,7 @@ export class QuizRoom {
    if(!room.revealed)return;
    if(room.index+1>=room.quiz.questions.length){
     room.started=false;await this.state.storage.put("room",room);await this.state.storage.deleteAlarm();
-    this.broadcast({type:"ended",leaderboard:this.leaderboard()});return;
+    this.broadcast({type:"ended",leaderboard:this.leaderboard(),stats:room.stats||[]});return;
    }
    room.index++;room.revealed=false;room.questionStartedAt=Date.now();
    room.deadline=Date.now()+(room.quiz.timeLimit||20)*1000;
