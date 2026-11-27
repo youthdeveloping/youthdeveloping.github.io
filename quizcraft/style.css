@@ -45,3 +45,19 @@
 .zip-actions .btn{flex:1;min-width:145px}
 .library-item-actions .export-library{border-color:#62d5c455;color:var(--cyan)}
 @media(max-width:560px){.zip-actions{display:grid;grid-template-columns:1fr}.zip-actions .btn{width:100%}.library-item-actions{flex-wrap:wrap}}
+
+/* - by ChatGPT Ai: live host answer progress */
+.answer-progress-panel{margin:18px 0;padding:16px;border:1px solid var(--line);border-radius:16px;background:var(--panel2)}
+.answer-progress-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.answer-progress-head p{margin:0;color:var(--muted);font-size:14px}
+.answer-progress-head strong{font-size:20px;color:var(--green)}
+.answer-progress-track{height:9px;margin:12px 0 14px;border-radius:99px;background:#ffffff18;overflow:hidden}
+.answer-progress-track i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--purple),var(--cyan));transition:width .25s ease}
+.answer-progress-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.answer-progress-player{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 11px;border-radius:10px;background:#ffffff08;font-size:12px}
+.answer-progress-player span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.answer-progress-player strong{font-size:11px;white-space:nowrap}
+.answer-progress-player .is-submitted{color:var(--green)}
+.answer-progress-player .is-waiting{color:var(--muted)}
+.answer-progress-empty{grid-column:1/-1;margin:0;color:var(--muted);font-size:12px}
+@media(max-width:520px){.answer-progress-panel{padding:12px}.answer-progress-list{grid-template-columns:1fr 1fr}.answer-progress-player{padding:8px;font-size:11px}}
