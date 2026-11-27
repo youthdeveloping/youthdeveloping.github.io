@@ -1,0 +1,11 @@
+name = "quizcraft-realtime"
+main = "src/index.js"
+compatibility_date = "2026-11-27"
+
+[[durable_objects.bindings]]
+name = "ROOMS"
+class_name = "QuizRoom"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["QuizRoom"]
