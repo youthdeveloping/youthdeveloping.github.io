@@ -1,5 +1,5 @@
 /* - by ChatGPT Ai */
-const API = "https://quizcraft-realtime.workers.dev";
+const API = "https://quizcraft-realtime.youthdeveloper-github.workers.dev";
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const sample = {title:"기본 상식 퀴즈",questions:[
@@ -21,7 +21,7 @@ $("#save-quiz").onclick=()=>{try{quiz=readEditor();localStorage.setItem("quizcra
 renderEditor();
 async function createRoom(){try{quiz=readEditor();localStorage.setItem("quizcraft.quiz",JSON.stringify(quiz));myName=$("#host-name").value.trim()||"진행자";const r=await fetch(API+"/api/rooms",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({hostName:myName,quiz})});const d=await r.json();if(!r.ok)throw Error(d.error||"방 생성 실패");roomCode=d.code;hostToken=d.hostToken;role="host";$("#host-pin").textContent=roomCode;$("#host-room").classList.remove("hidden");$("#host-players").textContent="참가자를 기다리는 중...";connect();toast("게임방이 만들어졌어!")}catch(e){toast(e.message.includes("Failed to fetch")?"실시간 서버에 연결할 수 없어. 서버 설정을 확인해 줘.":e.message)}}
 $("#create-room").onclick=createRoom;
-function connect(){if(socket)socket.close();const url=API+"/api/rooms/"+roomCode+"?role="+role+"&name="+encodeURIComponent(myName)+(role==="host"?"&token="+encodeURIComponent(hostToken):"");socket=new WebSocket(url);socket.onopen=()=>{$("#game-status").textContent="● 서버 연결됨"};socket.onmessage=e=>{const m=JSON.parse(e.data);handleMessage(m)};socket.onclose=()=>{$("#game-status").textContent="연결 종료"};socket.onerror=()=>toast("서버 연결 오류")}
+function connect(){if(socket)socket.close();const url=API.replace(/^http/,"ws")+"/api/rooms/"+roomCode+"?role="+role+"&name="+encodeURIComponent(myName)+(role==="host"?"&token="+encodeURIComponent(hostToken):"");socket=new WebSocket(url);socket.onopen=()=>{$("#game-status").textContent="● 서버 연결됨"};socket.onmessage=e=>{const m=JSON.parse(e.data);handleMessage(m)};socket.onclose=()=>{$("#game-status").textContent="연결 종료"};socket.onerror=()=>toast("서버 연결 오류")}
 function send(type,data={}){if(!socket||socket.readyState!==1)return toast("서버 연결을 기다려 줘.");socket.send(JSON.stringify({type,...data}))}
 function handleMessage(m){if(m.type==="lobby"){if(role==="host"){$("#host-players").textContent=m.players.length?m.players.map(p=>"👤 "+p.name).join("  ·  "):"아직 참가자가 없어. 친구들을 초대해 봐!";$("#start-game").disabled=m.players.length===0;$("#start-game").textContent=m.players.length?"게임 시작하기 ("+m.players.length+"명)":"참가자 기다리는 중..."}else renderLobby(m)}if(m.type==="started"){renderQuestion(m)}if(m.type==="question"){renderQuestion(m)}if(m.type==="answered"){if(role==="player"){$$(".answer").forEach(b=>b.disabled=true);$("#answer-feedback").textContent="답변 제출 완료! 결과를 기다려 봐."}}if(m.type==="reveal"){renderReveal(m)}if(m.type==="leaderboard"){renderLeaderboard(m)}if(m.type==="ended"){renderFinal(m)}if(m.type==="error")toast(m.message)}
 function showGame(){ $("#workspace").classList.add("hidden");$(".hero").classList.add("hidden");$(".features").classList.add("hidden");$("#game-screen").classList.remove("hidden");$("#game-screen").scrollIntoView({behavior:"smooth"})}
