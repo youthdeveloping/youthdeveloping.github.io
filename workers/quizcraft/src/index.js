@@ -21,7 +21,7 @@ export default {
    for(const q of quiz.questions){
     if(typeof q.q!=="string"||!q.q.trim()||q.q.length>180||!Array.isArray(q.a)||q.a.length!==4||q.a.some(a=>typeof a!=="string"||!a.trim()||a.length>70)||!Number.isInteger(q.correct)||q.correct<0||q.correct>3||!validQuestionMedia(q))return json({error:"문제 형식 또는 첨부 미디어가 올바르지 않아."},400);
    }
-   if(JSON.stringify(quiz).length>1100000)return json({error:"퀴즈와 첨부 파일 전체 용량은 850KB 이하로 맞춰 줘."},413);
+   if(JSON.stringify(quiz).length>1250000)return json({error:"퀴즈와 첨부 파일 전체 용량은 850KB 이하로 맞춰 줘."},413);
    quiz.title=String(quiz.title||"QuizCraft 퀴즈").slice(0,80);
    quiz.timeLimit=clamp(quiz.timeLimit,5,120);
    const code=String(Math.floor(100000+Math.random()*900000));
@@ -35,7 +35,7 @@ export default {
    let body;try{body=await request.json()}catch{return json({error:"Invalid JSON"},400)}
    const quiz=body.quiz,invalid=!quiz||!Array.isArray(quiz.questions)||quiz.questions.length<1||quiz.questions.length>30||quiz.questions.some(q=>typeof q.q!=="string"||!q.q.trim()||q.q.length>180||!Array.isArray(q.a)||q.a.length!==4||q.a.some(a=>typeof a!=="string"||!a.trim()||a.length>70)||!Number.isInteger(q.correct)||q.correct<0||q.correct>3||!validQuestionMedia(q));
    if(invalid)return json({error:"퀴즈 형식이 올바르지 않아."},400);
-   if(JSON.stringify(quiz).length>1100000)return json({error:"퀴즈와 첨부 파일 전체 용량은 850KB 이하로 맞춰 줘."},413);quiz.title=String(quiz.title||"QuizCraft 퀴즈").slice(0,80);quiz.timeLimit=clamp(quiz.timeLimit,5,120);
+   if(JSON.stringify(quiz).length>1250000)return json({error:"퀴즈와 첨부 파일 전체 용량은 850KB 이하로 맞춰 줘."},413);quiz.title=String(quiz.title||"QuizCraft 퀴즈").slice(0,80);quiz.timeLimit=clamp(quiz.timeLimit,5,120);
    const alphabet="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let code="";for(let i=0;i<8;i++)code+=alphabet[crypto.getRandomValues(new Uint8Array(1))[0]%alphabet.length];
    const stub=env.ROOMS.get(env.ROOMS.idFromName("library:"+code));
    const saved=await stub.fetch("https://library.internal/library/save",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({quiz,createdAt:Date.now()})});
