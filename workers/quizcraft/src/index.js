@@ -1,6 +1,12 @@
 /* - by ChatGPT Ai */
-const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET,POST,OPTIONS", "Access-Control-Allow-Headers": "Content-Type" };
+const cors = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type"
+};
 const json = (data,status=200)=>new Response(JSON.stringify(data),{status,headers:{...cors,"Content-Type":"application/json"}});
+const clamp=(n,min,max)=>Math.max(min,Math.min(max,Number(n)||min));
+
 export default {
  async fetch(request,env){
   const url=new URL(request.url);
@@ -8,26 +14,35 @@ export default {
   if(url.pathname==="/api/health")return json({ok:true,service:"QuizCraft Realtime",time:new Date().toISOString()});
   if(url.pathname==="/api/rooms"&&request.method==="POST"){
    let body;try{body=await request.json()}catch{return json({error:"Invalid JSON"},400)}
-   if(!body.quiz||!Array.isArray(body.quiz.questions)||body.quiz.questions.length<1||body.quiz.questions.length>30)return json({error:"퀴즈는 1~30문제가 필요해."},400);
-   for(const q of body.quiz.questions){if(!q.q||!Array.isArray(q.a)||q.a.length!==4||!Number.isInteger(q.correct)||q.correct<0||q.correct>3)return json({error:"문제 형식이 올바르지 않아."},400)}
+   const quiz=body.quiz;
+   if(!quiz||!Array.isArray(quiz.questions)||quiz.questions.length<1||quiz.questions.length>30)return json({error:"퀴즈는 1~30문제가 필요해."},400);
+   for(const q of quiz.questions){
+    if(typeof q.q!=="string"||!q.q.trim()||q.q.length>180||!Array.isArray(q.a)||q.a.length!==4||q.a.some(a=>typeof a!=="string"||!a.trim()||a.length>70)||!Number.isInteger(q.correct)||q.correct<0||q.correct>3)return json({error:"문제 형식이 올바르지 않아."},400);
+   }
+   quiz.title=String(quiz.title||"QuizCraft 퀴즈").slice(0,80);
+   quiz.timeLimit=clamp(quiz.timeLimit,5,120);
    const code=String(Math.floor(100000+Math.random()*900000));
    const hostToken=crypto.randomUUID()+crypto.randomUUID();
-   const id=env.ROOMS.idFromName(code),stub=env.ROOMS.get(id);
+   const roomId=env.ROOMS.idFromName(code),stub=env.ROOMS.get(roomId);
    const r=await stub.fetch("https://room.internal/create",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code,hostToken,quiz,hostName:String(body.hostName||"진행자").slice(0,18)})});
    if(!r.ok)return json({error:"방을 만들지 못했어."},500);
    return json({code,hostToken});
   }
   const match=url.pathname.match(/^\/api\/rooms\/(\d{6})$/);
-  if(match){const id=env.ROOMS.idFromName(match[1]);return env.ROOMS.get(id).fetch(request)}
+  if(match){const roomId=env.ROOMS.idFromName(match[1]);return env.ROOMS.get(roomId).fetch(request)}
   return json({error:"Not found"},404);
  }
 };
+
 export class QuizRoom {
  constructor(state){this.state=state;this.sessions=new Map();this.data=null}
+ async room(){return this.data||await this.state.storage.get("room")}
  async fetch(request){
   const url=new URL(request.url);
-  if(url.pathname==="/create"&&request.method==="POST"){const d=await request.json();await this.state.storage.put("room",d);this.data=d;return new Response("ok")}
-  const room=this.data||await this.state.storage.get("room");if(!room)return new Response(JSON.stringify({error:"존재하지 않는 방이야."}),{status:404});
+  if(url.pathname==="/create"&&request.method==="POST"){
+   const d=await request.json();await this.state.storage.put("room",d);this.data=d;return new Response("ok");
+  }
+  const room=await this.room();if(!room)return new Response(JSON.stringify({error:"존재하지 않는 방이야."}),{status:404});
   if(request.headers.get("Upgrade")!=="websocket")return new Response("WebSocket required",{status:426});
   const role=url.searchParams.get("role"),name=(url.searchParams.get("name")||"참가자").slice(0,18),token=url.searchParams.get("token");
   if(role==="host"&&token!==room.hostToken)return new Response("Unauthorized",{status:401});
@@ -41,24 +56,66 @@ export class QuizRoom {
   server.addEventListener("error",()=>this.sessions.delete(pid));
   server.send(JSON.stringify({type:"lobby",players:this.players()}));
   this.broadcast({type:"lobby",players:this.players()});
+  if(room.started&&!room.revealed){
+   const remaining=Math.max(0,Math.ceil((room.deadline-Date.now())/1000));
+   server.send(JSON.stringify({type:"timer",remaining,total:room.quiz.timeLimit||20}));
+  }
   return new Response(null,{status:101,webSocket:client});
  }
- players(){return [...this.sessions.values()].filter(p=>p.role==="player").map(p=>({name:p.name,score:p.score}))}
+ players(){return [...this.sessions.values()].filter(p=>p.role==="player").map(p=>({name:p.name,score:p.score,answered:p.answered}))}
  broadcast(m){const s=JSON.stringify(m);for(const p of this.sessions.values())try{p.ws.send(s)}catch{}}
  host(pid){return this.sessions.get(pid)?.role==="host"}
+ leaderboard(){return [...this.sessions.values()].filter(p=>p.role==="player").sort((a,b)=>b.score-a.score).map(p=>({name:p.name,score:p.score,lastCorrect:p.lastCorrect}))}
+ async reveal(room,automatic=false){
+  if(!room.started||room.revealed)return;
+  room.revealed=true;await this.state.storage.put("room",room);await this.state.storage.deleteAlarm();
+  const q=room.quiz.questions[room.index];
+  this.broadcast({type:"reveal",answerText:q.a[q.correct],leaderboard:this.leaderboard(),last:room.index===room.quiz.questions.length-1,automatic});
+ }
+ async alarm(){
+  const room=await this.room();if(!room||!room.started||room.revealed)return;
+  const remaining=Math.max(0,Math.ceil((room.deadline-Date.now())/1000));
+  if(remaining<=0){await this.reveal(room,true);return}
+  this.broadcast({type:"timer",remaining,total:room.quiz.timeLimit||20});
+  await this.state.storage.setAlarm(Date.now()+1000);
+ }
  async onMessage(pid,raw){
-  const sender=this.sessions.get(pid);if(!sender)return;let m;try{m=JSON.parse(raw)}catch{return}
-  const room=this.data||await this.state.storage.get("room");if(!room)return;
+  const sender=this.sessions.get(pid);if(!sender)return;
+  let m;try{m=JSON.parse(raw)}catch{return}
+  const room=await this.room();if(!room)return;
   if(sender.role==="player"&&m.type==="answer"){
-   if(!room.started||room.revealed||sender.answered||!Number.isInteger(m.answer))return;
+   if(!room.started||room.revealed||sender.answered||!Number.isInteger(m.answer)||m.answer<0||m.answer>3)return;
    sender.answered=true;sender.lastCorrect=m.answer===room.quiz.questions[room.index].correct;
-   sender.score+=sender.lastCorrect?Math.max(500,1000-Math.min(500,Date.now()-room.questionStartedAt)/2):0;
-   sender.answeredAt=Date.now();this.broadcast({type:"answered",count:[...this.sessions.values()].filter(p=>p.role==="player"&&p.answered).length,total:this.players().length});return;
+   const elapsed=Date.now()-room.questionStartedAt;
+   sender.score+=sender.lastCorrect?Math.max(100,Math.round(1000-900*Math.min(1,elapsed/(room.quiz.timeLimit*1000)))):0;
+   sender.answeredAt=Date.now();
+   const answered=[...this.sessions.values()].filter(p=>p.role==="player"&&p.answered).length;
+   const total=this.players().length;
+   this.broadcast({type:"answered",count:answered,total});
+   if(total>0&&answered>=total)await this.reveal(room,false);
+   return;
   }
   if(!this.host(pid))return;
-  if(m.type==="start"){room.started=true;room.index=0;room.revealed=false;room.questionStartedAt=Date.now();await this.state.storage.put("room",room);this.broadcast({type:"started",index:0,total:room.quiz.questions.length,question:{q:room.quiz.questions[0].q,a:room.quiz.questions[0].a}})}
-  if(m.type==="reveal"){if(!room.started||room.revealed)return;room.revealed=true;await this.state.storage.put("room",room);const q=room.quiz.questions[room.index];const leaderboard=this.leaderboard();this.broadcast({type:"reveal",answerText:q.a[q.correct],leaderboard,last:room.index===room.quiz.questions.length-1})}
-  if(m.type==="next"){if(!room.revealed)return;if(room.index+1>=room.quiz.questions.length){room.started=false;this.broadcast({type:"ended",leaderboard:this.leaderboard()});return}room.index++;room.revealed=false;room.questionStartedAt=Date.now();for(const p of this.sessions.values()){p.answered=false;p.lastCorrect=false}await this.state.storage.put("room",room);this.broadcast({type:"question",index:room.index,total:room.quiz.questions.length,question:{q:room.quiz.questions[room.index].q,a:room.quiz.questions[room.index].a}})}
+  if(m.type==="start"){
+   if(room.started)return;
+   room.started=true;room.index=0;room.revealed=false;room.questionStartedAt=Date.now();
+   room.deadline=Date.now()+(room.quiz.timeLimit||20)*1000;
+   for(const p of this.sessions.values()){p.answered=false;p.lastCorrect=false}
+   await this.state.storage.put("room",room);await this.state.storage.setAlarm(Date.now()+1000);
+   this.broadcast({type:"started",index:0,total:room.quiz.questions.length,question:{q:room.quiz.questions[0].q,a:room.quiz.questions[0].a},timeLimit:room.quiz.timeLimit||20});
+  }
+  if(m.type==="reveal")await this.reveal(room,false);
+  if(m.type==="next"){
+   if(!room.revealed)return;
+   if(room.index+1>=room.quiz.questions.length){
+    room.started=false;await this.state.storage.put("room",room);await this.state.storage.deleteAlarm();
+    this.broadcast({type:"ended",leaderboard:this.leaderboard()});return;
+   }
+   room.index++;room.revealed=false;room.questionStartedAt=Date.now();
+   room.deadline=Date.now()+(room.quiz.timeLimit||20)*1000;
+   for(const p of this.sessions.values()){p.answered=false;p.lastCorrect=false}
+   await this.state.storage.put("room",room);await this.state.storage.setAlarm(Date.now()+1000);
+   this.broadcast({type:"question",index:room.index,total:room.quiz.questions.length,question:{q:room.quiz.questions[room.index].q,a:room.quiz.questions[room.index].a},timeLimit:room.quiz.timeLimit||20});
+  }
  }
- leaderboard(){return [...this.sessions.values()].filter(p=>p.role==="player").sort((a,b)=>b.score-a.score).map(p=>({name:p.name,score:p.score,lastCorrect:p.lastCorrect}))}
 }
