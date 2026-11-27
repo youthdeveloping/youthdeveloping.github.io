@@ -27,8 +27,72 @@ function renderEditor(){ $("#quiz-title").value=quiz.title;$("#quiz-time-limit")
 function readEditor(){const cards=$$(".editor-question");const questions=cards.map((el,qi)=>{const files=[...el.querySelectorAll(".media-file")],get=(kind,index=0)=>files.find(x=>x.dataset.kind===kind&&Number(x.dataset.index)===index)?.dataset.media||"";return {q:el.querySelector(".qtext").value.trim(),a:[...el.querySelectorAll(".opt")].map(x=>x.value.trim()),correct:Number(el.querySelector(".correct").value),image:get("q-image",qi),audio:get("q-audio",qi),aMedia:[0,1,2,3].map(i=>({image:get("a-image",i),audio:get("a-audio",i)}))}});if(!$("#quiz-title").value.trim()||questions.some(q=>!q.q||q.a.some(a=>!a)||new Set(q.a).size!==4))throw Error("제목, 문제, 서로 다른 보기 4개를 모두 입력해 줘.");const bytes=questions.reduce((n,q)=>n+[q.image,q.audio,...q.aMedia.flatMap(x=>[x.image,x.audio])].reduce((a,v)=>a+(v?Math.ceil(v.length*.75):0),0),0);if(bytes>850*1024)throw Error("첨부한 이미지와 사운드 전체 용량은 850KB 이하로 맞춰 줘.");return {title:$("#quiz-title").value.trim(),timeLimit:Number($("#quiz-time-limit").value)||20,questions}}
 $("#add-question").onclick=()=>{if($$(".editor-question").length>=30)return toast("한 퀴즈는 최대 30문제야.");quiz=readEditor();quiz.questions.push({q:"새로운 문제를 입력해 줘.",a:["보기 1","보기 2","보기 3","보기 4"],correct:0,aMedia:[]});renderEditor()};
 function getLibrary(){try{return JSON.parse(localStorage.getItem("quizcraft.library")||"[]")}catch{return []}}
-function renderLibrary(){const items=getLibrary(),list=$("#library-list");$("#library-count").textContent=items.length+"개";if(!items.length){list.innerHTML='<p class="library-empty">아직 저장한 퀴즈가 없어.</p>';return}list.innerHTML=items.map(x=>'<article class="library-item" data-id="'+escapeHtml(x.id)+'"><div class="library-item-info"><strong>'+escapeHtml(x.title)+'</strong><small>'+x.questions.length+'문제 · '+new Date(x.updatedAt||Date.now()).toLocaleDateString("ko-KR")+'</small></div><div class="library-item-actions"><button class="btn tiny ghost load-library">열기</button><button class="btn tiny ghost share-library">공유</button><button class="btn tiny ghost delete-library">삭제</button></div></article>').join("");list.querySelectorAll(".library-item").forEach(card=>{const item=items.find(x=>x.id===card.dataset.id);card.querySelector(".load-library").onclick=()=>{quiz={title:item.title,timeLimit:item.timeLimit||20,questions:item.questions};renderEditor();toast("퀴즈를 불러왔어!")};card.querySelector(".share-library").onclick=()=>shareQuiz(item);card.querySelector(".delete-library").onclick=()=>{localStorage.setItem("quizcraft.library",JSON.stringify(getLibrary().filter(x=>x.id!==item.id)));renderLibrary();toast("보관함에서 삭제했어.")}})}
+function renderLibrary(){const items=getLibrary(),list=$("#library-list");$("#library-count").textContent=items.length+"개";if(!items.length){list.innerHTML='<p class="library-empty">아직 저장한 퀴즈가 없어.</p>';return}list.innerHTML=items.map(x=>'<article class="library-item" data-id="'+escapeHtml(x.id)+'"><div class="library-item-info"><strong>'+escapeHtml(x.title)+'</strong><small>'+x.questions.length+'문제 · '+new Date(x.updatedAt||Date.now()).toLocaleDateString("ko-KR")+'</small></div><div class="library-item-actions"><button class="btn tiny ghost load-library">열기</button><button class="btn tiny ghost export-library">ZIP</button><button class="btn tiny ghost share-library">공유</button><button class="btn tiny ghost delete-library">삭제</button></div></article>').join("");list.querySelectorAll(".library-item").forEach(card=>{const item=items.find(x=>x.id===card.dataset.id);card.querySelector(".load-library").onclick=()=>{quiz={title:item.title,timeLimit:item.timeLimit||20,questions:item.questions};renderEditor();toast("퀴즈를 불러왔어!")};card.querySelector(".export-library").onclick=()=>exportQuizZip(item);card.querySelector(".share-library").onclick=()=>shareQuiz(item);card.querySelector(".delete-library").onclick=()=>{localStorage.setItem("quizcraft.library",JSON.stringify(getLibrary().filter(x=>x.id!==item.id)));renderLibrary();toast("보관함에서 삭제했어.")}})}
 function saveToLibrary(item){const items=getLibrary(),id=item.id||("q"+Date.now().toString(36)+Math.random().toString(36).slice(2,6));const saved={...item,id,updatedAt:new Date().toISOString()};const i=items.findIndex(x=>x.id===id);if(i>=0)items[i]=saved;else items.unshift(saved);localStorage.setItem("quizcraft.library",JSON.stringify(items));renderLibrary()}
+
+/* - by ChatGPT Ai: portable QuizCraft ZIP backup with embedded media assets */
+function cloneQuizData(value){return JSON.parse(JSON.stringify(value))}
+async function exportQuizZip(source){
+ try{
+  if(!window.JSZip)throw Error("ZIP 모듈을 불러오지 못했어. 인터넷 연결을 확인해 줘.");
+  const sourceQuiz=source||readEditor(),copy=cloneQuizData(sourceQuiz),zip=new JSZip(),assets={};
+  function externalize(value,path){
+   if(typeof value==="string"&&value.startsWith("data:")){
+    const match=value.match(/^data:([^;,]+)?;base64,([\s\S]+)$/);
+    if(!match)throw Error("첨부 파일 형식을 읽을 수 없어.");
+    const assetPath="media/"+path.replace(/[^a-zA-Z0-9._/-]/g,"_")+".bin";
+    zip.file(assetPath,match[2],{base64:true});assets[assetPath]={mime:match[1]||"application/octet-stream"};
+    return "__QC_ASSET__:"+assetPath;
+   }
+   if(Array.isArray(value))return value.map((v,i)=>externalize(v,path+"-"+i));
+   if(value&&typeof value==="object"){for(const key of Object.keys(value))value[key]=externalize(value[key],path+"-"+key);return value}
+   return value;
+  }
+  externalize(copy,"quiz");
+  zip.file("quizcraft.json",JSON.stringify({format:"QuizCraft",version:1,exportedAt:new Date().toISOString(),assets,quiz:copy},null,2));
+  const blob=await zip.generateAsync({type:"blob",compression:"DEFLATE",compressionOptions:{level:6}});
+  const url=URL.createObjectURL(blob),a=document.createElement("a"),base=(sourceQuiz.title||"quizcraft").replace(/[\\/:*?"<>|]/g,"-").trim().slice(0,60)||"quizcraft";
+  a.href=url;a.download=base+".quizcraft.zip";document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
+  toast("문제·정답·사진·음악을 ZIP 파일로 저장했어! 📦");
+ }catch(e){toast(e.message||"ZIP 저장에 실패했어.")}
+}
+function validateImportedQuiz(q){
+ if(!q||typeof q.title!=="string"||!Array.isArray(q.questions)||q.questions.length<1||q.questions.length>30)throw Error("퀴즈 파일 형식이 올바르지 않아.");
+ for(const item of q.questions){if(!item||typeof item.q!=="string"||!Array.isArray(item.a)||item.a.length!==4||!Number.isInteger(item.correct)||item.correct<0||item.correct>3||item.a.some(x=>typeof x!=="string"))throw Error("문제 또는 보기 데이터가 올바르지 않아.");}
+ return q;
+}
+async function importQuizZip(file){
+ try{
+  if(!window.JSZip)throw Error("ZIP 모듈을 불러오지 못했어. 인터넷 연결을 확인해 줘.");
+  if(!file)return;if(file.size>15*1024*1024)throw Error("ZIP 파일은 15MB 이하만 불러올 수 있어.");
+  const zip=await JSZip.loadAsync(file,{checkCRC32:true}),entry=zip.file("quizcraft.json");
+  if(!entry)throw Error("QuizCraft에서 내보낸 ZIP 파일이 아니야.");
+  const backup=JSON.parse(await entry.async("string"));
+  if(backup.format!=="QuizCraft"||backup.version!==1||!backup.assets||typeof backup.assets!=="object")throw Error("지원하지 않는 퀴즈 백업 형식이야.");
+  let expanded=0;
+  async function restore(value){
+   if(typeof value==="string"&&value.startsWith("__QC_ASSET__:")){
+    const path=value.slice("__QC_ASSET__:".length),meta=backup.assets[path],asset=zip.file(path);
+    if(!meta||!asset)throw Error("ZIP 안에서 첨부 파일을 찾을 수 없어: "+path);
+    const base64=await asset.async("base64");expanded+=Math.ceil(base64.length*.75);
+    if(expanded>12*1024*1024)throw Error("압축 해제된 첨부 파일이 너무 커.");
+    return "data:"+(meta.mime||"application/octet-stream")+";base64,"+base64;
+   }
+   if(Array.isArray(value))return Promise.all(value.map(restore));
+   if(value&&typeof value==="object"){const out={};for(const key of Object.keys(value))out[key]=await restore(value[key]);return out}
+   return value;
+  }
+  const imported=validateImportedQuiz(await restore(backup.quiz));
+  imported.timeLimit=Number(imported.timeLimit)||20;quiz=imported;
+  localStorage.setItem("quizcraft.quiz",JSON.stringify(quiz));saveToLibrary(quiz);renderEditor();
+  $("#share-result").classList.add("hidden");tab("editor");
+  toast("퀴즈와 사진·음악까지 모두 불러왔어! 🎉");
+ }catch(e){toast(e.message||"ZIP 파일을 불러오지 못했어.")}
+}
+$("#export-zip").onclick=()=>{try{exportQuizZip(readEditor())}catch(e){toast(e.message)}};
+$("#import-zip-trigger").onclick=()=>$("#import-zip-file").click();
+$("#import-zip-file").onchange=e=>{const file=e.target.files?.[0];if(file)importQuizZip(file);e.target.value=""};
+
 async function shareQuiz(item){try{const r=await fetch(API+"/api/library",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({quiz:item})});const d=await r.json();if(!r.ok)throw Error(d.error||"공유 코드 생성 실패");$("#share-code").textContent=d.code;$("#share-result").classList.remove("hidden");toast("공유 코드가 만들어졌어!")}catch(e){toast(e.message.includes("Failed to fetch")?"공유 서버에 연결할 수 없어.":e.message)}}
 
 /* - by ChatGPT Ai: interactive quiz preview */
