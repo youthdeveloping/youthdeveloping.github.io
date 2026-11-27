@@ -56,9 +56,9 @@ export class QuizRoom {
    sender.answeredAt=Date.now();this.broadcast({type:"answered",count:[...this.sessions.values()].filter(p=>p.role==="player"&&p.answered).length,total:this.players().length});return;
   }
   if(!this.host(pid))return;
-  if(m.type==="start"){room.started=true;room.index=0;room.revealed=false;room.questionStartedAt=Date.now();await this.state.storage.put("room",room);this.broadcast({type:"started",index:0,total:room.quiz.questions.length,question:room.quiz.questions[0]})}
+  if(m.type==="start"){room.started=true;room.index=0;room.revealed=false;room.questionStartedAt=Date.now();await this.state.storage.put("room",room);this.broadcast({type:"started",index:0,total:room.quiz.questions.length,question:{q:room.quiz.questions[0].q,a:room.quiz.questions[0].a}})}
   if(m.type==="reveal"){if(!room.started||room.revealed)return;room.revealed=true;await this.state.storage.put("room",room);const q=room.quiz.questions[room.index];const leaderboard=this.leaderboard();this.broadcast({type:"reveal",answerText:q.a[q.correct],leaderboard,last:room.index===room.quiz.questions.length-1})}
-  if(m.type==="next"){if(!room.revealed)return;if(room.index+1>=room.quiz.questions.length){room.started=false;this.broadcast({type:"ended",leaderboard:this.leaderboard()});return}room.index++;room.revealed=false;room.questionStartedAt=Date.now();for(const p of this.sessions.values()){p.answered=false;p.lastCorrect=false}await this.state.storage.put("room",room);this.broadcast({type:"question",index:room.index,total:room.quiz.questions.length,question:room.quiz.questions[room.index]})}
+  if(m.type==="next"){if(!room.revealed)return;if(room.index+1>=room.quiz.questions.length){room.started=false;this.broadcast({type:"ended",leaderboard:this.leaderboard()});return}room.index++;room.revealed=false;room.questionStartedAt=Date.now();for(const p of this.sessions.values()){p.answered=false;p.lastCorrect=false}await this.state.storage.put("room",room);this.broadcast({type:"question",index:room.index,total:room.quiz.questions.length,question:{q:room.quiz.questions[room.index].q,a:room.quiz.questions[room.index].a}})}
  }
  leaderboard(){return [...this.sessions.values()].filter(p=>p.role==="player").sort((a,b)=>b.score-a.score).map(p=>({name:p.name,score:p.score,lastCorrect:p.lastCorrect}))}
 }
