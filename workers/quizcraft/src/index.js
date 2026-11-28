@@ -140,6 +140,10 @@ export class QuizRoom {
  async room(){return this.data||await this.state.storage.get("room")}
  async fetch(request){
   const url=new URL(request.url);
+  // - by ChatGPT Ai: dispatch account and public-quiz requests to their handlers
+  if(url.pathname.startsWith("/auth/"))return this.authFetch(request,url);
+  if(url.pathname.startsWith("/catalog/"))return this.catalogFetch(request,url);
+  if(url.pathname.startsWith("/quiz/"))return this.publicQuizFetch(request,url);
   if(url.pathname==="/library/save"&&request.method==="POST"){let data;try{data=await request.json()}catch{return new Response("Invalid JSON",{status:400})}await this.state.storage.put("sharedQuiz",data);return new Response("ok")}
   if(url.pathname==="/library/load"&&request.method==="GET"){const data=await this.state.storage.get("sharedQuiz");if(!data)return new Response(JSON.stringify({error:"공유 코드를 찾을 수 없어."}),{status:404,headers:{"Content-Type":"application/json","Access-Control-Allow-Origin":"*"}});return new Response(JSON.stringify({quiz:data.quiz}),{headers:{"Content-Type":"application/json","Access-Control-Allow-Origin":"*"}})}
   if(url.pathname==="/create"&&request.method==="POST"){
