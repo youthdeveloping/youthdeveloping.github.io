@@ -66,20 +66,25 @@ export class QuizRoom {
   if(role!=="host"&&role!=="player")return new Response("Invalid role",{status:400});
   if(role==="player"&&!room.started&&this.sessions.size>=100)return new Response("Room full",{status:409});
   const pair=new WebSocketPair(),client=pair[0],server=pair[1];server.accept();
-  const pid=crypto.randomUUID();this.sessions.set(pid,{ws:server,role,name,score:0,answered:false,lastCorrect:false});
+  const pid=crypto.randomUUID();this.sessions.set(pid,{ws:server,role,name,score:0,answered:false,lastCorrect:false,joinedAt:Date.now(),correctCount:0,wrongCount:0,history:[]});
   server.serializeAttachment({pid,role,name});
   server.addEventListener("message",e=>this.onMessage(pid,e.data));
-  server.addEventListener("close",()=>{this.sessions.delete(pid);this.broadcast({type:"lobby",players:this.players()})});
+  server.addEventListener("close",()=>{const gone=this.sessions.get(pid);this.sessions.delete(pid);this.broadcast({type:"lobby",players:this.players()});this.sendHost({type:"roster",players:this.hostPlayers()});if(gone?.role==="player")this.sendHost({type:"activity",event:{name:gone.name,action:"left",at:Date.now()}})});
   server.addEventListener("error",()=>this.sessions.delete(pid));
   server.send(JSON.stringify({type:"lobby",players:this.players()}));
   this.broadcast({type:"lobby",players:this.players()});
-  if(room.started&&!room.revealed){
+  this.sendHost({type:"roster",players:this.hostPlayers()});
+  if(role==="player")this.sendHost({type:"activity",event:{name,action:"joined",at:Date.now()}});
+  if(role==="player"&&room.started&&!room.revealed){
+   server.send(JSON.stringify({type:"question",index:room.index,total:room.quiz.questions.length,question:room.quiz.questions[room.index],timeLimit:room.quiz.timeLimit||20,players:this.players(),midJoin:true}));
    const remaining=Math.max(0,Math.ceil((room.deadline-Date.now())/1000));
    server.send(JSON.stringify({type:"timer",remaining,total:room.quiz.timeLimit||20}));
-  }
+  }else if(role==="player"&&room.started&&room.revealed){const q=room.quiz.questions[room.index],stat=room.stats?.[room.index]||{};server.send(JSON.stringify({type:"reveal",answerText:q.a[q.correct],correctIndex:q.correct,answerCounts:stat.answerCounts||[0,0,0,0],leaderboard:this.leaderboard(),last:room.index===room.quiz.questions.length-1,midJoin:true}));}
   return new Response(null,{status:101,webSocket:client});
  }
  players(){return [...this.sessions.values()].filter(p=>p.role==="player").map(p=>({name:p.name,score:p.score,answered:p.answered}))}
+ hostPlayers(){return [...this.sessions.entries()].filter(([,p])=>p.role==="player").map(([id,p])=>({id,name:p.name,score:p.score,answered:p.answered,lastCorrect:p.lastCorrect,correctCount:p.correctCount,wrongCount:p.wrongCount,joinedAt:p.joinedAt,lastAnsweredAt:p.lastAnsweredAt||null,history:p.history||[]}))}
+ sendHost(m){const s=JSON.stringify(m);for(const p of this.sessions.values())if(p.role==="host")try{p.ws.send(s)}catch{}}
  broadcast(m){const s=JSON.stringify(m);for(const p of this.sessions.values())try{p.ws.send(s)}catch{}}
  host(pid){return this.sessions.get(pid)?.role==="host"}
  leaderboard(){return [...this.sessions.values()].filter(p=>p.role==="player").sort((a,b)=>b.score-a.score).map(p=>({name:p.name,score:p.score,lastCorrect:p.lastCorrect}))}
@@ -105,15 +110,15 @@ export class QuizRoom {
   const room=await this.room();if(!room)return;
   if(sender.role==="player"&&m.type==="answer"){
    if(!room.started||room.revealed||sender.answered||!Number.isInteger(m.answer)||m.answer<0||m.answer>3)return;
-   sender.answered=true;sender.lastCorrect=m.answer===room.quiz.questions[room.index].correct;
+   sender.answered=true;sender.lastCorrect=m.answer===room.quiz.questions[room.index].correct;if(sender.lastCorrect)sender.correctCount++;else sender.wrongCount++;
    room.stats=room.stats||[];const qstat=room.stats[room.index]||(room.stats[room.index]={question:room.quiz.questions[room.index].q,correct:0,answered:0,total:this.players().length,answerCounts:[0,0,0,0],responseTimes:[]});
    qstat.answered++;qstat.answerCounts[m.answer]++;if(sender.lastCorrect)qstat.correct++;qstat.responseTimes.push(Date.now()-room.questionStartedAt);
    const elapsed=Date.now()-room.questionStartedAt;
    sender.score+=sender.lastCorrect?Math.max(100,Math.round(1000-900*Math.min(1,elapsed/(room.quiz.timeLimit*1000)))):0;
-   sender.answeredAt=Date.now();
+   sender.answeredAt=Date.now();sender.lastAnsweredAt=sender.answeredAt;sender.history.push({question:room.index+1,questionText:room.quiz.questions[room.index].q,selectedIndex:m.answer,selectedText:room.quiz.questions[room.index].a[m.answer],correctIndex:room.quiz.questions[room.index].correct,correctText:room.quiz.questions[room.index].a[room.quiz.questions[room.index].correct],correct:sender.lastCorrect,elapsedSeconds:Math.round(elapsed/100)/10,scoreEarned:sender.lastCorrect?Math.max(100,Math.round(1000-900*Math.min(1,elapsed/(room.quiz.timeLimit*1000)))):0});
    const answered=[...this.sessions.values()].filter(p=>p.role==="player"&&p.answered).length;
    const total=this.players().length;
-   this.broadcast({type:"answered",count:answered,total,players:this.players()});
+   this.broadcast({type:"answered",count:answered,total,players:this.players()});this.sendHost({type:"roster",players:this.hostPlayers()});this.sendHost({type:"activity",event:{name:sender.name,action:"answered",correct:sender.lastCorrect,question:room.index+1,at:Date.now()}});
    if(total>0&&answered>=total)await this.reveal(room,false);
    return;
   }
@@ -126,6 +131,7 @@ export class QuizRoom {
    await this.state.storage.put("room",room);await this.state.storage.setAlarm(Date.now()+1000);
    this.broadcast({type:"started",index:0,total:room.quiz.questions.length,question:room.quiz.questions[0],timeLimit:room.quiz.timeLimit||20,players:this.players()});
   }
+  if(m.type==="kick"&&typeof m.playerId==="string"){const target=this.sessions.get(m.playerId);if(target?.role==="player"){try{target.ws.send(JSON.stringify({type:"kicked",message:"진행자가 게임에서 내보냈어."}));target.ws.close(4001,"Removed by host")}catch{}this.sessions.delete(m.playerId);this.broadcast({type:"lobby",players:this.players()});this.sendHost({type:"roster",players:this.hostPlayers()});this.sendHost({type:"activity",event:{name:target.name,action:"kicked",at:Date.now()}})}return;}
   if(m.type==="reveal")await this.reveal(room,false);
   if(m.type==="leaderboard"&&room.revealed){const sorted=this.leaderboard();const scores=[...new Set(sorted.map(p=>p.score))];const ranked=sorted.map(p=>({...p,rank:scores.indexOf(p.score)+1}));this.broadcast({type:"leaderboard",leaderboard:ranked.filter(p=>p.rank<=5),last:room.index===room.quiz.questions.length-1});}
   if(m.type==="next"){
