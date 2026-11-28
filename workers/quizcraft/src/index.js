@@ -8,12 +8,50 @@ const json = (data,status=200)=>new Response(JSON.stringify(data),{status,header
 const clamp=(n,min,max)=>Math.max(min,Math.min(max,Number(n)||min));
 const validMedia=(v,kind)=>{if(v==null||v==="")return true;if(typeof v!=="string"||v.length>300000)return false;const re=kind==="image"?/^data:image\/(png|jpeg|webp|gif);base64,[A-Za-z0-9+/=]+$/:/^data:audio\/(mpeg|mp3|ogg|wav|webm|mp4);base64,[A-Za-z0-9+/=]+$/;return re.test(v)};
 const validQuestionMedia=q=>validMedia(q.image,"image")&&validMedia(q.audio,"audio")&&(!q.aMedia||Array.isArray(q.aMedia)&&q.aMedia.length===4&&q.aMedia.every(m=>m&&validMedia(m.image,"image")&&validMedia(m.audio,"audio")));
+// - by ChatGPT Ai: persistent accounts and public quiz catalog
+async function resolveUser(env,token){
+ if(!token)return null;
+ const stub=env.ROOMS.get(env.ROOMS.idFromName("auth:users"));
+ const r=await stub.fetch("https://auth.internal/auth/resolve",{headers:{Authorization:"Bearer "+token}});
+ if(!r.ok)return null;return r.json();
+}
+const validQuiz=(quiz)=>!!quiz&&Array.isArray(quiz.questions)&&quiz.questions.length>=1&&quiz.questions.length<=30&&quiz.questions.every(q=>typeof q.q==="string"&&q.q.trim()&&q.q.length<=180&&Array.isArray(q.a)&&q.a.length===4&&q.a.every(a=>typeof a==="string"&&a.trim()&&a.length<=70)&&Number.isInteger(q.correct)&&q.correct>=0&&q.correct<=3&&validQuestionMedia(q));
+
 
 export default {
  async fetch(request,env){
   const url=new URL(request.url);
   if(request.method==="OPTIONS")return new Response(null,{headers:cors});
   if(url.pathname==="/api/health")return json({ok:true,service:"QuizCraft Realtime",time:new Date().toISOString()});
+  if(url.pathname.startsWith("/api/auth/")){
+   const stub=env.ROOMS.get(env.ROOMS.idFromName("auth:users"));
+   return stub.fetch(new Request("https://auth.internal"+url.pathname.replace("/api","") ,request));
+  }
+  if(url.pathname==="/api/quizzes"&&request.method==="GET"){
+   const stub=env.ROOMS.get(env.ROOMS.idFromName("public:catalog"));return stub.fetch("https://catalog.internal/catalog/list");
+  }
+  if(url.pathname==="/api/quizzes"&&request.method==="POST"){
+   const auth=await resolveUser(env,request.headers.get("Authorization")?.replace(/^Bearer\s+/i,""));if(!auth?.user)return json({error:"퀴즈를 공개하려면 로그인해야 해."},401);
+   if(!auth.user.canHost)return json({error:"진행자 권한이 필요해."},403);
+   let body;try{body=await request.json()}catch{return json({error:"Invalid JSON"},400)}
+   const quiz=body.quiz;if(!validQuiz(quiz))return json({error:"퀴즈 형식이 올바르지 않아."},400);
+   if(JSON.stringify(quiz).length>1250000)return json({error:"첨부 파일 용량이 너무 커."},413);
+   const id=crypto.randomUUID().replace(/-/g,"").slice(0,16),title=String(quiz.title||"QuizCraft 퀴즈").slice(0,80),createdAt=Date.now();
+   const item={id,title,questionCount:quiz.questions.length,timeLimit:clamp(quiz.timeLimit,5,120),authorId:auth.user.id,authorName:auth.user.nickname,createdAt,visibility:body.visibility==="private"?"private":"public"};
+   const quizStub=env.ROOMS.get(env.ROOMS.idFromName("publicquiz:"+id));
+   await quizStub.fetch("https://quiz.internal/quiz/save",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({quiz:{...quiz,title,timeLimit:item.timeLimit},meta:item})});
+   const catalog=env.ROOMS.get(env.ROOMS.idFromName("public:catalog"));
+   const saved=await catalog.fetch("https://catalog.internal/catalog/add",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(item)});
+   if(!saved.ok)return json({error:"공개 퀴즈 저장에 실패했어."},500);return json({quiz:item});
+  }
+  const publicQuiz=url.pathname.match(/^\/api\/quizzes\/([a-f0-9]{16})$/);
+  if(publicQuiz&&request.method==="GET"){
+   const catalog=env.ROOMS.get(env.ROOMS.idFromName("public:catalog"));
+   const metaRes=await catalog.fetch("https://catalog.internal/catalog/get?id="+publicQuiz[1]);if(!metaRes.ok)return json({error:"퀴즈를 찾을 수 없어."},404);
+   const meta=await metaRes.json();if(meta.visibility!=="public")return json({error:"비공개 퀴즈야."},403);
+   const qstub=env.ROOMS.get(env.ROOMS.idFromName("publicquiz:"+publicQuiz[1]));return qstub.fetch("https://quiz.internal/quiz/load");
+  }
+
   if(url.pathname==="/api/rooms"&&request.method==="POST"){
    let body;try{body=await request.json()}catch{return json({error:"Invalid JSON"},400)}
    const quiz=body.quiz;
@@ -27,7 +65,7 @@ export default {
    const code=String(Math.floor(100000+Math.random()*900000));
    const hostToken=crypto.randomUUID()+crypto.randomUUID();
    const roomId=env.ROOMS.idFromName(code),stub=env.ROOMS.get(roomId);
-   const r=await stub.fetch("https://room.internal/create",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code,hostToken,quiz,hostName:String(body.hostName||"진행자").slice(0,18)})});
+   const r=await stub.fetch("https://room.internal/create",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code,hostToken,quiz,hostName:String(body.hostName||auth.user.nickname||"진행자").slice(0,18)})});
    if(!r.ok)return json({error:"방을 만들지 못했어."},500);
    return json({code,hostToken});
   }
@@ -51,7 +89,53 @@ export default {
 
 export class QuizRoom {
  constructor(state){this.state=state;this.sessions=new Map();this.data=null}
- async room(){return this.data||await this.state.storage.get("room")}
+
+ async authFetch(request,url){
+  let users=await this.state.storage.get("users")||{},sessions=await this.state.storage.get("sessions")||{};
+  const body=async()=>{try{return await request.json()}catch{return {}}};
+  const issue=(user)=>{const token=crypto.randomUUID()+crypto.randomUUID();sessions[token]={id:user.id,expires:Date.now()+30*86400000};return {token,user};};
+  if(url.pathname==="/auth/register"&&request.method==="POST"){
+   const b=await body(),nickname=String(b.nickname||"").trim(),password=String(b.password||""),role=b.role==="host"?"host":"player",key=nickname.toLowerCase();
+   if(nickname.length<2||nickname.length>20||!/^[가-힣a-zA-Z0-9_ -]+$/.test(nickname)||password.length<8||password.length>128)return json({error:"닉네임 2~20자, 비밀번호 8~128자로 입력해 줘."},400);
+   if(users[key])return json({error:"이미 사용 중인 닉네임이야."},409);
+   const salt=crypto.getRandomValues(new Uint8Array(16)),material=await crypto.subtle.importKey("raw",new TextEncoder().encode(password),"PBKDF2",false,["deriveBits"]),bits=await crypto.subtle.deriveBits({name:"PBKDF2",salt,iterations:120000,hash:"SHA-256"},material,256);
+   const user={id:"qc:"+key,nickname,provider:"quizcraft",role,canHost:role==="host",createdAt:Date.now(),passwordSalt:Array.from(salt),passwordHash:Array.from(new Uint8Array(bits))};users[key]=user;
+   const result=issue({id:user.id,nickname,provider:user.provider,role,canHost:user.canHost});await this.state.storage.put("users",users);await this.state.storage.put("sessions",sessions);return json(result);
+  }
+  if(url.pathname==="/auth/login"&&request.method==="POST"){
+   const b=await body(),key=String(b.nickname||"").trim().toLowerCase(),password=String(b.password||""),u=users[key];if(!u||u.provider!=="quizcraft")return json({error:"계정 또는 비밀번호를 확인해 줘."},401);
+   const salt=new Uint8Array(u.passwordSalt),material=await crypto.subtle.importKey("raw",new TextEncoder().encode(password),"PBKDF2",false,["deriveBits"]),bits=new Uint8Array(await crypto.subtle.deriveBits({name:"PBKDF2",salt,iterations:120000,hash:"SHA-256"},material,256));
+   if(bits.some((v,i)=>v!==u.passwordHash[i]))return json({error:"계정 또는 비밀번호를 확인해 줘."},401);
+   const result=issue({id:u.id,nickname:u.nickname,provider:u.provider,role:u.role,canHost:u.canHost});await this.state.storage.put("sessions",sessions);return json(result);
+  }
+  if(url.pathname==="/auth/youthdeveloper"&&request.method==="POST"){
+   const b=await body(),external=String(b.token||"");if(!external)return json({error:"YouthDeveloper 계정 토큰이 없어."},400);
+   let verified;try{const r=await fetch("https://web.youthdeveloper-github.workers.dev/api/chat/me",{headers:{Authorization:"Bearer "+external}});verified=await r.json();if(!r.ok||!verified.user?.nickname)throw Error("invalid")}catch{return json({error:"YouthDeveloper 계정을 확인하지 못했어."},401)}
+   const nickname=verified.user.nickname,key="yd:"+nickname.toLowerCase();let u=users[key];if(!u){u={id:key,nickname,provider:"youthdeveloper",role:"host",canHost:true,createdAt:Date.now()};users[key]=u}
+   const result=issue({id:u.id,nickname:u.nickname,provider:u.provider,role:u.role,canHost:u.canHost});await this.state.storage.put("users",users);await this.state.storage.put("sessions",sessions);return json(result);
+  }
+  const token=(request.headers.get("Authorization")||"").replace(/^Bearer\\s+/i,""),session=sessions[token],user=session&&session.expires>Date.now()?Object.values(users).find(u=>u.id===session.id):null;
+  if(url.pathname==="/auth/resolve"&&request.method==="GET")return user?json({user:{id:user.id,nickname:user.nickname,provider:user.provider,role:user.role,canHost:user.canHost}}):json({error:"Unauthorized"},401);
+  if(url.pathname==="/auth/me"&&request.method==="GET")return user?json({user:{id:user.id,nickname:user.nickname,provider:user.provider,role:user.role,canHost:user.canHost}}):json({error:"로그인이 필요해."},401);
+  if(url.pathname==="/auth/profile"&&request.method==="POST"){
+   if(!user)return json({error:"로그인이 필요해."},401);const b=await body(),role=b.role==="host"?"host":"player";user.role=role;user.canHost=role==="host"||user.provider==="youthdeveloper";await this.state.storage.put("users",users);return json({user:{id:user.id,nickname:user.nickname,provider:user.provider,role:user.role,canHost:user.canHost}});
+  }
+  if(url.pathname==="/auth/logout"&&request.method==="POST"){delete sessions[token];await this.state.storage.put("sessions",sessions);return json({ok:true})}
+  return json({error:"Not found"},404);
+ }
+ async catalogFetch(request,url){
+  let items=await this.state.storage.get("publicQuizzes")||[];
+  if(url.pathname==="/catalog/list")return json({quizzes:items.filter(x=>x.visibility==="public").sort((a,b)=>b.createdAt-a.createdAt)});
+  if(url.pathname==="/catalog/add"&&request.method==="POST"){const item=await request.json();items=[item,...items.filter(x=>x.id!==item.id)].slice(0,1000);await this.state.storage.put("publicQuizzes",items);return json({ok:true})}
+  if(url.pathname==="/catalog/get"){const item=items.find(x=>x.id===url.searchParams.get("id"));return item?json(item):json({error:"Not found"},404)}
+  return json({error:"Not found"},404);
+ }
+ async publicQuizFetch(request,url){
+  if(url.pathname==="/quiz/save"&&request.method==="POST"){const data=await request.json();await this.state.storage.put("publicQuiz",data);return json({ok:true})}
+  if(url.pathname==="/quiz/load"&&request.method==="GET"){const data=await this.state.storage.get("publicQuiz");return data?json(data):json({error:"Not found"},404)}
+  return json({error:"Not found"},404);
+ }
+\n async room(){return this.data||await this.state.storage.get("room")}
  async fetch(request){
   const url=new URL(request.url);
   if(url.pathname==="/library/save"&&request.method==="POST"){let data;try{data=await request.json()}catch{return new Response("Invalid JSON",{status:400})}await this.state.storage.put("sharedQuiz",data);return new Response("ok")}
