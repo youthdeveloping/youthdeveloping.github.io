@@ -79,7 +79,7 @@ export class QuizRoom {
    server.send(JSON.stringify({type:"question",index:room.index,total:room.quiz.questions.length,question:room.quiz.questions[room.index],timeLimit:room.quiz.timeLimit||20,players:this.players(),midJoin:true}));
    const remaining=Math.max(0,Math.ceil((room.deadline-Date.now())/1000));
    server.send(JSON.stringify({type:"timer",remaining,total:room.quiz.timeLimit||20}));
-  }else if(role==="player"&&room.started&&room.revealed){const q=room.quiz.questions[room.index],stat=room.stats?.[room.index]||{};server.send(JSON.stringify({type:"reveal",answerText:q.a[q.correct],correctIndex:q.correct,answerCounts:stat.answerCounts||[0,0,0,0],leaderboard:this.leaderboard(),last:room.index===room.quiz.questions.length-1,midJoin:true}));}
+  }else if(role==="player"&&room.started&&room.revealed){const q=room.quiz.questions[room.index],stat=room.stats?.[room.index]||{};server.send(JSON.stringify({type:"question",index:room.index,total:room.quiz.questions.length,question:q,timeLimit:room.quiz.timeLimit||20,players:this.players(),midJoin:true}));server.send(JSON.stringify({type:"reveal",answerText:q.a[q.correct],correctIndex:q.correct,answerCounts:stat.answerCounts||[0,0,0,0],leaderboard:this.leaderboard(),last:room.index===room.quiz.questions.length-1,midJoin:true}));}
   return new Response(null,{status:101,webSocket:client});
  }
  players(){return [...this.sessions.values()].filter(p=>p.role==="player").map(p=>({name:p.name,score:p.score,answered:p.answered}))}
