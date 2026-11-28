@@ -119,7 +119,7 @@ export class QuizRoom {
   if(url.pathname==="/auth/resolve"&&request.method==="GET")return user?json({user:{id:user.id,nickname:user.nickname,provider:user.provider,role:user.role,canHost:user.canHost}}):json({error:"Unauthorized"},401);
   if(url.pathname==="/auth/me"&&request.method==="GET")return user?json({user:{id:user.id,nickname:user.nickname,provider:user.provider,role:user.role,canHost:user.canHost}}):json({error:"로그인이 필요해."},401);
   if(url.pathname==="/auth/profile"&&request.method==="POST"){
-   if(!user)return json({error:"로그인이 필요해."},401);const b=await body(),role=b.role==="host"?"host":"player";user.role=role;user.canHost=role==="host"||user.provider==="youthdeveloper";await this.state.storage.put("users",users);return json({user:{id:user.id,nickname:user.nickname,provider:user.provider,role:user.role,canHost:user.canHost}});
+   if(!user)return json({error:"로그인이 필요해."},401);const b=await body(),role=b.role==="host"?"host":"player";user.role=role;user.canHost=role==="host";await this.state.storage.put("users",users);return json({user:{id:user.id,nickname:user.nickname,provider:user.provider,role:user.role,canHost:user.canHost}});
   }
   if(url.pathname==="/auth/logout"&&request.method==="POST"){delete sessions[token];await this.state.storage.put("sessions",sessions);return json({ok:true})}
   return json({error:"Not found"},404);
