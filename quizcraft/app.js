@@ -103,7 +103,7 @@ function drawQuizPreview(){
 $("#preview-quiz").onclick=()=>{try{const draft=readEditor();const modal=document.createElement("div");modal.id="quiz-preview-modal";modal.className="quiz-preview-overlay";modal.innerHTML='<section class="quiz-preview-dialog" role="dialog" aria-modal="true" aria-label="퀴즈 미리보기"><header><div><span class="eyebrow">QUIZ PREVIEW</span><h3>'+escapeHtml(draft.title)+'</h3></div><button class="preview-close" aria-label="닫기">✕</button></header><div class="preview-body"></div></section>';document.body.append(modal);previewState={quiz:draft,index:0,answered:false};modal.querySelector(".preview-close").onclick=closeQuizPreview;modal.onclick=e=>{if(e.target===modal)closeQuizPreview()};drawQuizPreview()}catch(e){toast(e.message)}};
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("#quiz-preview-modal"))closeQuizPreview()});
 
-$("#save-quiz").onclick=()=>{try{quiz=readEditor();localStorage.setItem("quizcraft.quiz",JSON.stringify(quiz));saveToLibrary(quiz);toast("퀴즈를 보관함에 저장했어!")}catch(e){toast(e.message)}};
+$("#save-quiz").onclick=()=>{try{quiz=readEditor();localStorage.setItem("quizcraft.quiz",JSON.stringify(quiz));saveToLibrary(quiz);$("#host-selected-quiz").querySelector("strong").textContent=quiz.title;$("#host-selected-quiz").querySelector("span").textContent=quiz.questions.length+" Q";toast("내 퀴즈 보관함에 저장했어!")}catch(e){toast(e.message)}};
 $("#share-quiz").onclick=()=>{try{quiz=readEditor();shareQuiz(quiz)}catch(e){toast(e.message)}};
 $("#copy-share-code").onclick=()=>{const code=$("#share-code").textContent;navigator.clipboard?.writeText(code).then(()=>toast("공유 코드를 복사했어!")).catch(()=>toast("공유 코드: "+code))};
 $("#import-quiz").onclick=async()=>{const code=$("#import-code").value.trim().toUpperCase();if(!/^[A-Z0-9]{8}$/.test(code))return toast("8자리 공유 코드를 입력해 줘.");try{const r=await fetch(API+"/api/library/"+code),d=await r.json();if(!r.ok)throw Error(d.error||"퀴즈를 찾을 수 없어.");quiz=d.quiz;localStorage.setItem("quizcraft.quiz",JSON.stringify(quiz));saveToLibrary(quiz);renderEditor();toast("공유 퀴즈를 가져왔어!")}catch(e){toast(e.message.includes("Failed to fetch")?"서버에 연결할 수 없어.":e.message)}};
@@ -238,7 +238,7 @@ async function loadPublicQuizzes(){
  }catch(e){list.innerHTML='<p class="library-empty">'+escapeHtml(e.message)+'</p>'}
 }
 async function publishCurrentQuiz(){
- try{if(!authToken)return openAuth("host");const draft=readEditor();const d=await qcRequest("/api/quizzes","POST",{quiz:draft,visibility:"public"});quiz=draft;saveToLibrary(quiz);toast("퀴즈를 공개 목록에 올렸어! 🌐");$("#share-code").textContent=d.quiz.id;$("#share-result").classList.remove("hidden");loadPublicQuizzes()}
+ try{if(!authToken)return openAuth("host");const draft=readEditor();const visibility=$("#quiz-visibility")?.value||"public";if(visibility!=="public")return toast("참가자에게 공개하려면 공개 설정을 선택해 줘.");const d=await qcRequest("/api/quizzes","POST",{quiz:draft,visibility});quiz=draft;saveToLibrary(quiz);toast("퀴즈를 공개 목록에 올렸어! 🌐");$("#share-code").textContent=d.quiz.id;$("#share-result").classList.remove("hidden");loadPublicQuizzes()}
  catch(e){toast(e.message)}
 }
 $("#publish-quiz").onclick=publishCurrentQuiz;
@@ -255,4 +255,4 @@ function drawSoloQuiz(){
  $("#solo-next").onclick=()=>{if(st.index===st.quiz.questions.length-1){$("#game-content").innerHTML='<div class="result-state"><div class="winner-cup">🏆</div><h2>퀴즈 완료!</h2><p>최종 점수 '+st.score+'점 / '+st.quiz.questions.length*100+'점</p><button class="btn primary full" id="solo-home">공개 퀴즈 더 보기</button></div>';$("#solo-home").onclick=()=>{soloState=null;$("#game-screen").classList.add("hidden");$("#host-roster").classList.remove("hidden");selectMode("player")};return}st.index++;st.answered=false;drawSoloQuiz()};
 }
 $("#account-provider").onchange=()=>{};
-refreshAccount();renderEditor();renderLibrary();
+refreshAccount();renderEditor();renderLibrary();const requestedMode=new URLSearchParams(location.search).get("mode");if(requestedMode==="host"||requestedMode==="player")selectMode(requestedMode);
