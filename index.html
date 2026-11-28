@@ -1086,7 +1086,7 @@
 </script>
 
 <script>
-if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navigator.serviceWorker.register("/yd-global-nav-sw.js", { scope: "/" }).catch(() => {}); }); }
+if ("serviceWorker" in navigator) { window.addEventListener("load", () => { navigator.serviceWorker.register("/yd-global-nav-sw.js?v=2", { scope: "/", updateViaCache: "none" }).catch(() => {}); }); }
 </script>
 </body>
 </html>
