@@ -530,6 +530,16 @@
       "status": "on",
       "group": "tool",
       "featured": false
+    },
+    {
+      "id": "speaker-cleaner",
+      "icon": "🔊",
+      "name": "스피커 물빼기",
+      "desc": "저주파 사운드로 스피커 진동 유도",
+      "url": "/services/speaker-cleaner.html",
+      "status": "on",
+      "group": "tool",
+      "featured": true
     }
   ]
 }
