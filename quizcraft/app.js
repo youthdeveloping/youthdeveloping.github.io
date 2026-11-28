@@ -215,7 +215,7 @@ async function selectMode(mode){
  await refreshAccount();
  if(mode==="host"&&!currentUser?.canHost){toast("현재 참가자 계정이야. 계정 설정에서 진행자 권한으로 바꿔 줘.");openAuth("login");$("#auth-form-wrap").classList.add("hidden");$("#account-profile").classList.remove("hidden");renderAccountProfile();return}
  $("#workspace").classList.remove("hidden");$("#selected-role-label").textContent=mode==="host"?"🎤 진행자 모드":"🎮 참가자 모드";
- $("#editor-tab").classList.toggle("hidden",mode!=="host");tab(mode==="host"?"host":"join");
+ $("#editor-tab").classList.toggle("hidden",mode!=="host");$("#host-tab").classList.toggle("hidden",mode!=="host");$("[data-role-tab=player]").forEach(x=>x.classList.toggle("hidden",mode!=="player"));tab(mode==="host"?"host":"join");
  if(mode==="host"){renderEditor();renderLibrary();const saved=getLibrary();if(saved.length){const item=saved[0];quiz={title:item.title,timeLimit:item.timeLimit||20,questions:item.questions};$("#host-selected-quiz").querySelector("strong").textContent=item.title;$("#host-selected-quiz").querySelector("span").textContent=item.questions.length+" Q"}}
  if(mode==="player")loadPublicQuizzes();
 }
