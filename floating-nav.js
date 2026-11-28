@@ -48,14 +48,15 @@
     if(!select)return;
     const saved=localStorage.getItem('yd-language')||'';
     const browser=(navigator.language||'').toLowerCase();
-    const detected=browser.startsWith('zh-tw')||browser.startsWith('zh-hk')?'zh-TW':browser.split('-')[0];
+    const detected=browser.startsWith('zh-tw')||browser.startsWith('zh-hk')?'zh-TW':browser.startsWith('zh')?'zh-CN':browser.split('-')[0];
     const supported=[...select.options].map(o=>o.value);
     const initial=saved||((detected!=='ko'&&supported.includes(detected))?detected:'ko');
     select.value=supported.includes(initial)?initial:'ko';
     function applyLanguage(code){
-      localStorage.setItem('yd-language',code);
+      if(code==='auto'){localStorage.setItem('yd-language','auto');code=(detected!=='ko'&&supported.includes(detected))?detected:'ko';}
+      else localStorage.setItem('yd-language',code);
       const combo=document.querySelector('.goog-te-combo');
-      if(code==='auto'||code==='ko'){
+      if(code==='ko'){
         document.cookie='googtrans=/ko/ko;path=/;max-age=31536000';
         document.cookie='googtrans=/ko/ko;domain='+location.hostname+';path=/;max-age=31536000';
         location.reload();
