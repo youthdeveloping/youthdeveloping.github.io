@@ -191,7 +191,8 @@ $("#leave-game").onclick=()=>{if(socket)socket.close();location.reload()};
 const AUTH_KEY="quizcraft.auth.token";
 let authToken=localStorage.getItem(AUTH_KEY)||"",currentUser=null,authMode="login",soloState=null;
 function openAuth(mode="login"){authMode=mode;if(mode==="register"&&$("#auth-provider").value==="youthdeveloper")$("#auth-provider").value="quizcraft";$("#auth-overlay").classList.remove("hidden");$("#auth-form-wrap").classList.remove("hidden");$("#account-profile").classList.add("hidden");$("#auth-title").textContent=mode==="register"?"회원가입":"로그인";$("#auth-submit").textContent=mode==="register"?"계정 만들기":"로그인";$("#auth-role-wrap").classList.toggle("hidden",mode!=="register");$("#auth-error").textContent="";$("#auth-password").value="";}
-function closeAuth(){$("#auth-overlay").classList.add("hidden")}
+function openAccountProfile(){if(!currentUser)return openAuth("login");$("#auth-overlay").classList.remove("hidden");$("#auth-title").textContent="계정 설정";$("#auth-form-wrap").classList.add("hidden");$("#account-profile").classList.remove("hidden");renderAccountProfile();}
+function closeAuth(){const overlay=$("#auth-overlay");if(overlay)overlay.classList.add("hidden")}
 function setAccount(user){currentUser=user;$("#account-open").textContent=user?user.nickname+" · 계정":"로그인 / 회원가입";if($("#account-open-inline"))$("#account-open-inline").textContent=user?user.nickname+" · 계정":"로그인";if(user&&$("#host-name"))$("#host-name").value=user.nickname}
 async function qcRequest(path,method="GET",body){const r=await fetch(API+path,{method,headers:{...(authToken?{Authorization:"Bearer "+authToken}:{}),...(body?{"Content-Type":"application/json"}:{})},body:body?JSON.stringify(body):undefined});const d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||"요청에 실패했어.");return d}
 async function refreshAccount(){if(!authToken){setAccount(null);return}try{const d=await qcRequest("/api/auth/me");setAccount(d.user)}catch{authToken="";localStorage.removeItem(AUTH_KEY);setAccount(null)}}
@@ -220,14 +221,14 @@ async function selectMode(mode){
  if(mode==="player")loadPublicQuizzes();
 }
 function renderAccountProfile(){if(!currentUser)return;$("#account-summary").textContent=currentUser.nickname+" · "+(currentUser.provider==="youthdeveloper"?"YouthDeveloper 계정":"QuizCraft 전용 계정");$("#profile-role").value=currentUser.canHost?"host":"player"}
-$("#account-open").onclick=async()=>{if(!authToken){openAuth("login");return}await refreshAccount();openAuth("login");$("#auth-form-wrap").classList.add("hidden");$("#account-profile").classList.remove("hidden");renderAccountProfile()};
+$("#account-open").onclick=async()=>{if(!authToken){openAuth("login");return}await refreshAccount();if(currentUser)openAccountProfile();else openAuth("login")};
 $("#account-open-inline").onclick=()=>$("#account-open").click();
-$("#auth-close").onclick=closeAuth;$("#auth-overlay").onclick=e=>{if(e.target===$("#auth-overlay"))closeAuth()};
+$("#auth-close").type="button";$("#auth-close").onclick=e=>{e.preventDefault();e.stopPropagation();closeAuth()};$("#auth-overlay").onclick=e=>{if(e.target===$("#auth-overlay"))closeAuth()};
 $("#auth-switch").onclick=()=>openAuth(authMode==="login"?"register":"login");
 $("#auth-submit").onclick=submitAuth;
 $("#auth-provider").onchange=()=>{const yd=$("#auth-provider").value==="youthdeveloper";if(yd&&authMode==="register"){authMode="login";$("#auth-title").textContent="로그인";$("#auth-submit").textContent="로그인";}$("#auth-role-wrap").classList.toggle("hidden",yd||authMode!=="register")};
-$("#profile-save").onclick=async()=>{try{const d=await qcRequest("/api/auth/profile","POST",{role:$("#profile-role").value});setAccount(d.user);toast("계정 설정을 저장했어!");closeAuth()}catch(e){toast(e.message)}};
-$("#auth-logout").onclick=async()=>{try{await qcRequest("/api/auth/logout","POST",{})}catch{}authToken="";localStorage.removeItem(AUTH_KEY);setAccount(null);closeAuth();toast("로그아웃했어.")};
+$("#profile-save").type="button";$("#profile-save").onclick=async e=>{e.preventDefault();e.stopPropagation();const button=$("#profile-save");button.disabled=true;try{const d=await qcRequest("/api/auth/profile","POST",{role:$("#profile-role").value});setAccount(d.user);toast("계정 설정을 저장했어!");closeAuth()}catch(e){toast(e.message)}finally{button.disabled=false}};
+$("#auth-logout").type="button";$("#auth-logout").onclick=async e=>{e.preventDefault();e.stopPropagation();if(!confirm("로그아웃할까?"))return;try{await qcRequest("/api/auth/logout","POST",{})}catch{}authToken="";currentUser=null;localStorage.removeItem(AUTH_KEY);setAccount(null);closeAuth();toast("로그아웃했어.")};
 $("#back-to-roles").onclick=()=>{$("#workspace").classList.add("hidden");window.scrollTo({top:0,behavior:"smooth"})};
 $("#refresh-public-quizzes").onclick=loadPublicQuizzes;
 async function loadPublicQuizzes(){
