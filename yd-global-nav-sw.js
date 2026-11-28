@@ -1,9 +1,11 @@
-const CACHE_NAME = 'yd-global-nav-v1';
+const CACHE_NAME = 'yd-global-nav-v2';
 self.addEventListener('install', event => { self.skipWaiting(); });
 self.addEventListener('activate', event => { event.waitUntil((async()=>{ const keys=await caches.keys(); await Promise.all(keys.filter(k=>k.startsWith('yd-global-nav-')&&k!==CACHE_NAME).map(k=>caches.delete(k))); await self.clients.claim(); })()); });
 self.addEventListener('fetch', event => {
   const req=event.request, url=new URL(req.url);
   if(req.method!=='GET'||req.mode!=='navigate'||url.origin!==self.location.origin) return;
+  // The floating portal navigation belongs ONLY to the main homepage.
+  if(url.pathname!=='/'&&url.pathname!=='/index.html') return;
   if(/\/(google|naver)[^/]*\.html$/i.test(url.pathname)) return;
   event.respondWith((async()=>{
     const res=await fetch(req);
