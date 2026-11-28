@@ -115,7 +115,7 @@ export class QuizRoom {
    const nickname=verified.user.nickname,key="yd:"+nickname.toLowerCase();let u=users[key];if(!u){u={id:key,nickname,provider:"youthdeveloper",role:"host",canHost:true,createdAt:Date.now()};users[key]=u}
    const result=issue({id:u.id,nickname:u.nickname,provider:u.provider,role:u.role,canHost:u.canHost});await this.state.storage.put("users",users);await this.state.storage.put("sessions",sessions);return json(result);
   }
-  const token=(request.headers.get("Authorization")||"").replace(/^Bearer\\s+/i,""),session=sessions[token],user=session&&session.expires>Date.now()?Object.values(users).find(u=>u.id===session.id):null;
+  const token=(request.headers.get("Authorization")||"").replace(/^Bearer\s+/i,""),session=sessions[token],user=session&&session.expires>Date.now()?Object.values(users).find(u=>u.id===session.id):null;
   if(url.pathname==="/auth/resolve"&&request.method==="GET")return user?json({user:{id:user.id,nickname:user.nickname,provider:user.provider,role:user.role,canHost:user.canHost}}):json({error:"Unauthorized"},401);
   if(url.pathname==="/auth/me"&&request.method==="GET")return user?json({user:{id:user.id,nickname:user.nickname,provider:user.provider,role:user.role,canHost:user.canHost}}):json({error:"로그인이 필요해."},401);
   if(url.pathname==="/auth/profile"&&request.method==="POST"){
