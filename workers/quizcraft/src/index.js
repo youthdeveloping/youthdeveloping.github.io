@@ -136,7 +136,8 @@ export class QuizRoom {
   if(url.pathname==="/quiz/load"&&request.method==="GET"){const data=await this.state.storage.get("publicQuiz");return data?json(data):json({error:"Not found"},404)}
   return json({error:"Not found"},404);
  }
-\n async room(){return this.data||await this.state.storage.get("room")}
+
+ async room(){return this.data||await this.state.storage.get("room")}
  async fetch(request){
   const url=new URL(request.url);
   if(url.pathname==="/library/save"&&request.method==="POST"){let data;try{data=await request.json()}catch{return new Response("Invalid JSON",{status:400})}await this.state.storage.put("sharedQuiz",data);return new Response("ok")}
