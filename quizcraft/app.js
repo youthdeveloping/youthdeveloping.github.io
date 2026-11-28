@@ -184,14 +184,14 @@ function renderFinal(m){launchConfetti();playTone(880,.18);setTimeout(()=>playTo
 
 $("#start-game").onclick=()=>send("start");$("#close-room").onclick=()=>{if(socket)socket.close();$("#host-room").classList.add("hidden");role=null;toast("방 연결을 종료했어.")};
 const invitedPin=new URLSearchParams(location.search).get("pin");if(invitedPin&&/^\d{6}$/.test(invitedPin))$("#join-pin").value=invitedPin;
-$("#join-room").onclick=()=>{roomCode=$("#join-pin").value.replace(/\D/g,"");myName=$("#player-name").value.trim()||currentUser?.nickname||"";if(roomCode.length!==6)return toast("6자리 PIN을 입력해 줘.");if(!myName)return toast("닉네임을 입력해 줘.");if(!authToken){pendingMode="player";return openAuth("login");}role="player";connect();showGame();$("#game-content").innerHTML='<div class="result-state"><h2>입장하는 중...</h2></div>'};
+$("#join-room").onclick=()=>{roomCode=$("#join-pin").value.replace(/\D/g,"");myName=$("#player-name").value.trim()||"";if(roomCode.length!==6)return toast("6자리 PIN을 입력해 줘.");if(myName.length<2)return toast("닉네임을 2글자 이상 입력해 줘.");role="player";connect();showGame();$("#game-content").innerHTML='<div class="result-state"><h2>입장하는 중...</h2></div>'};
 $("#leave-game").onclick=()=>{if(socket)socket.close();location.reload()};
 
 /* - by ChatGPT Ai: QuizCraft account lifecycle and role-first navigation */
 const AUTH_KEY="quizcraft.auth.token";
 let authToken=localStorage.getItem(AUTH_KEY)||"",currentUser=null,authMode="login",soloState=null;
 function openAuth(mode="login"){authMode=mode;if(mode==="register"&&$("#auth-provider").value==="youthdeveloper")$("#auth-provider").value="quizcraft";$("#auth-overlay").classList.remove("hidden");$("#auth-form-wrap").classList.remove("hidden");$("#account-profile").classList.add("hidden");$("#auth-title").textContent=mode==="register"?"회원가입":"로그인";$("#auth-submit").textContent=mode==="register"?"계정 만들기":"로그인";$("#auth-role-wrap").classList.toggle("hidden",mode!=="register");$("#auth-error").textContent="";$("#auth-password").value="";}
-function openAccountProfile(){if(!currentUser)return openAuth("login");$("#auth-overlay").classList.remove("hidden");$("#auth-title").textContent="계정 설정";$("#auth-form-wrap").classList.add("hidden");$("#account-profile").classList.remove("hidden");renderAccountProfile();}
+function openAccountProfile(){if(!currentUser)return openAuth("login");$("#auth-overlay").classList.remove("hidden");$("#auth-title").textContent="계정 설정";$("#auth-form-wrap").classList.add("hidden");$("#account-profile").classList.remove("hidden");$("#auth-role-wrap").classList.add("hidden");renderAccountProfile();}
 function closeAuth(){const overlay=$("#auth-overlay");if(overlay)overlay.classList.add("hidden")}
 function setAccount(user){currentUser=user;$("#account-open").textContent=user?user.nickname+" · 계정":"로그인 / 회원가입";if($("#account-open-inline"))$("#account-open-inline").textContent=user?user.nickname+" · 계정":"로그인";if(user&&$("#host-name"))$("#host-name").value=user.nickname}
 async function qcRequest(path,method="GET",body){const r=await fetch(API+path,{method,headers:{...(authToken?{Authorization:"Bearer "+authToken}:{}),...(body?{"Content-Type":"application/json"}:{})},body:body?JSON.stringify(body):undefined});const d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||"요청에 실패했어.");return d}
@@ -212,15 +212,15 @@ async function submitAuth(){
 }
 let pendingMode=null;
 async function selectMode(mode){
- if(!authToken){pendingMode=mode;openAuth("login");return}
- await refreshAccount();
- if(mode==="host"&&!currentUser?.canHost){toast("현재 참가자 계정이야. 계정 설정에서 진행자 권한으로 바꿔 줘.");openAuth("login");$("#auth-form-wrap").classList.add("hidden");$("#account-profile").classList.remove("hidden");renderAccountProfile();return}
+ if(mode==="host"&&!authToken){pendingMode=mode;openAuth("login");return}
+ if(mode==="host")await refreshAccount();
+ if(mode==="host"&&!currentUser?.canHost){toast("현재 참가자 계정이야. 계정 설정에서 진행자 권한으로 바꿔 줘.");openAccountProfile();return}
  $("#workspace").classList.remove("hidden");$("#selected-role-label").textContent=mode==="host"?"🎤 진행자 모드":"🎮 참가자 모드";
  $("#editor-tab").classList.toggle("hidden",mode!=="host");$("#host-tab").classList.toggle("hidden",mode!=="host");$("[data-role-tab=player]").forEach(x=>x.classList.toggle("hidden",mode!=="player"));tab(mode==="host"?"host":"join");
  if(mode==="host"){renderEditor();renderLibrary();const saved=getLibrary();if(saved.length){const item=saved[0];quiz={title:item.title,timeLimit:item.timeLimit||20,questions:item.questions};$("#host-selected-quiz").querySelector("strong").textContent=item.title;$("#host-selected-quiz").querySelector("span").textContent=item.questions.length+" Q"}}
  if(mode==="player")loadPublicQuizzes();
 }
-function renderAccountProfile(){if(!currentUser)return;$("#account-summary").textContent=currentUser.nickname+" · "+(currentUser.provider==="youthdeveloper"?"YouthDeveloper 계정":"QuizCraft 전용 계정");$("#profile-role").value=currentUser.canHost?"host":"player"}
+function renderAccountProfile(){if(!currentUser)return;$("#auth-title").textContent="계정 설정";$("#account-summary").textContent=currentUser.nickname+" · "+(currentUser.provider==="youthdeveloper"?"YouthDeveloper 계정":"QuizCraft 전용 계정");$("#profile-role").value=currentUser.canHost?"host":"player";$("#profile-save").textContent="변경사항 저장";}
 $("#account-open").onclick=async()=>{if(!authToken){openAuth("login");return}await refreshAccount();if(currentUser)openAccountProfile();else openAuth("login")};
 $("#account-open-inline").onclick=()=>$("#account-open").click();
 $("#auth-close").type="button";$("#auth-close").onclick=e=>{e.preventDefault();e.stopPropagation();closeAuth()};$("#auth-overlay").onclick=e=>{if(e.target===$("#auth-overlay"))closeAuth()};
