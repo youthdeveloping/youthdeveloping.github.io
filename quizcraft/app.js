@@ -190,7 +190,7 @@ $("#leave-game").onclick=()=>{if(socket)socket.close();location.reload()};
 /* - by ChatGPT Ai: QuizCraft account lifecycle and role-first navigation */
 const AUTH_KEY="quizcraft.auth.token";
 let authToken=localStorage.getItem(AUTH_KEY)||"",currentUser=null,authMode="login",soloState=null;
-function openAuth(mode="login"){authMode=mode;$("#auth-overlay").classList.remove("hidden");$("#auth-form-wrap").classList.remove("hidden");$("#account-profile").classList.add("hidden");$("#auth-title").textContent=mode==="register"?"회원가입":"로그인";$("#auth-submit").textContent=mode==="register"?"계정 만들기":"로그인";$("#auth-role-wrap").classList.toggle("hidden",mode!=="register");$("#auth-error").textContent="";$("#auth-password").value="";}
+function openAuth(mode="login"){authMode=mode;if(mode==="register"&&$("#auth-provider").value==="youthdeveloper")$("#auth-provider").value="quizcraft";$("#auth-overlay").classList.remove("hidden");$("#auth-form-wrap").classList.remove("hidden");$("#account-profile").classList.add("hidden");$("#auth-title").textContent=mode==="register"?"회원가입":"로그인";$("#auth-submit").textContent=mode==="register"?"계정 만들기":"로그인";$("#auth-role-wrap").classList.toggle("hidden",mode!=="register");$("#auth-error").textContent="";$("#auth-password").value="";}
 function closeAuth(){$("#auth-overlay").classList.add("hidden")}
 function setAccount(user){currentUser=user;$("#account-open").textContent=user?user.nickname+" · 계정":"로그인 / 회원가입";if($("#account-open-inline"))$("#account-open-inline").textContent=user?user.nickname+" · 계정":"로그인";if(user&&$("#host-name"))$("#host-name").value=user.nickname}
 async function qcRequest(path,method="GET",body){const r=await fetch(API+path,{method,headers:{...(authToken?{Authorization:"Bearer "+authToken}:{}),...(body?{"Content-Type":"application/json"}:{})},body:body?JSON.stringify(body):undefined});const d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||"요청에 실패했어.");return d}
@@ -241,7 +241,7 @@ async function publishCurrentQuiz(){
  try{if(!authToken)return openAuth("host");const draft=readEditor();const visibility=$("#quiz-visibility")?.value||"public";if(visibility!=="public")return toast("참가자에게 공개하려면 공개 설정을 선택해 줘.");const d=await qcRequest("/api/quizzes","POST",{quiz:draft,visibility});quiz=draft;saveToLibrary(quiz);toast("퀴즈를 공개 목록에 올렸어! 🌐");$("#share-code").textContent=d.quiz.id;$("#share-result").classList.remove("hidden");loadPublicQuizzes()}
  catch(e){toast(e.message)}
 }
-$("#publish-quiz").onclick=publishCurrentQuiz;
+$("#publish-quiz").onclick=publishCurrentQuiz;$("#new-quiz").onclick=()=>{quiz={title:"",timeLimit:20,questions:[{q:"",a:["","","",""],correct:0,aMedia:[]}]};renderEditor();toast("새 퀴즈를 만들 준비가 됐어!")};
 function startSoloQuiz(data,meta){
  if(!data?.questions?.length)return toast("퀴즈에 문제가 없어.");
  soloState={quiz:data,index:0,score:0,answered:false,meta};
@@ -255,4 +255,4 @@ function drawSoloQuiz(){
  $("#solo-next").onclick=()=>{if(st.index===st.quiz.questions.length-1){$("#game-content").innerHTML='<div class="result-state"><div class="winner-cup">🏆</div><h2>퀴즈 완료!</h2><p>최종 점수 '+st.score+'점 / '+st.quiz.questions.length*100+'점</p><button class="btn primary full" id="solo-home">공개 퀴즈 더 보기</button></div>';$("#solo-home").onclick=()=>{soloState=null;$("#game-screen").classList.add("hidden");$("#host-roster").classList.remove("hidden");selectMode("player")};return}st.index++;st.answered=false;drawSoloQuiz()};
 }
 $("#account-provider").onchange=()=>{};
-refreshAccount();renderEditor();renderLibrary();try{if(quiz?.title==="기본 상식 퀴즈"&&quiz.questions?.length===5){quiz={title:"",timeLimit:20,questions:[{q:"",a:["","","",""],correct:0,aMedia:[]}]};localStorage.removeItem("quizcraft.quiz")}const oldLibrary=getLibrary().filter(x=>!(x.title==="기본 상식 퀴즈"&&x.questions?.length===5));if(oldLibrary.length!==getLibrary().length)localStorage.setItem("quizcraft.library",JSON.stringify(oldLibrary));}catch{}const requestedMode=new URLSearchParams(location.search).get("mode");if(requestedMode==="host"||requestedMode==="player")selectMode(requestedMode);
+refreshAccount();try{if(quiz?.title==="기본 상식 퀴즈"&&quiz.questions?.length===5){quiz={title:"",timeLimit:20,questions:[{q:"",a:["","","",""],correct:0,aMedia:[]}]};localStorage.removeItem("quizcraft.quiz")}const oldLibrary=getLibrary().filter(x=>!(x.title==="기본 상식 퀴즈"&&x.questions?.length===5));if(oldLibrary.length!==getLibrary().length)localStorage.setItem("quizcraft.library",JSON.stringify(oldLibrary));}catch{}renderEditor();renderLibrary();const requestedMode=new URLSearchParams(location.search).get("mode");if(requestedMode==="host"||requestedMode==="player")selectMode(requestedMode);
