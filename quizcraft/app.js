@@ -225,7 +225,7 @@ $("#account-open-inline").onclick=()=>$("#account-open").click();
 $("#auth-close").onclick=closeAuth;$("#auth-overlay").onclick=e=>{if(e.target===$("#auth-overlay"))closeAuth()};
 $("#auth-switch").onclick=()=>openAuth(authMode==="login"?"register":"login");
 $("#auth-submit").onclick=submitAuth;
-$("#auth-provider").onchange=()=>{const yd=$("#auth-provider").value==="youthdeveloper";$("#auth-role-wrap").classList.toggle("hidden",yd||authMode!=="register")};
+$("#auth-provider").onchange=()=>{const yd=$("#auth-provider").value==="youthdeveloper";if(yd&&authMode==="register"){authMode="login";$("#auth-title").textContent="로그인";$("#auth-submit").textContent="로그인";}$("#auth-role-wrap").classList.toggle("hidden",yd||authMode!=="register")};
 $("#profile-save").onclick=async()=>{try{const d=await qcRequest("/api/auth/profile","POST",{role:$("#profile-role").value});setAccount(d.user);toast("계정 설정을 저장했어!");closeAuth()}catch(e){toast(e.message)}};
 $("#auth-logout").onclick=async()=>{try{await qcRequest("/api/auth/logout","POST",{})}catch{}authToken="";localStorage.removeItem(AUTH_KEY);setAccount(null);closeAuth();toast("로그아웃했어.")};
 $("#back-to-roles").onclick=()=>{$("#workspace").classList.add("hidden");window.scrollTo({top:0,behavior:"smooth"})};
