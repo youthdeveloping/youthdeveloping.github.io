@@ -53,6 +53,7 @@ export default {
   }
 
   if(url.pathname==="/api/rooms"&&request.method==="POST"){
+   const auth=await resolveUser(env,request.headers.get("Authorization")?.replace(/^Bearer\\s+/i,""));if(!auth?.user)return json({error:"로그인이 필요해."},401);if(!auth.user.canHost)return json({error:"진행자 권한이 필요해."},403);
    let body;try{body=await request.json()}catch{return json({error:"Invalid JSON"},400)}
    const quiz=body.quiz;
    if(!quiz||!Array.isArray(quiz.questions)||quiz.questions.length<1||quiz.questions.length>30)return json({error:"퀴즈는 1~30문제가 필요해."},400);
